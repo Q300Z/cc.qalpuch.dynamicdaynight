@@ -237,3 +237,104 @@ function getImageForPeriod(period, cfg, resolveLocalUrl) {
 
     return resolveLocalUrl(defaultFile);
 }
+
+/**
+ * Returns the start and end minutes for a given period in the schedule.
+ *
+ * @param {string} period - 'morning', 'noon', 'evening', 'night'
+ * @param {Object} schedule - { morning: number, noon: number, evening: number, night: number }
+ * @returns {{start: number, end: number}}
+ */
+function getPeriodRange(period, schedule) {
+    if (!schedule) {
+        return { start: 0, end: 0 };
+    }
+    switch (period) {
+        case "morning":
+            return { start: schedule.morning, end: schedule.noon };
+        case "noon":
+            return { start: schedule.noon, end: schedule.evening };
+        case "evening":
+            return { start: schedule.evening, end: schedule.night };
+        case "night":
+        default:
+            return { start: schedule.night, end: schedule.morning };
+    }
+}
+
+/**
+ * Returns an appropriate icon name for a given period.
+ *
+ * @param {string} period - 'morning', 'noon', 'evening', 'night'
+ * @returns {string}
+ */
+function getPeriodIcon(period) {
+    switch (period) {
+        case "morning":
+            return "weather-sunset-up";
+        case "noon":
+            return "weather-clear";
+        case "evening":
+            return "weather-sunset-down";
+        case "night":
+            return "weather-clear-night";
+        default:
+            return "preferences-system-time";
+    }
+}
+
+
+/**
+ * Calculates the exact number of milliseconds remaining until the next period change.
+ *
+ * @param {Date} [date] - Reference date (defaults to current date if omitted)
+ * @param {Object} [cfg] - Configuration object
+ * @returns {number} Milliseconds remaining until the next transition
+ */
+function getMsUntilNextPeriod(date, cfg) {
+    const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
+    const schedule = getEffectiveSchedule(d, cfg);
+
+    const currentMs = ((d.getHours() * 60 + d.getMinutes()) * 60 + d.getSeconds()) * 1000 + d.getMilliseconds();
+
+    // Distinct transition points in milliseconds from midnight
+    const points = [
+        schedule.morning * 60000,
+        schedule.noon * 60000,
+        schedule.evening * 60000,
+        schedule.night * 60000
+    ].sort((a, b) => a - b);
+
+    // Find the next transition point strictly after currentMs
+    for (let i = 0; i < points.length; ++i) {
+        if (points[i] > currentMs) {
+            return points[i] - currentMs;
+        }
+    }
+
+    // If current time is past all transitions today, next transition is tomorrow's first point
+    const msUntilMidnight = 86400000 - currentMs;
+    return msUntilMidnight + points[0];
+}
+
+/**
+ * Returns the optimal accent color for a given daylight period.
+ *
+ * @param {string} period - 'morning', 'noon', 'evening', 'night'
+ * @returns {string} Hex color code
+ */
+function getAccentColorForPeriod(period) {
+    switch (period) {
+        case "morning":
+            return "#F39C12"; // Warm dawn / aurora amber
+        case "noon":
+            return "#1D99F3"; // Vibrant KDE Breeze sky blue
+        case "evening":
+            return "#E67E22"; // Golden sunset amber
+        case "night":
+            return "#6C5CE7"; // Deep twilight indigo
+        default:
+            return "#1D99F3";
+    }
+}
+

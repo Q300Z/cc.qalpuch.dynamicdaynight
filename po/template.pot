@@ -179,6 +179,39 @@ msgstr ""
 msgid "Restore Default Configuration"
 msgstr ""
 
-#: contents/ui/main.qml:36
-msgid "Update Dynamic Wallpaper"
+#: contents/ui/main.qml:46
+msgid "Morning"
 msgstr ""
+
+#: contents/ui/main.qml:48
+msgid "Noon"
+msgstr ""
+
+#: contents/ui/main.qml:50
+msgid "Evening"
+msgstr ""
+
+#: contents/ui/main.qml:52
+msgid "Night"
+msgstr ""
+
+#: contents/ui/main.qml:65
+msgid "Previewing: %1 (Forced)"
+msgstr ""
+
+#: contents/ui/main.qml:71
+msgid "Current cycle: %1 (%2 - %3)"
+msgstr ""
+
+#: contents/ui/main.qml:86
+msgid "Preview: %1"
+msgstr ""
+
+#: contents/ui/config.qml:150
+msgid "Custom"
+msgstr ""
+
+#: contents/ui/config.qml:370
+msgid "Wallpapers:"
+msgstr ""
+

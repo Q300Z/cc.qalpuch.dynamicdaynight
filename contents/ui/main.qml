@@ -14,8 +14,20 @@ WallpaperItem {
     // Fill the screen area
     anchors.fill: parent
 
-    // Currently active period: "morning" | "noon" | "evening" | "night"
-    readonly property string currentPeriod: TimeUtils.getCurrentPeriod(currentTime, root.configuration)
+    // Forced period override for preview mode ("" = automatic, "morning" | "noon" | "evening" | "night")
+    property string forcedPeriod: ""
+
+    // Automatically calculated period from system time and configuration
+    readonly property string autoPeriod: TimeUtils.getCurrentPeriod(currentTime, root.configuration)
+
+    // Currently active period: forced period if specified, otherwise the automatically calculated one
+    readonly property string currentPeriod: forcedPeriod !== "" ? forcedPeriod : autoPeriod
+
+    // Effective schedule for period boundaries
+    readonly property var currentSchedule: TimeUtils.getEffectiveSchedule(currentTime, root.configuration)
+
+    // Dynamic accent color matching current daylight period
+    readonly property color accentColor: TimeUtils.getAccentColorForPeriod(currentPeriod)
 
     // Resolved source URL for the active period
     readonly property url targetImageSource: TimeUtils.getImageForPeriod(
@@ -30,13 +42,107 @@ WallpaperItem {
     // Flag indicating whether the first wallpaper has loaded
     property bool initialLoadDone: false
 
-    // Contextual action to manually refresh or inspect current period
+    // Notify Plasma on daylight period change
+    onCurrentPeriodChanged: {
+        root.accentColorChanged();
+    }
+
+    /**
+     * Localized display name for a period identifier.
+     * @param {string} period - 'morning', 'noon', 'evening', 'night'
+     * @returns {string}
+     */
+    function getPeriodDisplayName(period) {
+        switch (period) {
+            case "morning":
+                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning");
+            case "noon":
+                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon");
+            case "evening":
+                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening");
+            case "night":
+                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night");
+            default:
+                return "";
+        }
+    }
+
+    // Contextual actions providing a complete desktop right-click menu
     contextualActions: [
+        PlasmaCore.Action {
+            text: {
+                if (root.forcedPeriod !== "") {
+                    return i18nd(
+                        "plasma_wallpaper_cc.qalpuch.dynamicdaynight",
+                        "Previewing: %1 (Forced)",
+                        root.getPeriodDisplayName(root.forcedPeriod)
+                    );
+                }
+                const range = TimeUtils.getPeriodRange(root.autoPeriod, root.currentSchedule);
+                return i18nd(
+                    "plasma_wallpaper_cc.qalpuch.dynamicdaynight",
+                    "Current cycle: %1 (%2 - %3)",
+                    root.getPeriodDisplayName(root.autoPeriod),
+                    TimeUtils.formatMinutes(range.start),
+                    TimeUtils.formatMinutes(range.end)
+                );
+            }
+            icon.name: root.forcedPeriod !== "" ? "document-preview" : TimeUtils.getPeriodIcon(root.autoPeriod)
+            onTriggered: {
+                root.scheduleNextTick();
+                root.updateWallpaper(true);
+            }
+        },
+        PlasmaCore.Action {
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Preview: %1", root.getPeriodDisplayName("morning"))
+            icon.name: "weather-sunset-up"
+            checkable: true
+            checked: root.forcedPeriod === "morning"
+            onTriggered: {
+                root.forcedPeriod = "morning";
+            }
+        },
+        PlasmaCore.Action {
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Preview: %1", root.getPeriodDisplayName("noon"))
+            icon.name: "weather-clear"
+            checkable: true
+            checked: root.forcedPeriod === "noon"
+            onTriggered: {
+                root.forcedPeriod = "noon";
+            }
+        },
+        PlasmaCore.Action {
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Preview: %1", root.getPeriodDisplayName("evening"))
+            icon.name: "weather-sunset-down"
+            checkable: true
+            checked: root.forcedPeriod === "evening"
+            onTriggered: {
+                root.forcedPeriod = "evening";
+            }
+        },
+        PlasmaCore.Action {
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Preview: %1", root.getPeriodDisplayName("night"))
+            icon.name: "weather-clear-night"
+            checkable: true
+            checked: root.forcedPeriod === "night"
+            onTriggered: {
+                root.forcedPeriod = "night";
+            }
+        },
+        PlasmaCore.Action {
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Resume automatic cycle")
+            icon.name: "media-playback-start"
+            enabled: root.forcedPeriod !== ""
+            onTriggered: {
+                root.forcedPeriod = "";
+                root.scheduleNextTick();
+            }
+        },
         PlasmaCore.Action {
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Update Dynamic Wallpaper")
             icon.name: "view-refresh"
             onTriggered: {
-                root.currentTime = new Date();
+                root.scheduleNextTick();
                 root.updateWallpaper(true);
             }
         }
@@ -132,26 +238,47 @@ WallpaperItem {
         }
     }
 
+    /**
+     * Reschedules dynamic timer tick according to exact remaining milliseconds
+     * and refreshes current timestamp.
+     */
+    function scheduleNextTick() {
+        root.currentTime = new Date();
+        const nextDelay = Math.max(5000, TimeUtils.getMsUntilNextPeriod(root.currentTime, root.configuration));
+        timeTicker.interval = nextDelay;
+        timeTicker.restart();
+    }
+
     // React to target image source changes
     onTargetImageSourceChanged: {
         root.updateWallpaper(false);
     }
 
-    // Periodic timer to check for time transitions (every 30 seconds)
+    // Dynamic timer scheduled to trigger at the next period transition
     Timer {
         id: timeTicker
-        interval: 30000
+        interval: Math.max(5000, TimeUtils.getMsUntilNextPeriod(root.currentTime, root.configuration))
         running: true
-        repeat: true
-        triggeredOnStart: true
+        repeat: false
         onTriggered: {
-            root.currentTime = new Date();
+            root.scheduleNextTick();
+        }
+    }
+
+    // Refresh on system wake / application activation
+    Connections {
+        target: Qt.application
+        function onStateChanged() {
+            if (Qt.application.state === Qt.ApplicationActive) {
+                root.scheduleNextTick();
+            }
         }
     }
 
     Component.onCompleted: {
-        root.currentTime = new Date();
+        root.scheduleNextTick();
         root.updateWallpaper(true);
         root.loading = false;
     }
 }
+

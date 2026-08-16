@@ -335,15 +335,15 @@ function getAccentColorForPeriod(period, cfg) {
 
     switch (period) {
         case "morning":
-            return "#F39C12"; // Warm dawn / aurora amber
+            return "#1E3539"; // Extracted morning palette
         case "noon":
-            return "#1D99F3"; // Vibrant KDE Breeze sky blue
+            return "#446C84"; // Extracted noon palette
         case "evening":
-            return "#E67E22"; // Golden sunset amber
+            return "#322F21"; // Extracted evening palette
         case "night":
-            return "#6C5CE7"; // Deep twilight indigo
+            return "#48220B"; // Extracted night palette
         default:
-            return "#1D99F3";
+            return "#446C84";
     }
 }
 

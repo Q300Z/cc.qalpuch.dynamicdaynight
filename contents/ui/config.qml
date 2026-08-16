@@ -292,6 +292,13 @@ Layouts.ColumnLayout {
             onClicked: colorDialog.open()
         }
 
+        Component.onCompleted: {
+            // If color is not set, extract dynamically from active image
+            if (!fileRow.selectedColor || fileRow.selectedColor === "" || String(fileRow.selectedColor) === "#00000000") {
+                colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
+            }
+        }
+
         // Reset to default button
         PlasmaComponents.Button {
             icon.name: "edit-undo"
@@ -301,6 +308,7 @@ Layouts.ColumnLayout {
                 fileRow.pathText = "";
                 pathField.text = "";
                 fileRow.selectedColor = fileRow.defaultColor;
+                colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
                 root.configurationChanged();
             }
         }
@@ -530,7 +538,7 @@ Layouts.ColumnLayout {
             id: morningRow
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning wallpaper:")
             defaultFileName: "matin.png"
-            defaultColor: "#f39c12"
+            defaultColor: "#1e3539"
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Morning Wallpaper")
         }
 
@@ -538,7 +546,7 @@ Layouts.ColumnLayout {
             id: noonRow
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon wallpaper:")
             defaultFileName: "midi.png"
-            defaultColor: "#1d99f3"
+            defaultColor: "#446c84"
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Noon Wallpaper")
         }
 
@@ -546,7 +554,7 @@ Layouts.ColumnLayout {
             id: eveningRow
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening wallpaper:")
             defaultFileName: "soir.png"
-            defaultColor: "#e67e22"
+            defaultColor: "#322f21"
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Evening Wallpaper")
         }
 
@@ -554,7 +562,7 @@ Layouts.ColumnLayout {
             id: nightRow
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night wallpaper:")
             defaultFileName: "nuit.png"
-            defaultColor: "#6c5ce7"
+            defaultColor: "#48220b"
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Night Wallpaper")
         }
 
@@ -572,6 +580,7 @@ Layouts.ColumnLayout {
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Synchronize KDE Plasma accent color with active wallpaper period")
             checked: false
             onToggled: root.configurationChanged()
+            onCheckedChanged: root.configurationChanged()
         }
 
         PlasmaComponents.ComboBox {

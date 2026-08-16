@@ -50,6 +50,7 @@ Layouts.ColumnLayout {
     property alias cfg_NightImage: nightRow.pathText
 
     // Custom accent color bindings
+    property alias cfg_DynamicAccentColor: dynamicAccentColorCheckBox.checked
     property alias cfg_MorningColor: morningRow.selectedColor
     property alias cfg_NoonColor: noonRow.selectedColor
     property alias cfg_EveningColor: eveningRow.selectedColor
@@ -95,6 +96,8 @@ Layouts.ColumnLayout {
         noonRow.pathText = "";
         eveningRow.pathText = "";
         nightRow.pathText = "";
+
+        dynamicAccentColorCheckBox.checked = false;
 
         morningRow.selectedColor = morningRow.defaultColor;
         noonRow.selectedColor = noonRow.defaultColor;
@@ -180,12 +183,6 @@ Layouts.ColumnLayout {
                 cache: true
                 smooth: true
                 mipmap: true
-
-                onStatusChanged: {
-                    if (status === Image.Ready && fileRow.isCustom) {
-                        colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
-                    }
-                }
             }
 
             // Zoom icon overlay on hover
@@ -566,6 +563,14 @@ Layouts.ColumnLayout {
         Kirigami.Separator {
             Kirigami.FormData.isSection: true
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Appearance")
+        }
+
+        PlasmaComponents.CheckBox {
+            id: dynamicAccentColorCheckBox
+            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Accent color:")
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Synchronize KDE Plasma accent color with active wallpaper period")
+            checked: false
+            onToggled: root.configurationChanged()
         }
 
         PlasmaComponents.ComboBox {

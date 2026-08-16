@@ -77,13 +77,19 @@
     <entry name="NoonImage" type="String">
       <label>Custom noon image path</label>
       <default></default>
-    </entry>
     <entry name="EveningImage" type="String">
       <label>Custom evening image path</label>
       <default></default>
+    </entry>
     <entry name="NightImage" type="String">
       <label>Custom night image path</label>
       <default></default>
+    </entry>
+
+    <!-- Enable dynamic accent color synchronization (disabled by default to preserve KDE system theme) -->
+    <entry name="DynamicAccentColor" type="Bool">
+      <label>Apply dynamic accent color from current wallpaper to KDE Plasma</label>
+      <default>false</default>
     </entry>
 
     <!-- Custom accent colors per period (defaults matched to bundled wallpapers) -->

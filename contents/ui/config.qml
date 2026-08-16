@@ -77,6 +77,54 @@ Layouts.ColumnLayout {
         imagePreviewPopup.open();
     }
 
+    onWallpaperConfigurationChanged: {
+        if (wallpaperConfiguration) {
+            if (wallpaperConfiguration["DynamicAccentColor"] !== undefined) {
+                root.cfg_DynamicAccentColor = Boolean(wallpaperConfiguration["DynamicAccentColor"]);
+            }
+            if (wallpaperConfiguration["MorningColor"]) {
+                root.cfg_MorningColor = wallpaperConfiguration["MorningColor"];
+            }
+            if (wallpaperConfiguration["NoonColor"]) {
+                root.cfg_NoonColor = wallpaperConfiguration["NoonColor"];
+            }
+            if (wallpaperConfiguration["EveningColor"]) {
+                root.cfg_EveningColor = wallpaperConfiguration["EveningColor"];
+            }
+            if (wallpaperConfiguration["NightColor"]) {
+                root.cfg_NightColor = wallpaperConfiguration["NightColor"];
+            }
+        }
+    }
+
+    /**
+     * Called by KDE Plasma kcm_wallpaper before committing configuration changes to disk.
+     */
+    function saveConfig() {
+        if (wallpaperConfiguration) {
+            wallpaperConfiguration["AutoSchedule"] = root.cfg_AutoSchedule;
+            wallpaperConfiguration["MorningHour"] = root.cfg_MorningHour;
+            wallpaperConfiguration["MorningMinute"] = root.cfg_MorningMinute;
+            wallpaperConfiguration["NoonHour"] = root.cfg_NoonHour;
+            wallpaperConfiguration["NoonMinute"] = root.cfg_NoonMinute;
+            wallpaperConfiguration["EveningHour"] = root.cfg_EveningHour;
+            wallpaperConfiguration["EveningMinute"] = root.cfg_EveningMinute;
+            wallpaperConfiguration["NightHour"] = root.cfg_NightHour;
+            wallpaperConfiguration["NightMinute"] = root.cfg_NightMinute;
+            wallpaperConfiguration["MorningImage"] = root.cfg_MorningImage;
+            wallpaperConfiguration["NoonImage"] = root.cfg_NoonImage;
+            wallpaperConfiguration["EveningImage"] = root.cfg_EveningImage;
+            wallpaperConfiguration["NightImage"] = root.cfg_NightImage;
+            wallpaperConfiguration["DynamicAccentColor"] = root.cfg_DynamicAccentColor;
+            wallpaperConfiguration["MorningColor"] = String(root.cfg_MorningColor);
+            wallpaperConfiguration["NoonColor"] = String(root.cfg_NoonColor);
+            wallpaperConfiguration["EveningColor"] = String(root.cfg_EveningColor);
+            wallpaperConfiguration["NightColor"] = String(root.cfg_NightColor);
+            wallpaperConfiguration["FillMode"] = root.cfg_FillMode;
+            wallpaperConfiguration["TransitionDuration"] = root.cfg_TransitionDuration;
+        }
+    }
+
     /**
      * Resets all parameters to their initial factory default values.
      */

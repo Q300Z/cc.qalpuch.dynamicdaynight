@@ -9,8 +9,8 @@ Plugin de fond d'écran dynamique pour **KDE Plasma 6** (`cc.qalpuch.dynamicdayn
 - [Présentation](#présentation)
 - [Fonctionnalités](#fonctionnalités)
 - [Installation](#installation)
-  - [Installation automatique (Recommandé)](#installation-automatique-recommandé)
-  - [Installation manuelle](#installation-manuelle)
+  - [1. Installation automatique (Recommandé)](#1-installation-automatique-recommandé)
+  - [2. Installation manuelle](#2-installation-manuelle)
 - [Utilisation](#utilisation)
 - [Développement & Architecture](#développement--architecture)
   - [Structure du projet](#structure-du-projet)
@@ -23,7 +23,7 @@ Plugin de fond d'écran dynamique pour **KDE Plasma 6** (`cc.qalpuch.dynamicdayn
 ## Présentation
 
 Ce plugin est conçu nativement pour **KDE Plasma 6** (Qt 6 / KF6) selon les standards et conventions de la communauté KDE :
-- **Clé en main (*Out-of-the-box*) :** Embarque 4 illustrations haute qualité pour chaque moment de la journée.
+- **Clé en main (*Out-of-the-box*) :** Embarque 4 illustrations haute qualité pour chaque moment de la journée dans `contents/images/`.
 - **Calculs solaires automatiques :** Calcule les heures réelles du lever, du zénith, du coucher de soleil et du crépuscule en fonction du fuseau horaire de votre système (algorithme éphémérides solaires NOAA 100% hors-ligne).
 - **Transitions douces :** Animation de fondu réglable (*crossfade*) pour éviter tout changement brusque.
 - **Respect des principes KISS & DRY :** Code modulaire, séparation stricte des responsabilités (logique métier dans `TimeUtils.js`, schéma KConfigXT dans `main.xml`, interface déclarative dans `config.qml`).
@@ -44,40 +44,46 @@ Ce plugin est conçu nativement pour **KDE Plasma 6** (Qt 6 / KF6) selon les sta
 
 ## Installation
 
-### Installation automatique (Recommandé)
+### 1. Installation automatique (Recommandé)
 
-Un script shell d'installation automatisé est fourni à la racine du projet. Il compile les traductions, configure les répertoires XDG et lie le plugin à votre environnement Plasma :
+Cloner le dépôt, se placer à la racine du dossier cloné et exécuter le script d'installation :
 
 ```bash
-# 1. Rendre le script exécutable (si ce n'est pas déjà fait)
-chmod +x install.sh
+# 1. Cloner le dépôt et se placer dans le dossier
+git clone <URL_DU_DEPOT>
+cd wallpaper
 
-# 2. Lancer l'installation
+# 2. Lancer le script d'installation
+chmod +x install.sh
 ./install.sh
 ```
 
 ---
 
-### Installation manuelle
+### 2. Installation manuelle
 
-Si vous préférez installer le plugin manuellement étape par étape :
+Si vous préférez installer le plugin manuellement étape par étape depuis la racine du dossier cloné :
 
 ```bash
-# 1. Créer les répertoires cibles dans l'espace utilisateur
+# 1. Cloner le dépôt et se placer dans le dossier
+git clone <URL_DU_DEPOT>
+cd wallpaper
+
+# 2. Créer les répertoires cibles dans l'espace utilisateur
 mkdir -p ~/.local/share/plasma/wallpapers
 mkdir -p ~/.local/share/locale/fr/LC_MESSAGES
 
-# 2. Créer le lien symbolique vers le dossier du projet
-ln -sfn /chemin/vers/wallpaper ~/.local/share/plasma/wallpapers/cc.qalpuch.dynamicdaynight
+# 3. Créer le lien symbolique depuis la racine du dossier cloné
+ln -sfn "$(pwd)" ~/.local/share/plasma/wallpapers/cc.qalpuch.dynamicdaynight
 
-# 3. Compiler et installer le catalogue de traduction française
+# 4. Compiler et installer le catalogue de traduction française
 msgfmt po/fr.po -o contents/locale/fr/LC_MESSAGES/plasma_wallpaper_cc.qalpuch.dynamicdaynight.mo
 cp contents/locale/fr/LC_MESSAGES/plasma_wallpaper_cc.qalpuch.dynamicdaynight.mo ~/.local/share/locale/fr/LC_MESSAGES/
 ```
 
-*Alternative via `kpackagetool6` :*
+*Alternative via `kpackagetool6` (depuis la racine du dossier) :*
 ```bash
-kpackagetool6 --type Plasma/Wallpaper --install /chemin/vers/wallpaper
+kpackagetool6 --type Plasma/Wallpaper --install .
 ```
 
 ---
@@ -126,7 +132,7 @@ wallpaper/
 
 ### Internationalisation (i18n)
 
-Pour régénérer le template de traduction et recompiler les catalogues :
+Pour régénérer le template de traduction et recompiler les catalogues (depuis la racine du projet) :
 
 ```bash
 # 1. Extraction des chaînes traduisibles (template.pot)

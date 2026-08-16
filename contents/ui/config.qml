@@ -57,6 +57,16 @@ Layouts.ColumnLayout {
         return TimeUtils.calculateSolarSchedule(d, sys.lat, sys.lon);
     }
 
+    // Large Image Preview Dialog
+    property string previewDialogTitle: ""
+    property url previewDialogSource: ""
+
+    function openLargePreview(title, sourceUrl) {
+        previewDialogTitle = title;
+        previewDialogSource = sourceUrl;
+        imagePreviewPopup.open();
+    }
+
     /**
      * Resets all parameters to their initial factory default values.
      */
@@ -134,15 +144,15 @@ Layouts.ColumnLayout {
         spacing: Kirigami.Units.smallSpacing
         Layouts.Layout.fillWidth: true
 
-        // Compact 16:9 Thumbnail preview
+        // Compact 16:9 Thumbnail preview (clickable to open large preview)
         Rectangle {
             id: thumbFrame
             Layouts.Layout.preferredWidth: Math.round(Kirigami.Units.gridUnit * 3.2)
             Layouts.Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.8)
             radius: Kirigami.Units.smallSpacing / 2
             color: Kirigami.Theme.alternateBackgroundColor
-            border.color: fileRow.isCustom ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor
-            border.width: 1
+            border.color: thumbMouseArea.containsMouse ? Kirigami.Theme.highlightColor : (fileRow.isCustom ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor)
+            border.width: (thumbMouseArea.containsMouse || fileRow.isCustom) ? 1.5 : 1
             clip: true
 
             Image {
@@ -153,6 +163,31 @@ Layouts.ColumnLayout {
                 cache: true
                 smooth: true
                 mipmap: true
+            }
+
+            // Zoom icon overlay on hover
+            Rectangle {
+                anchors.fill: parent
+                color: Qt.rgba(0, 0, 0, 0.4)
+                visible: thumbMouseArea.containsMouse
+
+                Kirigami.Icon {
+                    anchors.centerIn: parent
+                    source: "zoom-in"
+                    implicitWidth: Kirigami.Units.iconSizes.small
+                    implicitHeight: Kirigami.Units.iconSizes.small
+                }
+            }
+
+            MouseArea {
+                id: thumbMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: Qt.PointingHandCursor
+                onClicked: root.openLargePreview(fileRow.dialogTitle, fileRow.resolvedImageSource)
+
+                PlasmaComponents.ToolTip.text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Click to enlarge")
+                PlasmaComponents.ToolTip.visible: containsMouse
             }
         }
 
@@ -476,6 +511,60 @@ Layouts.ColumnLayout {
                 icon.name: "document-revert"
                 text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Restore Default Configuration")
                 onClicked: root.resetToDefaults()
+            }
+        }
+    }
+
+    // Modal popup to display the wallpaper image in full / large view
+    PlasmaComponents.Popup {
+        id: imagePreviewPopup
+        anchors.centerIn: parent
+        modal: true
+        focus: true
+        closePolicy: PlasmaComponents.Popup.CloseOnEscape | PlasmaComponents.Popup.CloseOnPressOutside
+        width: Math.min(root.width * 0.9, Kirigami.Units.gridUnit * 42)
+        height: Math.min(root.height * 0.9, Kirigami.Units.gridUnit * 26)
+        padding: Kirigami.Units.largeSpacing
+
+        contentItem: Layouts.ColumnLayout {
+            spacing: Kirigami.Units.smallSpacing
+
+            Layouts.RowLayout {
+                Layouts.Layout.fillWidth: true
+
+                PlasmaComponents.Label {
+                    text: root.previewDialogTitle
+                    font.weight: Font.Bold
+                    Layouts.Layout.fillWidth: true
+                    elide: Text.ElideRight
+                }
+
+                PlasmaComponents.Button {
+                    icon.name: "window-close"
+                    text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Close")
+                    onClicked: imagePreviewPopup.close()
+                }
+            }
+
+            Rectangle {
+                Layouts.Layout.fillWidth: true
+                Layouts.Layout.fillHeight: true
+                radius: Kirigami.Units.smallSpacing
+                color: Kirigami.Theme.backgroundColor
+                border.color: Kirigami.Theme.disabledTextColor
+                border.width: 1
+                clip: true
+
+                Image {
+                    anchors.fill: parent
+                    anchors.margins: Kirigami.Units.smallSpacing
+                    source: root.previewDialogSource
+                    fillMode: Image.PreserveAspectFit
+                    asynchronous: true
+                    cache: true
+                    smooth: true
+                    mipmap: true
+                }
             }
         }
     }

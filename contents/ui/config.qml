@@ -24,7 +24,8 @@ Layouts.ColumnLayout {
     signal configurationChanged()
 
     Layouts.Layout.fillWidth: true
-    spacing: Kirigami.Units.largeSpacing
+    Layouts.Layout.alignment: Qt.AlignTop
+    spacing: 0
 
     // Automatic calculation option
     property alias cfg_AutoSchedule: autoScheduleCheckBox.checked
@@ -247,6 +248,7 @@ Layouts.ColumnLayout {
         id: innerFormLayout
 
         Layouts.Layout.fillWidth: true
+        Layouts.Layout.alignment: Qt.AlignTop
         twinFormLayouts: root.parentLayout ? [root.parentLayout] : []
 
         // ==========================================

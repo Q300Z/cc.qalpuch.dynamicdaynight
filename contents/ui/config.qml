@@ -41,10 +41,10 @@ Layouts.ColumnLayout {
     property alias cfg_NightMinute: nightMinuteSpin.value
 
     // Image path bindings
-    property alias cfg_MorningImage: morningCard.pathText
-    property alias cfg_NoonImage: noonCard.pathText
-    property alias cfg_EveningImage: eveningCard.pathText
-    property alias cfg_NightImage: nightCard.pathText
+    property alias cfg_MorningImage: morningRow.pathText
+    property alias cfg_NoonImage: noonRow.pathText
+    property alias cfg_EveningImage: eveningRow.pathText
+    property alias cfg_NightImage: nightRow.pathText
 
     // Behavior & Display settings
     property alias cfg_TransitionDuration: transitionSpin.value
@@ -72,10 +72,10 @@ Layouts.ColumnLayout {
         nightHourSpin.value = 22;
         nightMinuteSpin.value = 0;
 
-        morningCard.pathText = "";
-        noonCard.pathText = "";
-        eveningCard.pathText = "";
-        nightCard.pathText = "";
+        morningRow.pathText = "";
+        noonRow.pathText = "";
+        eveningRow.pathText = "";
+        nightRow.pathText = "";
 
         fillModeCombo.currentIndex = 1;
         transitionSpin.value = 1500;
@@ -113,12 +113,10 @@ Layouts.ColumnLayout {
         }
     }
 
-    // Visual 16:9 preview card component for each wallpaper slot
-    component WallpaperPreviewCard: Kirigami.AbstractCard {
-        id: card
+    // Helper component for single-line file selection with compact inline 16:9 preview
+    component FilePathRow: Layouts.RowLayout {
+        id: fileRow
 
-        property string periodTitle: ""
-        property string periodIcon: ""
         property string defaultFileName: ""
         property string dialogTitle: ""
         property string pathText: ""
@@ -126,154 +124,72 @@ Layouts.ColumnLayout {
         readonly property bool isCustom: pathText.trim().length > 0
 
         readonly property url resolvedImageSource: {
-            if (card.isCustom) {
+            if (fileRow.isCustom) {
                 const trimmed = pathText.trim();
                 return trimmed.startsWith("file://") ? trimmed : "file://" + trimmed;
             }
             return Qt.resolvedUrl("../images/" + defaultFileName);
         }
 
-        readonly property string displayFileName: {
-            if (card.isCustom) {
-                const trimmed = pathText.trim();
-                const lastSlash = Math.max(trimmed.lastIndexOf("/"), trimmed.lastIndexOf("\\"));
-                return lastSlash >= 0 ? trimmed.substring(lastSlash + 1) : trimmed;
+        spacing: Kirigami.Units.smallSpacing
+        Layouts.Layout.fillWidth: true
+
+        // Compact 16:9 Thumbnail preview
+        Rectangle {
+            id: thumbFrame
+            Layouts.Layout.preferredWidth: Math.round(Kirigami.Units.gridUnit * 3.2)
+            Layouts.Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.8)
+            radius: Kirigami.Units.smallSpacing / 2
+            color: Kirigami.Theme.alternateBackgroundColor
+            border.color: fileRow.isCustom ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor
+            border.width: 1
+            clip: true
+
+            Image {
+                anchors.fill: parent
+                source: fileRow.resolvedImageSource
+                fillMode: Image.PreserveAspectCrop
+                asynchronous: true
+                cache: true
+                smooth: true
+                mipmap: true
             }
-            return defaultFileName + " (" + i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default") + ")";
         }
 
-        Layouts.Layout.fillWidth: true
-        Layouts.Layout.minimumWidth: Kirigami.Units.gridUnit * 12
-
-        contentItem: Layouts.ColumnLayout {
-            spacing: Kirigami.Units.smallSpacing
-
-            // Top Header: Icon + Period Name + Status Badge
-            Layouts.RowLayout {
-                Layouts.Layout.fillWidth: true
-                spacing: Kirigami.Units.smallSpacing
-
-                Kirigami.Icon {
-                    source: card.periodIcon
-                    implicitWidth: Kirigami.Units.iconSizes.smallMedium
-                    implicitHeight: Kirigami.Units.iconSizes.smallMedium
-                }
-
-                PlasmaComponents.Label {
-                    text: card.periodTitle
-                    font.weight: Font.Bold
-                    Layouts.Layout.fillWidth: true
-                    elide: Text.ElideRight
-                }
-
-                // Custom vs Default pill badge
-                Kirigami.ShadowedRectangle {
-                    radius: Kirigami.Units.smallSpacing
-                    color: card.isCustom ? Kirigami.Theme.highlightColor : Kirigami.Theme.alternateBackgroundColor
-                    opacity: card.isCustom ? 0.95 : 0.85
-                    border.color: Kirigami.Theme.separatorColor
-                    border.width: 1
-
-                    implicitWidth: badgeLabel.implicitWidth + Kirigami.Units.smallSpacing * 2
-                    implicitHeight: badgeLabel.implicitHeight + Kirigami.Units.smallSpacing / 2
-
-                    PlasmaComponents.Label {
-                        id: badgeLabel
-                        anchors.centerIn: parent
-                        text: card.isCustom ? i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Custom") : i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default")
-                        font.pointSize: Kirigami.Theme.smallFont.pointSize
-                        color: card.isCustom ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
-                    }
-                }
+        // Path field
+        PlasmaComponents.TextField {
+            id: pathField
+            Layouts.Layout.fillWidth: true
+            text: fileRow.pathText
+            placeholderText: fileRow.defaultFileName + " (" + i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default") + ")"
+            onTextEdited: {
+                fileRow.pathText = text;
+                root.configurationChanged();
             }
+        }
 
-            // 16:9 Thumbnail Image with rounded corners and border
-            Kirigami.ShadowedRectangle {
-                id: thumbnailFrame
-                Layouts.Layout.fillWidth: true
-                Layouts.Layout.preferredHeight: Math.round(width * 9 / 16)
-                Layouts.Layout.minimumHeight: Kirigami.Units.gridUnit * 5
+        // Browse button
+        PlasmaComponents.Button {
+            icon.name: "document-open"
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Browse...")
+            onClicked: fileDialog.open()
+        }
 
-                radius: Kirigami.Units.smallSpacing
-                color: Kirigami.Theme.alternateBackgroundColor
-                border.color: Kirigami.Theme.separatorColor
-                border.width: 1
-                clip: true
-
-                Image {
-                    id: previewImage
-                    anchors.fill: parent
-                    source: card.resolvedImageSource
-                    fillMode: Image.PreserveAspectCrop
-                    asynchronous: true
-                    cache: true
-                    smooth: true
-                    mipmap: true
-
-                    PlasmaComponents.BusyIndicator {
-                        anchors.centerIn: parent
-                        running: previewImage.status === Image.Loading
-                        visible: running
-                    }
-
-                    Kirigami.Icon {
-                        anchors.centerIn: parent
-                        source: "image-missing"
-                        visible: previewImage.status === Image.Error
-                        implicitWidth: Kirigami.Units.iconSizes.large
-                        implicitHeight: Kirigami.Units.iconSizes.large
-                    }
-                }
-            }
-
-            // Filename label with ToolTip for full path
-            PlasmaComponents.Label {
-                text: card.displayFileName
-                font.pointSize: Kirigami.Theme.smallFont.pointSize
-                color: Kirigami.Theme.disabledTextColor
-                Layouts.Layout.fillWidth: true
-                elide: Text.ElideMiddle
-
-                PlasmaComponents.ToolTip.text: card.isCustom ? card.pathText : card.displayFileName
-                PlasmaComponents.ToolTip.visible: cardHoverArea.containsMouse
-            }
-
-            MouseArea {
-                id: cardHoverArea
-                anchors.fill: parent
-                hoverEnabled: true
-                acceptedButtons: Qt.NoButton
-                z: -1
-            }
-
-            // Integrated Action Buttons
-            Layouts.RowLayout {
-                Layouts.Layout.fillWidth: true
-                spacing: Kirigami.Units.smallSpacing
-
-                PlasmaComponents.Button {
-                    Layouts.Layout.fillWidth: true
-                    icon.name: "document-open"
-                    text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Browse...")
-                    onClicked: fileDialog.open()
-                }
-
-                PlasmaComponents.Button {
-                    icon.name: "edit-undo"
-                    text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default")
-                    enabled: card.isCustom
-                    visible: card.isCustom
-                    onClicked: {
-                        card.pathText = "";
-                        root.configurationChanged();
-                    }
-                }
+        // Reset to default button
+        PlasmaComponents.Button {
+            icon.name: "edit-undo"
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default")
+            enabled: fileRow.isCustom
+            onClicked: {
+                fileRow.pathText = "";
+                pathField.text = "";
+                root.configurationChanged();
             }
         }
 
         QtDialogs.FileDialog {
             id: fileDialog
-            title: card.dialogTitle
+            title: fileRow.dialogTitle
             nameFilters: [
                 i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Image Files (*.png *.jpg *.jpeg *.webp *.avif *.svg)"),
                 i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "All Files (*)")
@@ -283,7 +199,8 @@ Layouts.ColumnLayout {
                 if (selected.startsWith("file://")) {
                     selected = selected.substring(7);
                 }
-                card.pathText = selected;
+                fileRow.pathText = selected;
+                pathField.text = selected;
                 root.configurationChanged();
             }
         }
@@ -470,52 +387,39 @@ Layouts.ColumnLayout {
         }
 
         // ==========================================
-        // SECTION 3: Visual Wallpaper Preview Cards (16:9)
+        // SECTION 3: Images (Matin, Midi, Soir, Nuit)
         // ==========================================
         Kirigami.Separator {
             Kirigami.FormData.isSection: true
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Images")
         }
 
-        Layouts.GridLayout {
-            id: wallpapersGrid
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Wallpapers:")
-            Layouts.Layout.fillWidth: true
-            columns: 2
-            columnSpacing: Kirigami.Units.largeSpacing
-            rowSpacing: Kirigami.Units.largeSpacing
+        FilePathRow {
+            id: morningRow
+            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning wallpaper:")
+            defaultFileName: "matin.png"
+            dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Morning Wallpaper")
+        }
 
-            WallpaperPreviewCard {
-                id: morningCard
-                periodTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning wallpaper:")
-                periodIcon: "weather-sunset-up"
-                defaultFileName: "matin.png"
-                dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Morning Wallpaper")
-            }
+        FilePathRow {
+            id: noonRow
+            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon wallpaper:")
+            defaultFileName: "midi.png"
+            dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Noon Wallpaper")
+        }
 
-            WallpaperPreviewCard {
-                id: noonCard
-                periodTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon wallpaper:")
-                periodIcon: "weather-clear"
-                defaultFileName: "midi.png"
-                dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Noon Wallpaper")
-            }
+        FilePathRow {
+            id: eveningRow
+            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening wallpaper:")
+            defaultFileName: "soir.png"
+            dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Evening Wallpaper")
+        }
 
-            WallpaperPreviewCard {
-                id: eveningCard
-                periodTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening wallpaper:")
-                periodIcon: "weather-sunset-down"
-                defaultFileName: "soir.png"
-                dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Evening Wallpaper")
-            }
-
-            WallpaperPreviewCard {
-                id: nightCard
-                periodTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night wallpaper:")
-                periodIcon: "weather-clear-night"
-                defaultFileName: "nuit.png"
-                dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Night Wallpaper")
-            }
+        FilePathRow {
+            id: nightRow
+            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night wallpaper:")
+            defaultFileName: "nuit.png"
+            dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Night Wallpaper")
         }
 
         // ==========================================

@@ -13,6 +13,11 @@ import "TimeUtils.js" as TimeUtils
 Kirigami.FormLayout {
     id: root
 
+    // Properties injected by KDE Plasma 6 kcm_wallpaper
+    property var configDialog
+    property var wallpaperConfiguration
+    property var parentLayout
+
     twinFormLayouts: parentLayout
 
     // Automatic calculation option

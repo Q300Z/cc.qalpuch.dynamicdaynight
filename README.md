@@ -50,8 +50,8 @@ Cloner le dépôt, se placer à la racine du dossier cloné et exécuter le scri
 
 ```bash
 # 1. Cloner le dépôt et se placer dans le dossier
-git clone <URL_DU_DEPOT>
-cd wallpaper
+git clone git@github.com:Q300Z/cc.qalpuch.dynamicdaynight.git
+cd cc.qalpuch.dynamicdaynight
 
 # 2. Lancer le script d'installation
 chmod +x install.sh
@@ -66,8 +66,8 @@ Si vous préférez installer le plugin manuellement étape par étape depuis la 
 
 ```bash
 # 1. Cloner le dépôt et se placer dans le dossier
-git clone <URL_DU_DEPOT>
-cd wallpaper
+git clone git@github.com:Q300Z/cc.qalpuch.dynamicdaynight.git
+cd cc.qalpuch.dynamicdaynight
 
 # 2. Créer les répertoires cibles dans l'espace utilisateur
 mkdir -p ~/.local/share/plasma/wallpapers

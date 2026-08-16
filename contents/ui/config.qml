@@ -183,7 +183,7 @@ Layouts.ColumnLayout {
 
                 onStatusChanged: {
                     if (status === Image.Ready && fileRow.isCustom) {
-                        colorExtractorCanvas.requestPaint();
+                        colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
                     }
                 }
             }
@@ -222,15 +222,30 @@ Layouts.ColumnLayout {
             visible: false
             renderTarget: Canvas.Image
 
+            property string activeLoadingUrl: ""
+
+            function extractFromUrl(urlToLoad) {
+                if (!urlToLoad) return;
+                const strUrl = urlToLoad.toString();
+                activeLoadingUrl = strUrl;
+                loadImage(strUrl);
+            }
+
+            onImageLoaded: {
+                requestPaint();
+            }
+
             onPaint: {
+                if (!activeLoadingUrl || !isImageLoaded(activeLoadingUrl)) return;
                 const ctx = getContext("2d");
                 ctx.clearRect(0, 0, width, height);
-                ctx.drawImage(previewImage, 0, 0, width, height);
+                ctx.drawImage(activeLoadingUrl, 0, 0, width, height);
                 const extracted = TimeUtils.extractDominantColor(ctx, width, height, fileRow.defaultColor);
                 if (extracted && String(fileRow.selectedColor).toLowerCase() !== String(extracted).toLowerCase()) {
                     fileRow.selectedColor = extracted;
                     root.configurationChanged();
                 }
+                unloadImage(activeLoadingUrl);
             }
         }
 
@@ -242,6 +257,9 @@ Layouts.ColumnLayout {
             placeholderText: fileRow.defaultFileName + " (" + i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default") + ")"
             onTextEdited: {
                 fileRow.pathText = text;
+                if (text.trim().length > 0) {
+                    colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
+                }
                 root.configurationChanged();
             }
         }
@@ -303,6 +321,7 @@ Layouts.ColumnLayout {
                 }
                 fileRow.pathText = selected;
                 pathField.text = selected;
+                colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
                 root.configurationChanged();
             }
         }

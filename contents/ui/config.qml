@@ -50,11 +50,11 @@ Layouts.ColumnLayout {
     property alias cfg_NightImage: nightRow.pathText
 
     // Custom accent color bindings
-    property alias cfg_DynamicAccentColor: dynamicAccentColorCheckBox.checked
-    property alias cfg_MorningColor: morningRow.selectedColor
-    property alias cfg_NoonColor: noonRow.selectedColor
-    property alias cfg_EveningColor: eveningRow.selectedColor
-    property alias cfg_NightColor: nightRow.selectedColor
+    property bool cfg_DynamicAccentColor: false
+    property color cfg_MorningColor: "#1e3539"
+    property color cfg_NoonColor: "#446c84"
+    property color cfg_EveningColor: "#322f21"
+    property color cfg_NightColor: "#48220b"
 
     // Behavior & Display settings
     property alias cfg_TransitionDuration: transitionSpin.value
@@ -97,12 +97,11 @@ Layouts.ColumnLayout {
         eveningRow.pathText = "";
         nightRow.pathText = "";
 
-        dynamicAccentColorCheckBox.checked = false;
-
-        morningRow.selectedColor = morningRow.defaultColor;
-        noonRow.selectedColor = noonRow.defaultColor;
-        eveningRow.selectedColor = eveningRow.defaultColor;
-        nightRow.selectedColor = nightRow.defaultColor;
+        root.cfg_DynamicAccentColor = false;
+        root.cfg_MorningColor = morningRow.defaultColor;
+        root.cfg_NoonColor = noonRow.defaultColor;
+        root.cfg_EveningColor = eveningRow.defaultColor;
+        root.cfg_NightColor = nightRow.defaultColor;
 
         fillModeCombo.currentIndex = 1;
         transitionSpin.value = 1500;
@@ -539,7 +538,14 @@ Layouts.ColumnLayout {
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning wallpaper:")
             defaultFileName: "matin.png"
             defaultColor: "#1e3539"
+            selectedColor: root.cfg_MorningColor
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Morning Wallpaper")
+            onSelectedColorChanged: {
+                if (String(root.cfg_MorningColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
+                    root.cfg_MorningColor = selectedColor;
+                    root.configurationChanged();
+                }
+            }
         }
 
         FilePathRow {
@@ -547,7 +553,14 @@ Layouts.ColumnLayout {
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon wallpaper:")
             defaultFileName: "midi.png"
             defaultColor: "#446c84"
+            selectedColor: root.cfg_NoonColor
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Noon Wallpaper")
+            onSelectedColorChanged: {
+                if (String(root.cfg_NoonColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
+                    root.cfg_NoonColor = selectedColor;
+                    root.configurationChanged();
+                }
+            }
         }
 
         FilePathRow {
@@ -555,7 +568,14 @@ Layouts.ColumnLayout {
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening wallpaper:")
             defaultFileName: "soir.png"
             defaultColor: "#322f21"
+            selectedColor: root.cfg_EveningColor
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Evening Wallpaper")
+            onSelectedColorChanged: {
+                if (String(root.cfg_EveningColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
+                    root.cfg_EveningColor = selectedColor;
+                    root.configurationChanged();
+                }
+            }
         }
 
         FilePathRow {
@@ -563,7 +583,14 @@ Layouts.ColumnLayout {
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night wallpaper:")
             defaultFileName: "nuit.png"
             defaultColor: "#48220b"
+            selectedColor: root.cfg_NightColor
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Night Wallpaper")
+            onSelectedColorChanged: {
+                if (String(root.cfg_NightColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
+                    root.cfg_NightColor = selectedColor;
+                    root.configurationChanged();
+                }
+            }
         }
 
         // ==========================================
@@ -578,9 +605,11 @@ Layouts.ColumnLayout {
             id: dynamicAccentColorCheckBox
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Accent color:")
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Synchronize KDE Plasma accent color with active wallpaper period")
-            checked: false
-            onToggled: root.configurationChanged()
-            onCheckedChanged: root.configurationChanged()
+            checked: root.cfg_DynamicAccentColor
+            onToggled: {
+                root.cfg_DynamicAccentColor = checked;
+                root.configurationChanged();
+            }
         }
 
         PlasmaComponents.ComboBox {

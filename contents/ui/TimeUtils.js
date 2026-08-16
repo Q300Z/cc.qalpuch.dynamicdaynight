@@ -319,11 +319,20 @@ function getMsUntilNextPeriod(date, cfg) {
 
 /**
  * Returns the optimal accent color for a given daylight period.
+ * Checks configuration first, then falls back to default period palette.
  *
  * @param {string} period - 'morning', 'noon', 'evening', 'night'
+ * @param {Object} [cfg] - Configuration object
  * @returns {string} Hex color code
  */
-function getAccentColorForPeriod(period) {
+function getAccentColorForPeriod(period, cfg) {
+    if (cfg) {
+        if (period === "morning" && cfg.MorningColor) return String(cfg.MorningColor);
+        if (period === "noon" && cfg.NoonColor) return String(cfg.NoonColor);
+        if (period === "evening" && cfg.EveningColor) return String(cfg.EveningColor);
+        if (period === "night" && cfg.NightColor) return String(cfg.NightColor);
+    }
+
     switch (period) {
         case "morning":
             return "#F39C12"; // Warm dawn / aurora amber
@@ -337,4 +346,98 @@ function getAccentColorForPeriod(period) {
             return "#1D99F3";
     }
 }
+
+/**
+ * Extracts a vibrant dominant color from an image rendered onto a 2D Canvas context.
+ *
+ * @param {CanvasRenderingContext2D} ctx - 2D rendering context containing the image
+ * @param {number} width - Canvas width
+ * @param {number} height - Canvas height
+ * @param {string} [fallbackColor="#1D99F3"] - Fallback hex color
+ * @returns {string} Hex color string (#RRGGBB)
+ */
+function extractDominantColor(ctx, width, height, fallbackColor) {
+    try {
+        const imgData = ctx.getImageData(0, 0, width, height);
+        const data = imgData.data;
+        const colorBuckets = {};
+        let bestColor = null;
+        let maxScore = -1;
+
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const a = data[i + 3];
+
+            if (a < 128) continue; // Skip transparent pixels
+
+            // Convert to HSL
+            const rn = r / 255;
+            const gn = g / 255;
+            const bn = b / 255;
+            const max = Math.max(rn, gn, bn);
+            const min = Math.min(rn, gn, bn);
+            let h = 0, s = 0, l = (max + min) / 2;
+
+            if (max !== min) {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case rn: h = (gn - bn) / d + (gn < bn ? 6 : 0); break;
+                    case gn: h = (bn - rn) / d + 2; break;
+                    case bn: h = (rn - gn) / d + 4; break;
+                }
+                h /= 6;
+            }
+
+            // Filter out extreme blacks (L < 0.12), extreme whites (L > 0.88), and near-greys (S < 0.10)
+            if (l < 0.12 || l > 0.88 || s < 0.10) {
+                continue;
+            }
+
+            // Quantize hue into 24 bins (15 deg each) and lightness into 4 bins
+            const hueBin = Math.floor(h * 24);
+            const lightBin = Math.floor(l * 4);
+            const key = `${hueBin}_${lightBin}`;
+
+            if (!colorBuckets[key]) {
+                colorBuckets[key] = {
+                    count: 0,
+                    totalR: 0,
+                    totalG: 0,
+                    totalB: 0,
+                    saturation: s,
+                    lightness: l
+                };
+            }
+
+            colorBuckets[key].count++;
+            colorBuckets[key].totalR += r;
+            colorBuckets[key].totalG += g;
+            colorBuckets[key].totalB += b;
+        }
+
+        // Find the bucket with the highest vibrancy score
+        for (const key in colorBuckets) {
+            const bucket = colorBuckets[key];
+            // Prefer vibrant, well-balanced colors
+            const lightnessPenalty = 1 - Math.abs(bucket.lightness - 0.5) * 1.5;
+            const score = bucket.count * (bucket.saturation * 1.5) * Math.max(0.2, lightnessPenalty);
+
+            if (score > maxScore) {
+                maxScore = score;
+                const avgR = Math.round(bucket.totalR / bucket.count);
+                const avgG = Math.round(bucket.totalG / bucket.count);
+                const avgB = Math.round(bucket.totalB / bucket.count);
+                bestColor = "#" + ((1 << 24) + (avgR << 16) + (avgG << 8) + avgB).toString(16).slice(1);
+            }
+        }
+
+        return bestColor || fallbackColor || "#1D99F3";
+    } catch (e) {
+        return fallbackColor || "#1D99F3";
+    }
+}
+
 

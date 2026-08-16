@@ -49,6 +49,12 @@ Layouts.ColumnLayout {
     property alias cfg_EveningImage: eveningRow.pathText
     property alias cfg_NightImage: nightRow.pathText
 
+    // Custom accent color bindings
+    property alias cfg_MorningColor: morningRow.selectedColor
+    property alias cfg_NoonColor: noonRow.selectedColor
+    property alias cfg_EveningColor: eveningRow.selectedColor
+    property alias cfg_NightColor: nightRow.selectedColor
+
     // Behavior & Display settings
     property alias cfg_TransitionDuration: transitionSpin.value
     property alias cfg_FillMode: fillModeCombo.currentIndex
@@ -90,6 +96,11 @@ Layouts.ColumnLayout {
         eveningRow.pathText = "";
         nightRow.pathText = "";
 
+        morningRow.selectedColor = morningRow.defaultColor;
+        noonRow.selectedColor = noonRow.defaultColor;
+        eveningRow.selectedColor = eveningRow.defaultColor;
+        nightRow.selectedColor = nightRow.defaultColor;
+
         fillModeCombo.currentIndex = 1;
         transitionSpin.value = 1500;
 
@@ -126,11 +137,13 @@ Layouts.ColumnLayout {
         }
     }
 
-    // Helper component for single-line file selection with compact inline 16:9 preview
+    // Helper component for single-line file selection with compact inline 16:9 preview & color picker
     component FilePathRow: Layouts.RowLayout {
         id: fileRow
 
         property string defaultFileName: ""
+        property color defaultColor: "#1D99F3"
+        property color selectedColor: defaultColor
         property string dialogTitle: ""
         property string pathText: ""
 
@@ -159,6 +172,7 @@ Layouts.ColumnLayout {
             clip: true
 
             Image {
+                id: previewImage
                 anchors.fill: parent
                 source: fileRow.resolvedImageSource
                 fillMode: Image.PreserveAspectCrop
@@ -166,6 +180,12 @@ Layouts.ColumnLayout {
                 cache: true
                 smooth: true
                 mipmap: true
+
+                onStatusChanged: {
+                    if (status === Image.Ready && fileRow.isCustom) {
+                        colorExtractorCanvas.requestPaint();
+                    }
+                }
             }
 
             // Zoom icon overlay on hover
@@ -194,6 +214,26 @@ Layouts.ColumnLayout {
             }
         }
 
+        // Hidden Canvas for dominant color calculation
+        Canvas {
+            id: colorExtractorCanvas
+            width: 32
+            height: 32
+            visible: false
+            renderTarget: Canvas.Image
+
+            onPaint: {
+                const ctx = getContext("2d");
+                ctx.clearRect(0, 0, width, height);
+                ctx.drawImage(previewImage, 0, 0, width, height);
+                const extracted = TimeUtils.extractDominantColor(ctx, width, height, fileRow.defaultColor);
+                if (extracted && String(fileRow.selectedColor).toLowerCase() !== String(extracted).toLowerCase()) {
+                    fileRow.selectedColor = extracted;
+                    root.configurationChanged();
+                }
+            }
+        }
+
         // Path field
         PlasmaComponents.TextField {
             id: pathField
@@ -208,19 +248,43 @@ Layouts.ColumnLayout {
 
         // Browse button
         PlasmaComponents.Button {
+            id: browseBtn
             icon.name: "document-open"
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Browse...")
             onClicked: fileDialog.open()
+        }
+
+        // Dominant accent color customization button (right of Browse button)
+        PlasmaComponents.Button {
+            id: colorButton
+            implicitWidth: Kirigami.Units.gridUnit * 2.4
+            implicitHeight: browseBtn.implicitHeight
+
+            PlasmaComponents.ToolTip.text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Accent color: %1 (click to customize)", String(fileRow.selectedColor))
+            PlasmaComponents.ToolTip.visible: hovered
+
+            Rectangle {
+                anchors.centerIn: parent
+                width: Kirigami.Units.gridUnit * 1.3
+                height: Kirigami.Units.gridUnit * 1.1
+                radius: Kirigami.Units.smallSpacing / 2
+                color: fileRow.selectedColor
+                border.color: Kirigami.Theme.disabledTextColor
+                border.width: 1
+            }
+
+            onClicked: colorDialog.open()
         }
 
         // Reset to default button
         PlasmaComponents.Button {
             icon.name: "edit-undo"
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default")
-            enabled: fileRow.isCustom
+            enabled: fileRow.isCustom || (String(fileRow.selectedColor).toLowerCase() !== String(fileRow.defaultColor).toLowerCase())
             onClicked: {
                 fileRow.pathText = "";
                 pathField.text = "";
+                fileRow.selectedColor = fileRow.defaultColor;
                 root.configurationChanged();
             }
         }
@@ -239,6 +303,16 @@ Layouts.ColumnLayout {
                 }
                 fileRow.pathText = selected;
                 pathField.text = selected;
+                root.configurationChanged();
+            }
+        }
+
+        QtDialogs.ColorDialog {
+            id: colorDialog
+            title: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Accent Color")
+            selectedColor: fileRow.selectedColor
+            onAccepted: {
+                fileRow.selectedColor = selectedColor;
                 root.configurationChanged();
             }
         }
@@ -439,6 +513,7 @@ Layouts.ColumnLayout {
             id: morningRow
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning wallpaper:")
             defaultFileName: "matin.png"
+            defaultColor: "#f39c12"
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Morning Wallpaper")
         }
 
@@ -446,6 +521,7 @@ Layouts.ColumnLayout {
             id: noonRow
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon wallpaper:")
             defaultFileName: "midi.png"
+            defaultColor: "#1d99f3"
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Noon Wallpaper")
         }
 
@@ -453,6 +529,7 @@ Layouts.ColumnLayout {
             id: eveningRow
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening wallpaper:")
             defaultFileName: "soir.png"
+            defaultColor: "#e67e22"
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Evening Wallpaper")
         }
 
@@ -460,6 +537,7 @@ Layouts.ColumnLayout {
             id: nightRow
             Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night wallpaper:")
             defaultFileName: "nuit.png"
+            defaultColor: "#6c5ce7"
             dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Night Wallpaper")
         }
 

@@ -26,8 +26,8 @@ WallpaperItem {
     // Effective schedule for period boundaries
     readonly property var currentSchedule: TimeUtils.getEffectiveSchedule(currentTime, root.configuration)
 
-    // Dynamic accent color matching current daylight period
-    readonly property color accentColor: TimeUtils.getAccentColorForPeriod(currentPeriod)
+    // Dynamic accent color matching current daylight period (customizable per slot)
+    readonly property color accentColor: TimeUtils.getAccentColorForPeriod(currentPeriod, root.configuration)
 
     // Resolved source URL for the active period
     readonly property url targetImageSource: TimeUtils.getImageForPeriod(

@@ -81,10 +81,27 @@
     <entry name="EveningImage" type="String">
       <label>Custom evening image path</label>
       <default></default>
-    </entry>
     <entry name="NightImage" type="String">
       <label>Custom night image path</label>
       <default></default>
+    </entry>
+
+    <!-- Custom accent colors per period (defaults matched to bundled wallpapers) -->
+    <entry name="MorningColor" type="Color">
+      <label>Accent color for morning period</label>
+      <default>#f39c12</default>
+    </entry>
+    <entry name="NoonColor" type="Color">
+      <label>Accent color for noon period</label>
+      <default>#1d99f3</default>
+    </entry>
+    <entry name="EveningColor" type="Color">
+      <label>Accent color for evening period</label>
+      <default>#e67e22</default>
+    </entry>
+    <entry name="NightColor" type="Color">
+      <label>Accent color for night period</label>
+      <default>#6c5ce7</default>
     </entry>
 
     <!-- Transition settings -->

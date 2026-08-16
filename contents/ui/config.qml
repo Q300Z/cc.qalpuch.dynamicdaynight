@@ -234,8 +234,8 @@ Layouts.ColumnLayout {
                 Layouts.Layout.fillWidth: true
                 elide: Text.ElideMiddle
 
-                Kirigami.ToolTip.text: card.isCustom ? card.pathText : card.displayFileName
-                Kirigami.ToolTip.visible: cardHoverArea.containsMouse
+                PlasmaComponents.ToolTip.text: card.isCustom ? card.pathText : card.displayFileName
+                PlasmaComponents.ToolTip.visible: cardHoverArea.containsMouse
             }
 
             MouseArea {

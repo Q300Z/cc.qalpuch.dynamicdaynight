@@ -8,6 +8,8 @@ import QtQuick.Layouts as Layouts
 import QtQuick.Dialogs as QtDialogs
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.components as PlasmaComponents
+import org.kde.kcmutils as KCM
+import org.kde.config as KConfig
 import "TimeUtils.js" as TimeUtils
 
 Layouts.ColumnLayout {
@@ -286,16 +288,18 @@ Layouts.ColumnLayout {
             PlasmaComponents.Button {
                 icon.name: "preferences-system-time"
                 text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Open System Date, Time & Location Settings...")
+                enabled: KConfig.KAuthorized.authorizeControlModule("kcm_clock")
                 onClicked: {
-                    Qt.openUrlExternally("kcm:kcm_clock");
+                    KCM.KCMLauncher.openSystemSettings("kcm_clock");
                 }
             }
 
             PlasmaComponents.Button {
                 icon.name: "redshift-status-on"
                 text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night Light Settings...")
+                enabled: KConfig.KAuthorized.authorizeControlModule("kcm_nightlight")
                 onClicked: {
-                    Qt.openUrlExternally("kcm:kcm_nightlight");
+                    KCM.KCMLauncher.openSystemSettings("kcm_nightlight");
                 }
             }
         }

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: org.kde.plasma.dynamicdaynight 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-16 19:25+0200\n"
+"POT-Creation-Date: 2026-08-16 19:45+0200\n"
 "PO-Revision-Date: 2026-08-16 19:26+0200\n"
 "Last-Translator: Plasma Developer <contact@kde.org>\n"
 "Language-Team: French <kde-i18n-doc@kde.org>\n"
@@ -16,37 +16,38 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: contents/ui/config.qml:137
+#: contents/ui/config.qml:124
 msgid "Browse..."
 msgstr "Parcourir..."
 
-#: contents/ui/config.qml:143
+#: contents/ui/config.qml:130
 msgid "Default"
 msgstr "Par défaut"
 
-#: contents/ui/config.qml:152
+#: contents/ui/config.qml:139
 msgid "Image Files (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
 msgstr "Fichiers image (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
 
-#: contents/ui/config.qml:153
+#: contents/ui/config.qml:140
 msgid "All Files (*)"
 msgstr "Tous les fichiers (*)"
 
-#: contents/ui/config.qml:170
+#: contents/ui/config.qml:157
 msgid "Schedule Mode"
 msgstr "Mode de planification"
 
-#: contents/ui/config.qml:175
+#: contents/ui/config.qml:162
 msgid "Solar detection:"
 msgstr "Détection solaire :"
 
-#: contents/ui/config.qml:176
+#: contents/ui/config.qml:163
 msgid ""
 "Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)"
 msgstr ""
-"Calculer automatiquement les heures de bascule (Lever, Midi solaire, Coucher, Nuit)"
+"Calculer automatiquement les heures de bascule (Lever, Midi solaire, "
+"Coucher, Nuit)"
 
-#: contents/ui/config.qml:187
+#: contents/ui/config.qml:174
 msgid ""
 "Today's calculated times:\n"
 "• Morning (Sunrise): %1\n"
@@ -60,142 +61,139 @@ msgstr ""
 "• Soir (Coucher du soleil) : %3\n"
 "• Nuit (Crépuscule) : %4"
 
-#: contents/ui/config.qml:198
-msgid "Location:"
-msgstr "Localisation :"
-
-#: contents/ui/config.qml:199
-msgid "Detect approximate location automatically from timezone"
-msgstr "Détecter la position approximative via le fuseau horaire"
-
-#: contents/ui/config.qml:205
+#: contents/ui/config.qml:184
 msgid "System Settings:"
 msgstr "Paramètres système :"
 
-#: contents/ui/config.qml:210
+#: contents/ui/config.qml:189
 msgid "Open System Date, Time & Location Settings..."
 msgstr "Ouvrir les paramètres système de Date, Heure & Localisation..."
 
-#: contents/ui/config.qml:218
+#: contents/ui/config.qml:197
 msgid "Night Light Settings..."
 msgstr "Paramètres du Mode Nuit (Night Light)..."
 
-#: contents/ui/config.qml:227
-msgid "Custom coordinates (Lat / Lon):"
-msgstr "Coordonnées personnalisées (Lat / Lon) :"
-
-#: contents/ui/config.qml:251
+#: contents/ui/config.qml:210
 msgid "Manual Time Periods"
 msgstr "Périodes horaires manuelles"
 
-#: contents/ui/config.qml:257
+#: contents/ui/config.qml:216
 msgid "Morning starts at:"
 msgstr "Le matin commence à :"
 
-#: contents/ui/config.qml:273
+#: contents/ui/config.qml:235
 msgid "Noon starts at:"
 msgstr "Le midi commence à :"
 
-#: contents/ui/config.qml:289
+#: contents/ui/config.qml:251
 msgid "Evening starts at:"
 msgstr "Le soir commence à :"
 
-#: contents/ui/config.qml:305
+#: contents/ui/config.qml:267
 msgid "Night starts at:"
 msgstr "La nuit commence à :"
 
-#: contents/ui/config.qml:323
+#: contents/ui/config.qml:285
 msgid "Images"
 msgstr "Images"
 
-#: contents/ui/config.qml:328
+#: contents/ui/config.qml:290
 msgid "Morning wallpaper:"
 msgstr "Fond d'écran du matin :"
 
-#: contents/ui/config.qml:329
+#: contents/ui/config.qml:291
 msgid "matin.png (Default)"
 msgstr "matin.png (Par défaut)"
 
-#: contents/ui/config.qml:330
+#: contents/ui/config.qml:292
 msgid "Select Morning Wallpaper"
 msgstr "Sélectionner le fond d'écran du matin"
 
-#: contents/ui/config.qml:337
+#: contents/ui/config.qml:297
 msgid "Noon wallpaper:"
 msgstr "Fond d'écran du midi :"
 
-#: contents/ui/config.qml:338
+#: contents/ui/config.qml:298
 msgid "midi.png (Default)"
 msgstr "midi.png (Par défaut)"
 
-#: contents/ui/config.qml:339
+#: contents/ui/config.qml:299
 msgid "Select Noon Wallpaper"
 msgstr "Sélectionner le fond d'écran du midi"
 
-#: contents/ui/config.qml:346
+#: contents/ui/config.qml:304
 msgid "Evening wallpaper:"
 msgstr "Fond d'écran du soir :"
 
-#: contents/ui/config.qml:347
+#: contents/ui/config.qml:305
 msgid "soir.png (Default)"
 msgstr "soir.png (Par défaut)"
 
-#: contents/ui/config.qml:348
+#: contents/ui/config.qml:306
 msgid "Select Evening Wallpaper"
 msgstr "Sélectionner le fond d'écran du soir"
 
-#: contents/ui/config.qml:355
+#: contents/ui/config.qml:311
 msgid "Night wallpaper:"
 msgstr "Fond d'écran de nuit :"
 
-#: contents/ui/config.qml:356
+#: contents/ui/config.qml:312
 msgid "nuit.png (Default)"
 msgstr "nuit.png (Par défaut)"
 
-#: contents/ui/config.qml:357
+#: contents/ui/config.qml:313
 msgid "Select Night Wallpaper"
 msgstr "Sélectionner le fond d'écran de nuit"
 
-#: contents/ui/config.qml:367
+#: contents/ui/config.qml:321
 msgid "Appearance"
 msgstr "Apparence"
 
-#: contents/ui/config.qml:372
+#: contents/ui/config.qml:326
 msgid "Fill Mode:"
 msgstr "Mode de remplissage :"
 
-#: contents/ui/config.qml:374
+#: contents/ui/config.qml:328
 msgid "Scaled (Stretch)"
 msgstr "Étiré"
 
-#: contents/ui/config.qml:375
+#: contents/ui/config.qml:329
 msgid "Zoom / Crop (Preserve Aspect Ratio)"
 msgstr "Recadré / Zoom (Conserver les proportions)"
 
-#: contents/ui/config.qml:376
+#: contents/ui/config.qml:330
 msgid "Fit (Preserve Aspect Ratio)"
 msgstr "Ajusté (Conserver les proportions)"
 
-#: contents/ui/config.qml:382
+#: contents/ui/config.qml:336
 msgid "Transition duration:"
 msgstr "Durée de transition :"
 
-#: contents/ui/config.qml:395
+#: contents/ui/config.qml:349
 msgid "ms"
 msgstr "ms"
 
-#: contents/ui/config.qml:404
+#: contents/ui/config.qml:358
 msgid "Reset"
 msgstr "Réinitialisation"
 
-#: contents/ui/config.qml:408
+#: contents/ui/config.qml:362
 msgid "Defaults:"
 msgstr "Valeurs par défaut :"
 
-#: contents/ui/config.qml:412
+#: contents/ui/config.qml:366
 msgid "Restore Default Configuration"
 msgstr "Restaurer la configuration par défaut"
 
 #: contents/ui/main.qml:36
 msgid "Update Dynamic Wallpaper"
 msgstr "Mettre à jour le fond d'écran dynamique"
+
+#~ msgid "Location:"
+#~ msgstr "Localisation :"
+
+#~ msgid "Detect approximate location automatically from timezone"
+#~ msgstr "Détecter la position approximative via le fuseau horaire"
+
+#~ msgid "Custom coordinates (Lat / Lon):"
+#~ msgstr "Coordonnées personnalisées (Lat / Lon) :"

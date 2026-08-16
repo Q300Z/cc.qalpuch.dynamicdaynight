@@ -18,7 +18,7 @@ Kirigami.FormLayout {
     property var wallpaperConfiguration
     property var parentLayout
 
-    twinFormLayouts: parentLayout
+    twinFormLayouts: parentLayout ? [parentLayout] : []
     property alias formLayout: root
 
     // Automatic calculation option

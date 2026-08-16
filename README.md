@@ -8,7 +8,9 @@ Plugin de fond d'écran dynamique pour **KDE Plasma 6** (`cc.qalpuch.dynamicdayn
 
 - [Présentation](#présentation)
 - [Fonctionnalités](#fonctionnalités)
-- [Installation manuelle](#installation-manuelle)
+- [Installation](#installation)
+  - [Installation automatique (Recommandé)](#installation-automatique-recommandé)
+  - [Installation manuelle](#installation-manuelle)
 - [Utilisation](#utilisation)
 - [Développement & Architecture](#développement--architecture)
   - [Structure du projet](#structure-du-projet)
@@ -40,33 +42,42 @@ Ce plugin est conçu nativement pour **KDE Plasma 6** (Qt 6 / KF6) selon les sta
 
 ---
 
-## Installation manuelle
+## Installation
 
-### Méthode 1 : Lien symbolique de développement (Recommandé)
+### Installation automatique (Recommandé)
 
-Pour lier le dossier directement dans l'environnement utilisateur Plasma :
+Un script shell d'installation automatisé est fourni à la racine du projet. Il compile les traductions, configure les répertoires XDG et lie le plugin à votre environnement Plasma :
 
 ```bash
-# 1. Créer les dossiers de destination
+# 1. Rendre le script exécutable (si ce n'est pas déjà fait)
+chmod +x install.sh
+
+# 2. Lancer l'installation
+./install.sh
+```
+
+---
+
+### Installation manuelle
+
+Si vous préférez installer le plugin manuellement étape par étape :
+
+```bash
+# 1. Créer les répertoires cibles dans l'espace utilisateur
 mkdir -p ~/.local/share/plasma/wallpapers
 mkdir -p ~/.local/share/locale/fr/LC_MESSAGES
 
-# 2. Créer le lien symbolique du plugin
+# 2. Créer le lien symbolique vers le dossier du projet
 ln -sfn /chemin/vers/wallpaper ~/.local/share/plasma/wallpapers/cc.qalpuch.dynamicdaynight
 
-# 3. Installer le catalogue de traduction française
+# 3. Compiler et installer le catalogue de traduction française
+msgfmt po/fr.po -o contents/locale/fr/LC_MESSAGES/plasma_wallpaper_cc.qalpuch.dynamicdaynight.mo
 cp contents/locale/fr/LC_MESSAGES/plasma_wallpaper_cc.qalpuch.dynamicdaynight.mo ~/.local/share/locale/fr/LC_MESSAGES/
 ```
 
-### Méthode 2 : Installation via `kpackagetool6`
-
+*Alternative via `kpackagetool6` :*
 ```bash
 kpackagetool6 --type Plasma/Wallpaper --install /chemin/vers/wallpaper
-```
-
-Pour mettre à jour un paquet déjà installé :
-```bash
-kpackagetool6 --type Plasma/Wallpaper --upgrade /chemin/vers/wallpaper
 ```
 
 ---
@@ -92,6 +103,7 @@ kpackagetool6 --type Plasma/Wallpaper --upgrade /chemin/vers/wallpaper
 ```text
 wallpaper/
 ├── metadata.json                 # Métadonnées du KPackage Plasma 6 (Id: cc.qalpuch.dynamicdaynight)
+├── install.sh                    # Script d'installation automatique
 ├── README.md                     # Documentation du projet
 ├── contents/
 │   ├── config/

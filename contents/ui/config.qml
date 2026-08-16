@@ -269,9 +269,10 @@ Layouts.ColumnLayout {
             onClicked: fileDialog.open()
         }
 
-        // Dominant accent color customization button (right of Browse button)
+        // Dominant accent color customization button (visible only if dynamic accent color is enabled)
         PlasmaComponents.Button {
             id: colorButton
+            visible: root.cfg_DynamicAccentColor
             implicitWidth: Kirigami.Units.gridUnit * 2.4
             implicitHeight: browseBtn.implicitHeight
 

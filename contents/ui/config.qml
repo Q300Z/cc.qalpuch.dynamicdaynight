@@ -19,6 +19,7 @@ Kirigami.FormLayout {
     property var parentLayout
 
     twinFormLayouts: parentLayout
+    property alias formLayout: root
 
     // Automatic calculation option
     property alias cfg_AutoSchedule: autoScheduleCheckBox.checked

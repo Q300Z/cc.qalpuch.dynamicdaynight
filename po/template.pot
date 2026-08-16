@@ -1,0 +1,184 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-16 19:45+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: contents/ui/config.qml:124
+msgid "Browse..."
+msgstr ""
+
+#: contents/ui/config.qml:130
+msgid "Default"
+msgstr ""
+
+#: contents/ui/config.qml:139
+msgid "Image Files (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+msgstr ""
+
+#: contents/ui/config.qml:140
+msgid "All Files (*)"
+msgstr ""
+
+#: contents/ui/config.qml:157
+msgid "Schedule Mode"
+msgstr ""
+
+#: contents/ui/config.qml:162
+msgid "Solar detection:"
+msgstr ""
+
+#: contents/ui/config.qml:163
+msgid ""
+"Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)"
+msgstr ""
+
+#: contents/ui/config.qml:174
+msgid ""
+"Today's calculated times:\n"
+"• Morning (Sunrise): %1\n"
+"• Noon (Solar Noon): %2\n"
+"• Evening (Sunset): %3\n"
+"• Night (Dusk): %4"
+msgstr ""
+
+#: contents/ui/config.qml:184
+msgid "System Settings:"
+msgstr ""
+
+#: contents/ui/config.qml:189
+msgid "Open System Date, Time & Location Settings..."
+msgstr ""
+
+#: contents/ui/config.qml:197
+msgid "Night Light Settings..."
+msgstr ""
+
+#: contents/ui/config.qml:210
+msgid "Manual Time Periods"
+msgstr ""
+
+#: contents/ui/config.qml:216
+msgid "Morning starts at:"
+msgstr ""
+
+#: contents/ui/config.qml:235
+msgid "Noon starts at:"
+msgstr ""
+
+#: contents/ui/config.qml:251
+msgid "Evening starts at:"
+msgstr ""
+
+#: contents/ui/config.qml:267
+msgid "Night starts at:"
+msgstr ""
+
+#: contents/ui/config.qml:285
+msgid "Images"
+msgstr ""
+
+#: contents/ui/config.qml:290
+msgid "Morning wallpaper:"
+msgstr ""
+
+#: contents/ui/config.qml:291
+msgid "matin.png (Default)"
+msgstr ""
+
+#: contents/ui/config.qml:292
+msgid "Select Morning Wallpaper"
+msgstr ""
+
+#: contents/ui/config.qml:297
+msgid "Noon wallpaper:"
+msgstr ""
+
+#: contents/ui/config.qml:298
+msgid "midi.png (Default)"
+msgstr ""
+
+#: contents/ui/config.qml:299
+msgid "Select Noon Wallpaper"
+msgstr ""
+
+#: contents/ui/config.qml:304
+msgid "Evening wallpaper:"
+msgstr ""
+
+#: contents/ui/config.qml:305
+msgid "soir.png (Default)"
+msgstr ""
+
+#: contents/ui/config.qml:306
+msgid "Select Evening Wallpaper"
+msgstr ""
+
+#: contents/ui/config.qml:311
+msgid "Night wallpaper:"
+msgstr ""
+
+#: contents/ui/config.qml:312
+msgid "nuit.png (Default)"
+msgstr ""
+
+#: contents/ui/config.qml:313
+msgid "Select Night Wallpaper"
+msgstr ""
+
+#: contents/ui/config.qml:321
+msgid "Appearance"
+msgstr ""
+
+#: contents/ui/config.qml:326
+msgid "Fill Mode:"
+msgstr ""
+
+#: contents/ui/config.qml:328
+msgid "Scaled (Stretch)"
+msgstr ""
+
+#: contents/ui/config.qml:329
+msgid "Zoom / Crop (Preserve Aspect Ratio)"
+msgstr ""
+
+#: contents/ui/config.qml:330
+msgid "Fit (Preserve Aspect Ratio)"
+msgstr ""
+
+#: contents/ui/config.qml:336
+msgid "Transition duration:"
+msgstr ""
+
+#: contents/ui/config.qml:349
+msgid "ms"
+msgstr ""
+
+#: contents/ui/config.qml:358
+msgid "Reset"
+msgstr ""
+
+#: contents/ui/config.qml:362
+msgid "Defaults:"
+msgstr ""
+
+#: contents/ui/config.qml:366
+msgid "Restore Default Configuration"
+msgstr ""
+
+#: contents/ui/main.qml:36
+msgid "Update Dynamic Wallpaper"
+msgstr ""

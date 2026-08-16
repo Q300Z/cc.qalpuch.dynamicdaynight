@@ -1,0 +1,25 @@
+{
+    "KPackageStructure": "Plasma/Wallpaper",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "Q300Zhomas@gmail.com",
+                "Name": "Q300Z"
+            }
+        ],
+        "Category": "Wallpaper",
+        "Description": "Dynamic wallpaper changing automatically according to the time of day (Morning, Noon, Evening, Night).",
+        "Description[fr]": "Fond d'écran dynamique changeant automatiquement selon l'heure de la journée (Matin, Midi, Soir, Nuit).",
+        "Icon": "preferences-desktop-wallpaper",
+        "Id": "cc.qalpuch.dynamicdaynight",
+        "License": "GPL-3.0-or-later",
+        "Name": "Dynamic Day & Night Wallpaper",
+        "Name[fr]": "Fond d'écran dynamique Jour & Nuit",
+        "ServiceTypes": [
+            "Plasma/Wallpaper"
+        ],
+        "Version": "1.0.0",
+        "Website": "https://qalpuch.cc"
+    },
+    "X-KDE-ParentApp": "org.kde.plasmashell"
+}

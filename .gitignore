@@ -1,0 +1,9 @@
+# KDE / Plasma cache & backup files
+*.kate-swp
+*~
+*.orig
+*.bak
+
+# Build / local artifacts
+*.qmlc
+*.jsc

@@ -17,6 +17,7 @@ Kirigami.FormLayout {
 
     // Properties and signals expected by KDE Plasma 6 kcm_wallpaper
     property var configDialog
+    property var wallpaperConfiguration
     property var parentLayout
     property alias formLayout: root
     twinFormLayouts: parentLayout ? [parentLayout] : []

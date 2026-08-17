@@ -44,12 +44,6 @@ Kirigami.FormLayout {
     property alias cfg_EveningImage: eveningRow.pathText
     property alias cfg_NightImage: nightRow.pathText
 
-    property alias cfg_DynamicAccentColor: dynamicAccentColorCheckBox.checked
-    property alias cfg_MorningColor: morningRow.selectedColor
-    property alias cfg_NoonColor: noonRow.selectedColor
-    property alias cfg_EveningColor: eveningRow.selectedColor
-    property alias cfg_NightColor: nightRow.selectedColor
-
     property alias cfg_FillMode: fillModeCombo.currentIndex
     property alias cfg_TransitionDuration: transitionSpin.value
 
@@ -90,25 +84,17 @@ Kirigami.FormLayout {
         eveningRow.pathText = "";
         nightRow.pathText = "";
 
-        dynamicAccentColorCheckBox.checked = false;
-        morningRow.selectedColor = morningRow.defaultColor;
-        noonRow.selectedColor = noonRow.defaultColor;
-        eveningRow.selectedColor = eveningRow.defaultColor;
-        nightRow.selectedColor = nightRow.defaultColor;
-
         fillModeCombo.currentIndex = 1;
         transitionSpin.value = 1500;
 
         root.configurationChanged();
     }
 
-    // Helper component for single-line file selection with compact inline 16:9 preview & color picker
+    // Helper component for single-line file selection with compact inline 16:9 preview
     component FilePathRow: Layouts.RowLayout {
         id: fileRow
 
         property string defaultFileName: ""
-        property color defaultColor: "#1E3539"
-        property color selectedColor: defaultColor
         property string dialogTitle: ""
         property string pathText: ""
 
@@ -155,13 +141,6 @@ Kirigami.FormLayout {
                 cache: true
                 smooth: true
                 mipmap: true
-                onStatusChanged: {
-                    if (status === Image.Ready) {
-                        colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
-                    } else if (status === Image.Error) {
-                        colorExtractorCanvas.resetState();
-                    }
-                }
             }
 
             // Zoom icon overlay on hover or active focus
@@ -190,55 +169,6 @@ Kirigami.FormLayout {
             }
         }
 
-        // Hidden Canvas for dominant color calculation (optimized 16x16)
-        Canvas {
-            id: colorExtractorCanvas
-            width: 16
-            height: 16
-            visible: false
-            renderTarget: Canvas.Image
-
-            property string activeLoadingUrl: ""
-
-            function extractFromUrl(urlToLoad) {
-                if (!urlToLoad) return;
-                const strUrl = urlToLoad.toString();
-                if (activeLoadingUrl === strUrl && isImageLoaded(strUrl)) {
-                    requestPaint();
-                    return;
-                }
-                activeLoadingUrl = strUrl;
-                loadImage(strUrl);
-            }
-
-            function resetState() {
-                if (activeLoadingUrl) {
-                    if (isImageLoaded(activeLoadingUrl)) {
-                        unloadImage(activeLoadingUrl);
-                    }
-                    activeLoadingUrl = "";
-                }
-            }
-
-            onImageLoaded: {
-                requestPaint();
-            }
-
-            onPaint: {
-                if (!activeLoadingUrl || !isImageLoaded(activeLoadingUrl)) return;
-                const ctx = getContext("2d");
-                ctx.clearRect(0, 0, width, height);
-                ctx.drawImage(activeLoadingUrl, 0, 0, width, height);
-                const extracted = TimeUtils.extractDominantColor(ctx, width, height, fileRow.defaultColor);
-                if (extracted && !Qt.colorEqual(fileRow.selectedColor, extracted)) {
-                    fileRow.selectedColor = extracted;
-                    root.configurationChanged();
-                }
-                unloadImage(activeLoadingUrl);
-                activeLoadingUrl = "";
-            }
-        }
-
         // Path field
         PlasmaComponents.TextField {
             id: pathField
@@ -262,44 +192,14 @@ Kirigami.FormLayout {
             onClicked: fileDialog.open()
         }
 
-        // Dominant accent color customization button (visible only if dynamic accent color is enabled)
-        PlasmaComponents.Button {
-            id: colorButton
-            visible: root.cfg_DynamicAccentColor
-            implicitWidth: Kirigami.Units.gridUnit * 2.4
-            implicitHeight: browseBtn.implicitHeight
-
-            PlasmaComponents.ToolTip.text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Accent color: %1 (click to customize)", String(fileRow.selectedColor))
-            PlasmaComponents.ToolTip.visible: hovered
-
-            Rectangle {
-                anchors.centerIn: parent
-                width: Kirigami.Units.gridUnit * 1.3
-                height: Kirigami.Units.gridUnit * 1.1
-                radius: Kirigami.Units.smallSpacing / 2
-                color: fileRow.selectedColor
-                border.color: Kirigami.Theme.disabledTextColor
-                border.width: 1
-            }
-
-            onClicked: colorDialog.open()
-        }
-
-        Component.onCompleted: {
-            if (previewImage.status === Image.Ready && (!fileRow.selectedColor || fileRow.selectedColor === "" || String(fileRow.selectedColor) === "#00000000")) {
-                colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
-            }
-        }
-
         // Reset to default button
         PlasmaComponents.Button {
             icon.name: "edit-undo"
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default")
-            enabled: fileRow.isCustom || !Qt.colorEqual(fileRow.selectedColor, fileRow.defaultColor)
+            enabled: fileRow.isCustom
             onClicked: {
                 fileRow.pathText = "";
                 pathField.text = "";
-                fileRow.selectedColor = fileRow.defaultColor;
                 root.configurationChanged();
             }
         }
@@ -318,16 +218,6 @@ Kirigami.FormLayout {
                 }
                 fileRow.pathText = selected;
                 pathField.text = selected;
-                root.configurationChanged();
-            }
-        }
-
-        QtDialogs.ColorDialog {
-            id: colorDialog
-            title: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Accent Color")
-            selectedColor: fileRow.selectedColor
-            onAccepted: {
-                fileRow.selectedColor = selectedColor;
                 root.configurationChanged();
             }
         }
@@ -525,7 +415,6 @@ Kirigami.FormLayout {
         id: morningRow
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning wallpaper:")
         defaultFileName: "matin.png"
-        defaultColor: "#1e3539"
         dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Morning Wallpaper")
     }
 
@@ -533,7 +422,6 @@ Kirigami.FormLayout {
         id: noonRow
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon wallpaper:")
         defaultFileName: "midi.png"
-        defaultColor: "#446c84"
         dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Noon Wallpaper")
     }
 
@@ -541,7 +429,6 @@ Kirigami.FormLayout {
         id: eveningRow
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening wallpaper:")
         defaultFileName: "soir.png"
-        defaultColor: "#322f21"
         dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Evening Wallpaper")
     }
 
@@ -549,7 +436,6 @@ Kirigami.FormLayout {
         id: nightRow
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night wallpaper:")
         defaultFileName: "nuit.png"
-        defaultColor: "#48220b"
         dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Night Wallpaper")
     }
 
@@ -559,14 +445,6 @@ Kirigami.FormLayout {
     Kirigami.Separator {
         Kirigami.FormData.isSection: true
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Appearance")
-    }
-
-    PlasmaComponents.CheckBox {
-        id: dynamicAccentColorCheckBox
-        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Accent color:")
-        text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Synchronize KDE Plasma accent color with active wallpaper period")
-        checked: false
-        onToggled: root.configurationChanged()
     }
 
     PlasmaComponents.ComboBox {

@@ -26,13 +26,6 @@ WallpaperItem {
     // Effective schedule for period boundaries
     readonly property var currentSchedule: TimeUtils.getEffectiveSchedule(currentTime, root.configuration)
 
-    // Dynamic accent color: applied only if enabled in settings.
-    // Uses autoPeriod (real temporal cycle) so forcedPeriod previews don't pollute global OS accent color.
-    // Evaluates to undefined when disabled, yielding an invalid QColor to cleanly restore default system theme.
-    accentColor: (root.configuration && root.configuration.DynamicAccentColor)
-        ? Qt.color(TimeUtils.getAccentColorForPeriod(autoPeriod, root.configuration))
-        : undefined
-
     // Resolved source URL for the active period
     readonly property url targetImageSource: TimeUtils.getImageForPeriod(
         currentPeriod,
@@ -49,9 +42,7 @@ WallpaperItem {
     // Declarative loading state: active until initial load completes or while active layer is loading
     loading: !initialLoadDone || (activeLayerIndex === 0 ? imageLayerA.status === Image.Loading : imageLayerB.status === Image.Loading)
 
-    onAccentColorChanged: {
-        console.log("[cc.qalpuch.dynamicdaynight] Dynamic accent color updated:", root.accentColor);
-    }
+
 
     /**
      * Resolves default bundled image URL for a given period.

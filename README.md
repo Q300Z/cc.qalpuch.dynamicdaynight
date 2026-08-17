@@ -109,6 +109,7 @@ kpackagetool6 --type Plasma/Wallpaper --install .
 
 ```text
 wallpaper/
+├── LICENSE                       # Texte intégral de la licence GNU GPL v3
 ├── metadata.json                 # Métadonnées du KPackage Plasma 6 (Id: cc.qalpuch.dynamicdaynight)
 ├── install.sh                    # Script d'installation automatique
 ├── README.md                     # Documentation du projet
@@ -120,8 +121,6 @@ wallpaper/
 │   │   ├── midi.png              # Image du midi (par défaut 12:00 -> 17:59)
 │   │   ├── soir.png              # Image du soir (par défaut 18:00 -> 21:59)
 │   │   └── nuit.png              # Image de nuit (par défaut 22:00 -> 05:59)
-│   ├── locale/
-│   │   └── fr/LC_MESSAGES/       # Catalogue binaire Gettext (.mo) compilé
 │   └── ui/
 │       ├── TimeUtils.js          # Module métier (éphémérides solaires et résolutions)
 │       ├── main.qml              # Vue principale (WallpaperItem + transitions)
@@ -167,4 +166,5 @@ cp contents/locale/fr/LC_MESSAGES/plasma_wallpaper_cc.qalpuch.dynamicdaynight.mo
 
 ## Licence
 
-Ce projet est distribué sous licence **GPL-3.0-or-later** conformément aux standards du projet KDE.
+Ce projet est un logiciel libre distribué sous licence **GNU General Public License v3.0 or later (GPL-3.0-or-later)** conformément aux standards de la communauté KDE.  
+Consultez le fichier [`LICENSE`](LICENSE) pour le texte intégral des termes et conditions.

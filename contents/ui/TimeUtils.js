@@ -62,17 +62,19 @@ const TIMEZONE_COORDINATES = {
 /**
  * Returns estimated coordinates from the system timezone.
  * Falls back to dynamic longitude estimation based on UTC timezone offset if timezone is not hardcoded.
+ * Detects Southern Hemisphere timezones to assign a realistic austral latitude (-33.8688) instead of boreal (+48.8566).
  *
  * @param {Date} [date] - Reference date for timezone offset calculation
  * @returns {{lat: number, lon: number}}
  */
 function getSystemCoordinates(date) {
     const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
+    let detectedTz = "";
     try {
         if (typeof Intl !== "undefined" && Intl.DateTimeFormat) {
-            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            if (tz && TIMEZONE_COORDINATES[tz]) {
-                return TIMEZONE_COORDINATES[tz];
+            detectedTz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+            if (detectedTz && TIMEZONE_COORDINATES[detectedTz]) {
+                return TIMEZONE_COORDINATES[detectedTz];
             }
         }
     } catch (e) {
@@ -86,8 +88,20 @@ function getSystemCoordinates(date) {
     const tzOffsetMinutes = -d.getTimezoneOffset();
     const approxLon = tzOffsetMinutes / 4.0;
 
-    // Default latitude to standard temperate mid-latitude (48.8566)
-    return { lat: 48.8566, lon: approxLon };
+    // Detect Southern Hemisphere timezones to assign realistic austral latitude (-33.8688) instead of boreal (+48.8566)
+    const southernPrefixes = [
+        "Australia/",
+        "Pacific/",
+        "Antarctica/",
+        "America/Argentina",
+        "America/Santiago",
+        "America/Sao_Paulo",
+        "Africa/Johannesburg"
+    ];
+    const isSouthern = detectedTz && southernPrefixes.some((prefix) => detectedTz.startsWith(prefix));
+    const approxLat = isSouthern ? -33.8688 : 48.8566;
+
+    return { lat: approxLat, lon: approxLon };
 }
 
 /**
@@ -315,7 +329,16 @@ function getImageForPeriod(period, cfg, resolveLocalUrl) {
 
     if (customImage && String(customImage).trim().length > 0) {
         const trimmed = String(customImage).trim();
-        return trimmed.startsWith("file://") ? trimmed : "file://" + trimmed;
+        if (trimmed.startsWith("file://") || trimmed.startsWith("qrc:/")) {
+            return trimmed;
+        }
+        const rawPath = trimmed.startsWith("/") ? trimmed : "/" + trimmed;
+        try {
+            return "file://" + encodeURI(rawPath).replace(/#/g, "%23").replace(/\?/g, "%3F");
+        } catch (e) {
+            const safeSegments = rawPath.split("/").map((seg) => encodeURIComponent(seg)).join("/");
+            return "file://" + safeSegments;
+        }
     }
 
     return safeResolve(defaultFile);

@@ -138,16 +138,17 @@ function calculateSolarSchedule(date, lat, lon) {
  * @returns {{morning: number, noon: number, evening: number, night: number}}
  */
 function getEffectiveSchedule(date, cfg) {
-    if (cfg && cfg.AutoSchedule) {
+    const c = cfg || {};
+    if (c.AutoSchedule !== false) {
         const sysCoords = getSystemCoordinates();
         return calculateSolarSchedule(date, sysCoords.lat, sysCoords.lon);
     }
 
     return {
-        morning: toMinutes(cfg.MorningHour !== undefined ? cfg.MorningHour : 6, cfg.MorningMinute !== undefined ? cfg.MorningMinute : 0),
-        noon:    toMinutes(cfg.NoonHour !== undefined ? cfg.NoonHour : 12, cfg.NoonMinute !== undefined ? cfg.NoonMinute : 0),
-        evening: toMinutes(cfg.EveningHour !== undefined ? cfg.EveningHour : 18, cfg.EveningMinute !== undefined ? cfg.EveningMinute : 0),
-        night:   toMinutes(cfg.NightHour !== undefined ? cfg.NightHour : 22, cfg.NightMinute !== undefined ? cfg.NightMinute : 0)
+        morning: toMinutes(c.MorningHour !== undefined ? c.MorningHour : 6, c.MorningMinute !== undefined ? c.MorningMinute : 0),
+        noon:    toMinutes(c.NoonHour !== undefined ? c.NoonHour : 12, c.NoonMinute !== undefined ? c.NoonMinute : 0),
+        evening: toMinutes(c.EveningHour !== undefined ? c.EveningHour : 18, c.EveningMinute !== undefined ? c.EveningMinute : 0),
+        night:   toMinutes(c.NightHour !== undefined ? c.NightHour : 22, c.NightMinute !== undefined ? c.NightMinute : 0)
     };
 }
 
@@ -207,25 +208,26 @@ function getCurrentPeriod(date, cfg) {
  * @returns {string}
  */
 function getImageForPeriod(period, cfg, resolveLocalUrl) {
+    const c = cfg || {};
     let customImage = "";
     let defaultFile = "";
 
     switch (period) {
         case "morning":
-            customImage = cfg.MorningImage;
+            customImage = c.MorningImage;
             defaultFile = "../images/matin.png";
             break;
         case "noon":
-            customImage = cfg.NoonImage;
+            customImage = c.NoonImage;
             defaultFile = "../images/midi.png";
             break;
         case "evening":
-            customImage = cfg.EveningImage;
+            customImage = c.EveningImage;
             defaultFile = "../images/soir.png";
             break;
         case "night":
         default:
-            customImage = cfg.NightImage;
+            customImage = c.NightImage;
             defaultFile = "../images/nuit.png";
             break;
     }

@@ -29,7 +29,7 @@ WallpaperItem {
     // Dynamic accent color: applied only if enabled in settings (disabled by default to keep system theme color)
     readonly property color accentColor: (root.configuration && root.configuration.DynamicAccentColor)
         ? TimeUtils.getAccentColorForPeriod(currentPeriod, root.configuration)
-        : undefined
+        : "transparent"
 
     // Resolved source URL for the active period
     readonly property url targetImageSource: TimeUtils.getImageForPeriod(
@@ -44,9 +44,13 @@ WallpaperItem {
     // Flag indicating whether the first wallpaper has loaded
     property bool initialLoadDone: false
 
-    // Notify Plasma on daylight period change
+    // Notify Plasma on daylight period or accent color change
     onCurrentPeriodChanged: {
         root.accentColorChanged();
+    }
+
+    onAccentColorChanged: {
+        console.log("[cc.qalpuch.dynamicdaynight] Dynamic accent color updated:", root.accentColor);
     }
 
     /**
@@ -157,13 +161,18 @@ WallpaperItem {
 
         // Map fill mode integer config (0: Stretch, 1: PreserveAspectCrop, 2: PreserveAspectFit)
         readonly property int resolvedFillMode: {
-            switch (root.configuration.FillMode) {
+            const mode = (root.configuration && root.configuration.FillMode !== undefined) ? root.configuration.FillMode : 1;
+            switch (mode) {
                 case 0:  return Image.Stretch;
                 case 2:  return Image.PreserveAspectFit;
                 case 1:
                 default: return Image.PreserveAspectCrop;
             }
         }
+
+        readonly property int transitionDuration: (root.configuration && root.configuration.TransitionDuration !== undefined)
+            ? root.configuration.TransitionDuration
+            : 1500
 
         Image {
             id: imageLayerA
@@ -184,7 +193,7 @@ WallpaperItem {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: root.configuration.TransitionDuration
+                    duration: imageContainer.transitionDuration
                     easing.type: Easing.InOutQuad
                 }
             }
@@ -209,7 +218,7 @@ WallpaperItem {
 
             Behavior on opacity {
                 NumberAnimation {
-                    duration: root.configuration.TransitionDuration
+                    duration: imageContainer.transitionDuration
                     easing.type: Easing.InOutQuad
                 }
             }

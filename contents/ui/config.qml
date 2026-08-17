@@ -128,16 +128,27 @@ Kirigami.FormLayout {
         spacing: Kirigami.Units.smallSpacing
         Layouts.Layout.fillWidth: true
 
-        // Compact 16:9 Thumbnail preview (clickable to open large preview)
+        // Compact 16:9 Thumbnail preview (clickable to open large preview, accessible via keyboard)
         Rectangle {
             id: thumbFrame
             Layouts.Layout.preferredWidth: Math.round(Kirigami.Units.gridUnit * 3.2)
             Layouts.Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.8)
             radius: Kirigami.Units.smallSpacing / 2
             color: Kirigami.Theme.alternateBackgroundColor
-            border.color: thumbMouseArea.containsMouse ? Kirigami.Theme.highlightColor : (fileRow.isCustom ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor)
-            border.width: (thumbMouseArea.containsMouse || fileRow.isCustom) ? 1.5 : 1
+            border.color: (thumbMouseArea.containsMouse || thumbFrame.activeFocus) ? Kirigami.Theme.highlightColor : (fileRow.isCustom ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor)
+            border.width: (thumbMouseArea.containsMouse || thumbFrame.activeFocus || fileRow.isCustom) ? 1.5 : 1
             clip: true
+
+            focus: true
+            activeFocusOnTab: true
+
+            Accessible.role: Accessible.Button
+            Accessible.name: fileRow.dialogTitle
+            Accessible.description: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Click to enlarge")
+            Accessible.onPressAction: root.openLargePreview(fileRow.dialogTitle, fileRow.resolvedImageSource)
+
+            Keys.onReturnPressed: root.openLargePreview(fileRow.dialogTitle, fileRow.resolvedImageSource)
+            Keys.onSpacePressed: root.openLargePreview(fileRow.dialogTitle, fileRow.resolvedImageSource)
 
             Image {
                 id: previewImage
@@ -150,11 +161,11 @@ Kirigami.FormLayout {
                 mipmap: true
             }
 
-            // Zoom icon overlay on hover
+            // Zoom icon overlay on hover or active focus
             Rectangle {
                 anchors.fill: parent
                 color: Qt.rgba(0, 0, 0, 0.4)
-                visible: thumbMouseArea.containsMouse
+                visible: thumbMouseArea.containsMouse || thumbFrame.activeFocus
 
                 Kirigami.Icon {
                     anchors.centerIn: parent
@@ -176,11 +187,11 @@ Kirigami.FormLayout {
             }
         }
 
-        // Hidden Canvas for dominant color calculation
+        // Hidden Canvas for dominant color calculation (optimized 16x16)
         Canvas {
             id: colorExtractorCanvas
-            width: 32
-            height: 32
+            width: 16
+            height: 16
             visible: false
             renderTarget: Canvas.Image
 
@@ -208,6 +219,7 @@ Kirigami.FormLayout {
                     root.configurationChanged();
                 }
                 unloadImage(activeLoadingUrl);
+                activeLoadingUrl = "";
             }
         }
 
@@ -287,7 +299,7 @@ Kirigami.FormLayout {
                 i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "All Files (*)")
             ]
             onAccepted: {
-                let selected = fileDialog.selectedFile.toString();
+                let selected = decodeURIComponent(fileDialog.selectedFile.toString());
                 if (selected.startsWith("file://")) {
                     selected = selected.substring(7);
                 }

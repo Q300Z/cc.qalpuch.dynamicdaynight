@@ -15,11 +15,7 @@
         "License": "GPL-3.0-or-later",
         "Name": "Dynamic Day & Night Wallpaper",
         "Name[fr]": "Fond d'écran dynamique Jour & Nuit",
-        "ServiceTypes": [
-            "Plasma/Wallpaper"
-        ],
         "Version": "1.0.0",
         "Website": "https://qalpuch.cc"
-    },
-    "X-KDE-ParentApp": "org.kde.plasmashell"
+    }
 }

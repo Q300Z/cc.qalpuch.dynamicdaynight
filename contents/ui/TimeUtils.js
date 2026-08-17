@@ -10,7 +10,9 @@
  * @returns {number}
  */
 function toMinutes(hour, minute) {
-    return (Number(hour) || 0) * 60 + (Number(minute) || 0);
+    const h = Number(hour);
+    const m = Number(minute);
+    return (isNaN(h) ? 0 : h) * 60 + (isNaN(m) ? 0 : m);
 }
 
 /**
@@ -19,7 +21,9 @@ function toMinutes(hour, minute) {
  * @returns {string}
  */
 function formatMinutes(minutes) {
-    const normalized = (Math.round(minutes) % 1440 + 1440) % 1440;
+    const num = Number(minutes);
+    const valid = isNaN(num) ? 0 : num;
+    const normalized = (Math.round(valid) % 1440 + 1440) % 1440;
     const h = Math.floor(normalized / 60);
     const m = normalized % 60;
     return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m;
@@ -57,91 +61,166 @@ const TIMEZONE_COORDINATES = {
 
 /**
  * Returns estimated coordinates from the system timezone.
+ * Falls back to dynamic longitude estimation based on UTC timezone offset if timezone is not hardcoded.
+ *
+ * @param {Date} [date] - Reference date for timezone offset calculation
  * @returns {{lat: number, lon: number}}
  */
-function getSystemCoordinates() {
+function getSystemCoordinates(date) {
+    const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
     try {
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        if (tz && TIMEZONE_COORDINATES[tz]) {
-            return TIMEZONE_COORDINATES[tz];
+        if (typeof Intl !== "undefined" && Intl.DateTimeFormat) {
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (tz && TIMEZONE_COORDINATES[tz]) {
+                return TIMEZONE_COORDINATES[tz];
+            }
         }
     } catch (e) {
-        // Fallback default
+        // Fallback to offset calculation
     }
-    return { lat: 48.8566, lon: 2.3522 }; // Default Paris
+
+    // Dynamic longitude approximation: Earth rotates 360° in 1440 minutes (1° every 4 minutes)
+    // Date.prototype.getTimezoneOffset() returns minutes behind UTC (e.g. UTC+2 is -120, UTC-5 is +300)
+    // Therefore: offsetMinutesFromUtc = -d.getTimezoneOffset()
+    // approxLon = offsetMinutesFromUtc / 4.0
+    const tzOffsetMinutes = -d.getTimezoneOffset();
+    const approxLon = tzOffsetMinutes / 4.0;
+
+    // Default latitude to standard temperate mid-latitude (48.8566)
+    return { lat: 48.8566, lon: approxLon };
 }
 
 /**
  * Calculates accurate astronomical solar cycle (Sunrise, Solar Noon, Sunset, Dusk/Night)
  * using standard NOAA solar ephemeris algorithms.
  *
- * @param {Date} date
- * @param {number} lat - Latitude in decimal degrees
- * @param {number} lon - Longitude in decimal degrees
- * @returns {{morning: number, noon: number, evening: number, night: number}} minutes from midnight
+ * Handles leap years, pure UTC day-of-year calculations (DST immune),
+ * and polar extremes (Polar Night cosHA > 1, Midnight Sun cosHA < -1).
+ *
+ * @param {Date} [date] - Reference date
+ * @param {number} [lat=48.8566] - Latitude in decimal degrees
+ * @param {number} [lon=2.3522] - Longitude in decimal degrees
+ * @returns {{morning: number, noon: number, evening: number, night: number}} minutes from midnight [0..1439]
  */
 function calculateSolarSchedule(date, lat, lon) {
+    const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
+    const latitude = (typeof lat === "number" && !isNaN(lat)) ? lat : 48.8566;
+    const longitude = (typeof lon === "number" && !isNaN(lon)) ? lon : 2.3522;
+
     const rad = Math.PI / 180.0;
     const deg = 180.0 / Math.PI;
 
-    // Day of the year
-    const startOfYear = new Date(date.getFullYear(), 0, 1);
-    const dayOfYear = Math.floor((date - startOfYear) / 86400000) + 1;
+    // 1. Day of the year calculated in pure UTC (avoids DST 1-hour shift artifacts)
+    const year = d.getFullYear();
+    const startOfYearUtc = Date.UTC(year, 0, 1);
+    const dateUtc = Date.UTC(year, d.getMonth(), d.getDate());
+    const dayOfYear = Math.floor((dateUtc - startOfYearUtc) / 86400000) + 1;
 
-    // Fractional year in radians
-    const gamma = (2.0 * Math.PI / 365.0) * (dayOfYear - 1 + ((date.getHours() - 12) / 24.0));
+    // 2. Fractional year in radians taking leap years into account
+    const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    const daysInYear = isLeap ? 366.0 : 365.0;
+    const gamma = (2.0 * Math.PI / daysInYear) * (dayOfYear - 1 + ((d.getHours() - 12) / 24.0));
 
-    // Equation of Time (in minutes)
+    // 3. NOAA Equation of Time (in minutes)
     const eqTime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma)
                    - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
 
-    // Solar Declination (in radians)
+    // 4. Solar Declination (in radians)
     const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma)
                  - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma);
 
-    // Timezone offset in minutes
-    const tzOffsetMinutes = -date.getTimezoneOffset();
+    // 5. Timezone offset in minutes (local time relative to UTC)
+    const tzOffsetMinutes = -d.getTimezoneOffset();
 
-    // Solar noon in local minutes
-    const solarNoonMinutes = 720.0 - 4.0 * lon - eqTime + tzOffsetMinutes;
+    // 6. True Solar Noon in local minutes from midnight
+    const solarNoonMinutes = 720.0 - 4.0 * longitude - eqTime + tzOffsetMinutes;
 
-    function getHourAngle(zenithDeg) {
-        const cosHA = (Math.cos(zenithDeg * rad) - Math.sin(lat * rad) * Math.sin(decl)) /
-                      (Math.cos(lat * rad) * Math.cos(decl));
-        if (cosHA > 1.0) return null; // Polar night
-        if (cosHA < -1.0) return null; // Midnight sun
-        return Math.acos(cosHA) * deg;
+    /**
+     * Calculates the Hour Angle for a given solar zenith angle.
+     * Evaluates polar cases:
+     * - cosHA > 1.0 : Polar Night (Sun never rises above zenith angle)
+     * - cosHA < -1.0: Midnight Sun (Sun never drops below zenith angle)
+     *
+     * @param {number} zenithDeg
+     * @returns {{ status: string, ha: number|null }} status: 'NORMAL' | 'POLAR_NIGHT' | 'MIDNIGHT_SUN'
+     */
+    function evaluateHourAngle(zenithDeg) {
+        const cosHA = (Math.cos(zenithDeg * rad) - Math.sin(latitude * rad) * Math.sin(decl)) /
+                      (Math.cos(latitude * rad) * Math.cos(decl));
+
+        if (cosHA > 1.0) {
+            // Sun remains below zenith all day -> Polar Night
+            return { status: "POLAR_NIGHT", ha: null };
+        }
+        if (cosHA < -1.0) {
+            // Sun remains above zenith all day -> Midnight Sun
+            return { status: "MIDNIGHT_SUN", ha: null };
+        }
+        return { status: "NORMAL", ha: Math.acos(cosHA) * deg };
     }
 
-    // 90.833° = standard sunrise/sunset with atmospheric refraction
-    const haSunrise = getHourAngle(90.833);
-    // 96.0° = Civil dusk / twilight
-    const haDusk = getHourAngle(96.0);
+    // 90.833° = standard sunrise/sunset zenith (including 34' refraction and 16' solar semi-diameter)
+    const sunriseEval = evaluateHourAngle(90.833);
+    // 96.0° = Civil dusk / twilight zenith
+    const duskEval = evaluateHourAngle(96.0);
 
-    const sunriseMin = (haSunrise !== null) ? solarNoonMinutes - haSunrise * 4.0 : 360;
-    const sunsetMin  = (haSunrise !== null) ? solarNoonMinutes + haSunrise * 4.0 : 1080;
-    const duskMin    = (haDusk !== null) ? solarNoonMinutes + haDusk * 4.0 : sunsetMin + 45;
+    let sunriseMin, sunsetMin, duskMin;
+
+    if (sunriseEval.status === "POLAR_NIGHT") {
+        // Polar Night: The sun does not rise above the horizon.
+        if (duskEval.status === "NORMAL" && duskEval.ha !== null) {
+            // Civil twilight glow occurs around solar noon
+            const halfTwilight = duskEval.ha * 4.0;
+            sunriseMin = solarNoonMinutes - halfTwilight;
+            sunsetMin  = solarNoonMinutes + halfTwilight;
+            duskMin    = sunsetMin + 30.0;
+        } else {
+            // Total polar night: 24 hours of darkness
+            sunriseMin = solarNoonMinutes - 60.0;
+            sunsetMin  = solarNoonMinutes + 60.0;
+            duskMin    = solarNoonMinutes + 120.0;
+        }
+    } else if (sunriseEval.status === "MIDNIGHT_SUN") {
+        // Midnight Sun: The sun does not set below the horizon (24 hours of sunlight).
+        sunriseMin = solarNoonMinutes - 360.0; // ~6 hours before solar noon
+        sunsetMin  = solarNoonMinutes + 360.0; // ~6 hours after solar noon
+        duskMin    = solarNoonMinutes + 540.0; // ~9 hours after solar noon
+    } else {
+        // Standard sunrise, sunset, and twilight calculation
+        const haSunrise = sunriseEval.ha;
+        sunriseMin = solarNoonMinutes - haSunrise * 4.0;
+        sunsetMin  = solarNoonMinutes + haSunrise * 4.0;
+
+        if (duskEval.status === "NORMAL" && duskEval.ha !== null) {
+            duskMin = solarNoonMinutes + duskEval.ha * 4.0;
+        } else {
+            duskMin = sunsetMin + 45.0;
+        }
+    }
+
+    const norm = (m) => ((Math.round(m) % 1440) + 1440) % 1440;
 
     return {
-        morning: Math.round(sunriseMin),
-        noon: Math.round(solarNoonMinutes),
-        evening: Math.round(sunsetMin),
-        night: Math.round(duskMin)
+        morning: norm(sunriseMin),
+        noon: norm(solarNoonMinutes),
+        evening: norm(sunsetMin),
+        night: norm(duskMin)
     };
 }
 
 /**
  * Returns effective schedule in minutes for the given configuration.
  *
- * @param {Date} date
- * @param {Object} cfg
+ * @param {Date} [date]
+ * @param {Object} [cfg]
  * @returns {{morning: number, noon: number, evening: number, night: number}}
  */
 function getEffectiveSchedule(date, cfg) {
+    const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
     const c = cfg || {};
     if (c.AutoSchedule !== false) {
-        const sysCoords = getSystemCoordinates();
-        return calculateSolarSchedule(date, sysCoords.lat, sysCoords.lon);
+        const sysCoords = getSystemCoordinates(d);
+        return calculateSolarSchedule(d, sysCoords.lat, sysCoords.lon);
     }
 
     return {
@@ -155,13 +234,14 @@ function getEffectiveSchedule(date, cfg) {
 /**
  * Determines which time period is active based on current time and configured schedule.
  *
- * @param {Date} date - The date to check
- * @param {Object} cfg - The configuration object
+ * @param {Date} [date] - The date to check
+ * @param {Object} [cfg] - The configuration object
  * @returns {string} One of: 'morning', 'noon', 'evening', 'night'
  */
 function getCurrentPeriod(date, cfg) {
-    const currentMinutes = toMinutes(date.getHours(), date.getMinutes());
-    const schedule = getEffectiveSchedule(date, cfg);
+    const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
+    const currentMinutes = toMinutes(d.getHours(), d.getMinutes());
+    const schedule = getEffectiveSchedule(d, cfg);
 
     const morningMin = schedule.morning;
     const noonMin    = schedule.noon;
@@ -203,12 +283,13 @@ function getCurrentPeriod(date, cfg) {
  * Resolves the appropriate image URL for a given time period.
  *
  * @param {string} period - 'morning', 'noon', 'evening', 'night'
- * @param {Object} cfg - Configuration object
- * @param {function} resolveLocalUrl - Function to resolve package-relative URLs
+ * @param {Object} [cfg] - Configuration object
+ * @param {function} [resolveLocalUrl] - Function to resolve package-relative URLs
  * @returns {string}
  */
 function getImageForPeriod(period, cfg, resolveLocalUrl) {
     const c = cfg || {};
+    const safeResolve = (typeof resolveLocalUrl === "function") ? resolveLocalUrl : ((p) => p);
     let customImage = "";
     let defaultFile = "";
 
@@ -237,7 +318,7 @@ function getImageForPeriod(period, cfg, resolveLocalUrl) {
         return trimmed.startsWith("file://") ? trimmed : "file://" + trimmed;
     }
 
-    return resolveLocalUrl(defaultFile);
+    return safeResolve(defaultFile);
 }
 
 /**
@@ -248,19 +329,24 @@ function getImageForPeriod(period, cfg, resolveLocalUrl) {
  * @returns {{start: number, end: number}}
  */
 function getPeriodRange(period, schedule) {
-    if (!schedule) {
+    if (!schedule || typeof schedule !== "object") {
         return { start: 0, end: 0 };
     }
+    const morning = schedule.morning !== undefined ? schedule.morning : 360;
+    const noon    = schedule.noon !== undefined ? schedule.noon : 720;
+    const evening = schedule.evening !== undefined ? schedule.evening : 1080;
+    const night   = schedule.night !== undefined ? schedule.night : 1320;
+
     switch (period) {
         case "morning":
-            return { start: schedule.morning, end: schedule.noon };
+            return { start: morning, end: noon };
         case "noon":
-            return { start: schedule.noon, end: schedule.evening };
+            return { start: noon, end: evening };
         case "evening":
-            return { start: schedule.evening, end: schedule.night };
+            return { start: evening, end: night };
         case "night":
         default:
-            return { start: schedule.night, end: schedule.morning };
+            return { start: night, end: morning };
     }
 }
 
@@ -284,7 +370,6 @@ function getPeriodIcon(period) {
             return "preferences-system-time";
     }
 }
-
 
 /**
  * Calculates the exact number of milliseconds remaining until the next period change.
@@ -359,8 +444,15 @@ function getAccentColorForPeriod(period, cfg) {
  * @returns {string} Hex color string (#RRGGBB)
  */
 function extractDominantColor(ctx, width, height, fallbackColor) {
+    const defaultColor = fallbackColor || "#1D99F3";
+    if (!ctx || !width || !height || width <= 0 || height <= 0) {
+        return defaultColor;
+    }
     try {
         const imgData = ctx.getImageData(0, 0, width, height);
+        if (!imgData || !imgData.data) {
+            return defaultColor;
+        }
         const data = imgData.data;
         const colorBuckets = {};
         let bestColor = null;
@@ -436,10 +528,8 @@ function extractDominantColor(ctx, width, height, fallbackColor) {
             }
         }
 
-        return bestColor || fallbackColor || "#1D99F3";
+        return bestColor || defaultColor;
     } catch (e) {
-        return fallbackColor || "#1D99F3";
+        return defaultColor;
     }
 }
-
-

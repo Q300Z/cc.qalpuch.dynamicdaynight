@@ -54,6 +54,25 @@ WallpaperItem {
     }
 
     /**
+     * Resolves default bundled image URL for a given period.
+     * @param {string} period - 'morning', 'noon', 'evening', 'night'
+     * @returns {url}
+     */
+    function getBundledImageSource(period) {
+        switch (period) {
+            case "morning":
+                return Qt.resolvedUrl("../images/matin.png");
+            case "noon":
+                return Qt.resolvedUrl("../images/midi.png");
+            case "evening":
+                return Qt.resolvedUrl("../images/soir.png");
+            case "night":
+            default:
+                return Qt.resolvedUrl("../images/nuit.png");
+        }
+    }
+
+    /**
      * Localized display name for a period identifier.
      * @param {string} period - 'morning', 'noon', 'evening', 'night'
      * @returns {string}
@@ -187,7 +206,10 @@ WallpaperItem {
             onStatusChanged: {
                 if (status === Image.Error) {
                     console.warn("[cc.qalpuch.dynamicdaynight] Failed to load wallpaper: " + source + " - Falling back to default bundled image.");
-                    source = Qt.resolvedUrl("../images/" + root.currentPeriod + ".png");
+                    const fallbackUrl = root.getBundledImageSource(root.currentPeriod);
+                    if (source !== fallbackUrl) {
+                        source = fallbackUrl;
+                    }
                 }
             }
 
@@ -195,6 +217,11 @@ WallpaperItem {
                 NumberAnimation {
                     duration: imageContainer.transitionDuration
                     easing.type: Easing.InOutQuad
+                    onRunningChanged: {
+                        if (!running && imageLayerA.opacity === 0.0) {
+                            imageLayerA.source = "";
+                        }
+                    }
                 }
             }
         }
@@ -212,7 +239,10 @@ WallpaperItem {
             onStatusChanged: {
                 if (status === Image.Error) {
                     console.warn("[cc.qalpuch.dynamicdaynight] Failed to load wallpaper: " + source + " - Falling back to default bundled image.");
-                    source = Qt.resolvedUrl("../images/" + root.currentPeriod + ".png");
+                    const fallbackUrl = root.getBundledImageSource(root.currentPeriod);
+                    if (source !== fallbackUrl) {
+                        source = fallbackUrl;
+                    }
                 }
             }
 
@@ -220,6 +250,11 @@ WallpaperItem {
                 NumberAnimation {
                     duration: imageContainer.transitionDuration
                     easing.type: Easing.InOutQuad
+                    onRunningChanged: {
+                        if (!running && imageLayerB.opacity === 0.0) {
+                            imageLayerB.source = "";
+                        }
+                    }
                 }
             }
         }
@@ -240,6 +275,7 @@ WallpaperItem {
             imageLayerA.source = nextUrl;
             imageLayerA.opacity = 1.0;
             imageLayerB.opacity = 0.0;
+            imageLayerB.source = "";
             root.activeLayerIndex = 0;
             root.initialLoadDone = true;
             return;
@@ -290,6 +326,29 @@ WallpaperItem {
         }
     }
 
+    // Heartbeat Watchdog Timer (30s interval) to detect system wake-up from suspend/sleep immediately
+    property double lastHeartbeatTime: Date.now()
+
+    Timer {
+        id: heartbeatWatchdog
+        interval: 30000
+        repeat: true
+        running: true
+        onTriggered: {
+            const now = Date.now();
+            const elapsed = now - root.lastHeartbeatTime;
+            root.lastHeartbeatTime = now;
+
+            // If elapsed time > 45s, a system suspend or severe clock jump occurred
+            if (elapsed > 45000) {
+                console.log("[cc.qalpuch.dynamicdaynight] System wake/clock jump detected (" + elapsed + "ms elapsed). Resynchronizing.");
+                root.scheduleNextTick();
+            } else {
+                root.currentTime = new Date();
+            }
+        }
+    }
+
     // Refresh on system wake / application activation
     Connections {
         target: Qt.application
@@ -306,4 +365,3 @@ WallpaperItem {
         root.loading = false;
     }
 }
-

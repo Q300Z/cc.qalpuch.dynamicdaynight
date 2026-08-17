@@ -1,0 +1,50 @@
+name: Code Quality & Validation
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate:
+    name: Lint & Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install validation dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq libxml2-utils gettext
+
+      - name: Validate JSON syntax (metadata.json)
+        run: |
+          echo "Validating metadata.json..."
+          jq empty metadata.json
+          echo "✅ metadata.json is valid JSON"
+
+      - name: Validate XML syntax (contents/config/main.xml)
+        run: |
+          echo "Validating contents/config/main.xml..."
+          xmllint --noout contents/config/main.xml
+          echo "✅ contents/config/main.xml is valid XML"
+
+      - name: Validate Gettext PO catalogs (po/*.po)
+        run: |
+          echo "Validating Gettext PO files..."
+          count=0
+          for po_file in po/*.po; do
+            if [ -f "$po_file" ]; then
+              echo "Checking $po_file..."
+              msgfmt --check -o /dev/null "$po_file"
+              count=$((count + 1))
+            fi
+          done
+          if [ "$count" -eq 0 ]; then
+            echo "⚠️ No .po files found in po/"
+          else
+            echo "✅ Successfully validated $count PO catalog(s)"
+          fi

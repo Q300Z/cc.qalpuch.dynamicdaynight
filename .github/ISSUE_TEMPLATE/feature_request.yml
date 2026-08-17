@@ -1,0 +1,49 @@
+name: "✨ Proposition de fonctionnalité / Feature Request"
+description: Proposer une idée, une amélioration ou une nouvelle fonctionnalité.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci pour votre intérêt envers le projet et pour votre proposition d'amélioration !
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problème ou besoin constaté
+      description: Votre proposition est-elle liée à un problème ou à une limitation existante ?
+      placeholder: Je trouve difficile de... / Il manque actuellement la possibilité de...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solution proposée
+      description: Décrivez précisément la fonctionnalité souhaitée et la façon dont elle devrait fonctionner.
+      placeholder: Ajouter une option pour...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives envisagées
+      description: Avez-vous pensé à d'autres solutions ou contournements possibles ?
+      placeholder: Une autre approche pourrait être de...
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Contexte additionnel & Maquettes
+      description: Ajoutez ici toute information, capture d'écran, maquette ou référence utile.
+      placeholder: Captures d'écran, liens de documentation KDE, etc.
+
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: Vérifications préalables
+      options:
+        - label: J'ai vérifié qu'une proposition similaire n'a pas déjà été soumise.
+          required: true

@@ -16,6 +16,7 @@ Plugin de fond d'écran dynamique pour **KDE Plasma 6** (`cc.qalpuch.dynamicdayn
   - [Structure du projet](#structure-du-projet)
   - [Internationalisation (i18n)](#internationalisation-i18n)
   - [Commandes utiles](#commandes-utiles)
+- [Contribution & Communauté](#contribution--communauté)
 - [Licence](#licence)
 
 ---
@@ -161,6 +162,16 @@ cp contents/locale/fr/LC_MESSAGES/plasma_wallpaper_cc.qalpuch.dynamicdaynight.mo
   ```bash
   systemctl --user restart plasma-plasmashell
   ```
+
+---
+
+## Contribution & Communauté
+
+Les contributions sont les bienvenues ! Que ce soit pour signaler un bug, proposer une fonctionnalité, améliorer la documentation ou ajouter une nouvelle langue :
+
+- 📘 **Guide de contribution :** Consultez [`CONTRIBUTING.md`](CONTRIBUTING.md) pour les prérequis, le workflow de développement KDE Plasma 6, les conventions de commits et la gestion des traductions Gettext.
+- 🤝 **Code de conduite :** Notre communauté applique les principes du [Contributor Covenant v2.1](CODE_OF_CONDUCT.md).
+- 🔒 **Politique de sécurité :** Pour signaler une vulnérabilité de manière responsable, consultez [`SECURITY.md`](SECURITY.md).
 
 ---
 

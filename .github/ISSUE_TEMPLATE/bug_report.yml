@@ -1,0 +1,91 @@
+name: "🐛 Signalement de bug / Bug Report"
+description: Signaler un dysfonctionnement ou un comportement inattendu du fond d'écran.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de prendre le temps de signaler un bug !
+        Veuillez vous assurer que le problème n'a pas déjà été signalé dans les [Issues ouvertes](https://github.com/Q300Z/dynamic-day-night-wallpaper/issues).
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description du bug
+      description: Une description claire et concise du problème rencontré.
+      placeholder: Décrivez précisément ce qui ne fonctionne pas...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Étapes pour reproduire
+      description: Indiquez la séquence d'actions permettant de reproduire le problème.
+      placeholder: |
+        1. Ouvrir la configuration du bureau...
+        2. Sélectionner le fond d'écran "Jour & Nuit"...
+        3. Configurer l'heure du matin à...
+        4. Observer l'erreur...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportement attendu
+      description: Ce que vous vous attendiez à voir se produire.
+      placeholder: Le fond d'écran devrait basculer automatiquement à l'heure programmée...
+    validations:
+      required: true
+
+  - type: input
+    id: plasma_version
+    attributes:
+      label: Version de KDE Plasma
+      description: Indiquez votre version de Plasma (ex: Plasma 6.2.0). Ce plugin requiert KDE Plasma 6.
+      placeholder: "6.2.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: session_type
+    attributes:
+      label: Type de session
+      description: Quel serveur graphique utilisez-vous ?
+      options:
+        - Wayland
+        - X11
+        - Autre / Inconnu
+    validations:
+      required: true
+
+  - type: input
+    id: distro
+    attributes:
+      label: Distribution Linux & Version
+      description: Exemple : Arch Linux, Fedora 40, openSUSE Tumbleweed, etc.
+      placeholder: "Fedora 40 KDE"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs et messages d'erreur
+      description: |
+        Sortie utile de journalctl ou de la console Plasma.
+        Ex: `journalctl --user -u plasma-plasmashell -e --no-pager` ou logs QML.
+      render: shell
+      placeholder: Collez les logs pertinents ici...
+
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: Vérifications préalables
+      options:
+        - label: J'ai vérifié qu'une issue similaire n'existe pas déjà.
+          required: true
+        - label: J'utilise une version de KDE Plasma 6.
+          required: true

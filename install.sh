@@ -10,9 +10,8 @@ PLUGIN_ID="cc.qalpuch.dynamicdaynight"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 TARGET_WALLPAPER_DIR="${HOME}/.local/share/plasma/wallpapers"
-TARGET_LOCALE_DIR="${HOME}/.local/share/locale/fr/LC_MESSAGES"
+LOCAL_SHARE_LOCALE="${HOME}/.local/share/locale"
 TARGET_PLUGIN_PATH="${TARGET_WALLPAPER_DIR}/${PLUGIN_ID}"
-TARGET_MO_FILE="${TARGET_LOCALE_DIR}/plasma_wallpaper_${PLUGIN_ID}.mo"
 
 show_help() {
     echo "Usage: $(basename "$0") [OPTIONS]"
@@ -38,10 +37,24 @@ if [ "${1:-}" = "-u" ] || [ "${1:-}" = "--uninstall" ]; then
         echo "ℹ️  Plugin non trouvé dans ${TARGET_WALLPAPER_DIR}"
     fi
 
-    if [ -f "${TARGET_MO_FILE}" ] || [ -L "${TARGET_MO_FILE}" ]; then
-        echo "🗑️  Suppression du catalogue de traduction : ${TARGET_MO_FILE}..."
-        rm -f "${TARGET_MO_FILE}"
-    fi
+    # Suppression dynamique des catalogues de traduction
+    for po_file in "${SCRIPT_DIR}"/po/*.po; do
+        [ -f "$po_file" ] || continue
+        lang="$(basename "$po_file" .po)"
+        target_mo="${LOCAL_SHARE_LOCALE}/${lang}/LC_MESSAGES/plasma_wallpaper_${PLUGIN_ID}.mo"
+        if [ -f "${target_mo}" ] || [ -L "${target_mo}" ]; then
+            echo "🗑️  Suppression du catalogue de traduction (${lang}) : ${target_mo}..."
+            rm -f "${target_mo}"
+        fi
+    done
+
+    # Suppression de catalogues résiduels éventuels
+    for mo_file in "${LOCAL_SHARE_LOCALE}"/*/LC_MESSAGES/plasma_wallpaper_${PLUGIN_ID}.mo; do
+        if [ -f "$mo_file" ] || [ -L "$mo_file" ]; then
+            echo "🗑️  Suppression du catalogue résiduel : ${mo_file}..."
+            rm -f "$mo_file"
+        fi
+    done
 
     echo ""
     echo "============================================================"
@@ -64,11 +77,13 @@ echo "============================================================"
 
 # 1. Compilation des catalogues de traduction
 if command -v msgfmt &>/dev/null; then
-    if [ -f "${SCRIPT_DIR}/po/fr.po" ]; then
-        echo "⚙️  Compilation de la traduction française..."
-        mkdir -p "${SCRIPT_DIR}/contents/locale/fr/LC_MESSAGES"
-        msgfmt "${SCRIPT_DIR}/po/fr.po" -o "${SCRIPT_DIR}/contents/locale/fr/LC_MESSAGES/plasma_wallpaper_${PLUGIN_ID}.mo"
-    fi
+    for po_file in "${SCRIPT_DIR}"/po/*.po; do
+        [ -f "$po_file" ] || continue
+        lang="$(basename "$po_file" .po)"
+        echo "⚙️  Compilation de la traduction (${lang})..."
+        mkdir -p "${SCRIPT_DIR}/contents/locale/${lang}/LC_MESSAGES"
+        msgfmt "$po_file" -o "${SCRIPT_DIR}/contents/locale/${lang}/LC_MESSAGES/plasma_wallpaper_${PLUGIN_ID}.mo"
+    done
 else
     echo "⚠️  Avertissement : 'msgfmt' (gettext) n'est pas installé. Les traductions ne seront pas compilées."
 fi
@@ -76,19 +91,25 @@ fi
 # 2. Création des répertoires cibles dans l'espace utilisateur
 echo "📁 Création des dossiers cibles dans ~/.local/share/..."
 mkdir -p "${TARGET_WALLPAPER_DIR}"
-mkdir -p "${TARGET_LOCALE_DIR}"
 
 # 3. Création du lien symbolique vers le paquet
 echo "🔗 Liaison du plugin dans ${TARGET_PLUGIN_PATH}..."
 rm -rf "${TARGET_PLUGIN_PATH}"
 ln -sfn "${SCRIPT_DIR}" "${TARGET_PLUGIN_PATH}"
 
-# 4. Déploiement des traductions
-MO_FILE="${SCRIPT_DIR}/contents/locale/fr/LC_MESSAGES/plasma_wallpaper_${PLUGIN_ID}.mo"
-if [ -f "${MO_FILE}" ]; then
-    echo "🌍 Installation du catalogue de traduction..."
-    cp "${MO_FILE}" "${TARGET_MO_FILE}"
-fi
+# 4. Déploiement dynamique des traductions
+for po_file in "${SCRIPT_DIR}"/po/*.po; do
+    [ -f "$po_file" ] || continue
+    lang="$(basename "$po_file" .po)"
+    src_mo="${SCRIPT_DIR}/contents/locale/${lang}/LC_MESSAGES/plasma_wallpaper_${PLUGIN_ID}.mo"
+    dest_dir="${LOCAL_SHARE_LOCALE}/${lang}/LC_MESSAGES"
+    dest_mo="${dest_dir}/plasma_wallpaper_${PLUGIN_ID}.mo"
+    if [ -f "${src_mo}" ]; then
+        echo "🌍 Installation du catalogue de traduction (${lang})..."
+        mkdir -p "${dest_dir}"
+        cp "${src_mo}" "${dest_mo}"
+    fi
+done
 
 # 5. Validation du paquet avec kpackagetool6 si présent
 if command -v kpackagetool6 &>/dev/null; then

@@ -120,7 +120,7 @@ Kirigami.FormLayout {
                 if (trimmed.startsWith("file://") || trimmed.startsWith("qrc:/")) {
                     return trimmed;
                 }
-                return "file://" + (trimmed.startsWith("/") ? trimmed : "/" + trimmed);
+                return "file://" + encodeURI(trimmed.startsWith("/") ? trimmed : "/" + trimmed);
             }
             return Qt.resolvedUrl("../images/" + defaultFileName);
         }
@@ -159,6 +159,11 @@ Kirigami.FormLayout {
                 cache: true
                 smooth: true
                 mipmap: true
+                onStatusChanged: {
+                    if (status === Image.Error) {
+                        colorExtractorCanvas.activeLoadingUrl = "";
+                    }
+                }
             }
 
             // Zoom icon overlay on hover or active focus
@@ -214,7 +219,7 @@ Kirigami.FormLayout {
                 ctx.clearRect(0, 0, width, height);
                 ctx.drawImage(activeLoadingUrl, 0, 0, width, height);
                 const extracted = TimeUtils.extractDominantColor(ctx, width, height, fileRow.defaultColor);
-                if (extracted && String(fileRow.selectedColor).toLowerCase() !== String(extracted).toLowerCase()) {
+                if (extracted && !Qt.colorEqual(fileRow.selectedColor, extracted)) {
                     fileRow.selectedColor = extracted;
                     root.configurationChanged();
                 }
@@ -281,7 +286,7 @@ Kirigami.FormLayout {
         PlasmaComponents.Button {
             icon.name: "edit-undo"
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default")
-            enabled: fileRow.isCustom || (String(fileRow.selectedColor).toLowerCase() !== String(fileRow.defaultColor).toLowerCase())
+            enabled: fileRow.isCustom || !Qt.colorEqual(fileRow.selectedColor, fileRow.defaultColor)
             onClicked: {
                 fileRow.pathText = "";
                 pathField.text = "";

@@ -92,7 +92,7 @@ fi
 # 5. Validation du paquet avec kpackagetool6 si présent
 if command -v kpackagetool6 &>/dev/null; then
     echo "✅ Validation du paquet KPackage..."
-    kpackagetool6 --type Plasma/Wallpaper --show "${SCRIPT_DIR}" >/dev/null && echo "   -> Paquet valide !"
+    kpackagetool6 --type Plasma/Wallpaper --show "${PLUGIN_ID}" >/dev/null && echo "   -> Paquet valide !"
 fi
 
 echo ""

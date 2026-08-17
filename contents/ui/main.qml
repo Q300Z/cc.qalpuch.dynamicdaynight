@@ -44,10 +44,8 @@ WallpaperItem {
     // Flag indicating whether the first wallpaper has loaded
     property bool initialLoadDone: false
 
-    // Notify Plasma on daylight period or accent color change
-    onCurrentPeriodChanged: {
-        root.accentColorChanged();
-    }
+    // Declarative loading state: active until initial load completes or while active layer is loading
+    loading: !initialLoadDone || (activeLayerIndex === 0 ? imageLayerA.status === Image.Loading : imageLayerB.status === Image.Loading)
 
     onAccentColorChanged: {
         console.log("[cc.qalpuch.dynamicdaynight] Dynamic accent color updated:", root.accentColor);
@@ -124,7 +122,10 @@ WallpaperItem {
             checkable: true
             checked: root.forcedPeriod === "morning"
             onTriggered: {
-                root.forcedPeriod = "morning";
+                root.forcedPeriod = (root.forcedPeriod === "morning") ? "" : "morning";
+                if (root.forcedPeriod === "") {
+                    root.scheduleNextTick();
+                }
             }
         },
         PlasmaCore.Action {
@@ -133,7 +134,10 @@ WallpaperItem {
             checkable: true
             checked: root.forcedPeriod === "noon"
             onTriggered: {
-                root.forcedPeriod = "noon";
+                root.forcedPeriod = (root.forcedPeriod === "noon") ? "" : "noon";
+                if (root.forcedPeriod === "") {
+                    root.scheduleNextTick();
+                }
             }
         },
         PlasmaCore.Action {
@@ -142,7 +146,10 @@ WallpaperItem {
             checkable: true
             checked: root.forcedPeriod === "evening"
             onTriggered: {
-                root.forcedPeriod = "evening";
+                root.forcedPeriod = (root.forcedPeriod === "evening") ? "" : "evening";
+                if (root.forcedPeriod === "") {
+                    root.scheduleNextTick();
+                }
             }
         },
         PlasmaCore.Action {
@@ -151,7 +158,10 @@ WallpaperItem {
             checkable: true
             checked: root.forcedPeriod === "night"
             onTriggered: {
-                root.forcedPeriod = "night";
+                root.forcedPeriod = (root.forcedPeriod === "night") ? "" : "night";
+                if (root.forcedPeriod === "") {
+                    root.scheduleNextTick();
+                }
             }
         },
         PlasmaCore.Action {
@@ -204,7 +214,11 @@ WallpaperItem {
             mipmap: true
 
             onStatusChanged: {
-                if (status === Image.Error) {
+                if (status === Image.Ready && root.activeLayerIndex === 1 && String(imageLayerA.source) !== "") {
+                    imageLayerA.opacity = 1.0;
+                    imageLayerB.opacity = 0.0;
+                    root.activeLayerIndex = 0;
+                } else if (status === Image.Error) {
                     console.warn("[cc.qalpuch.dynamicdaynight] Failed to load wallpaper: " + source + " - Falling back to default bundled image.");
                     const fallbackUrl = root.getBundledImageSource(root.currentPeriod);
                     if (source !== fallbackUrl) {
@@ -237,7 +251,11 @@ WallpaperItem {
             mipmap: true
 
             onStatusChanged: {
-                if (status === Image.Error) {
+                if (status === Image.Ready && root.activeLayerIndex === 0 && String(imageLayerB.source) !== "") {
+                    imageLayerB.opacity = 1.0;
+                    imageLayerA.opacity = 0.0;
+                    root.activeLayerIndex = 1;
+                } else if (status === Image.Error) {
                     console.warn("[cc.qalpuch.dynamicdaynight] Failed to load wallpaper: " + source + " - Falling back to default bundled image.");
                     const fallbackUrl = root.getBundledImageSource(root.currentPeriod);
                     if (source !== fallbackUrl) {
@@ -288,14 +306,18 @@ WallpaperItem {
 
         if (root.activeLayerIndex === 0) {
             imageLayerB.source = nextUrl;
-            imageLayerB.opacity = 1.0;
-            imageLayerA.opacity = 0.0;
-            root.activeLayerIndex = 1;
+            if (imageLayerB.status === Image.Ready) {
+                imageLayerB.opacity = 1.0;
+                imageLayerA.opacity = 0.0;
+                root.activeLayerIndex = 1;
+            }
         } else {
             imageLayerA.source = nextUrl;
-            imageLayerA.opacity = 1.0;
-            imageLayerB.opacity = 0.0;
-            root.activeLayerIndex = 0;
+            if (imageLayerA.status === Image.Ready) {
+                imageLayerA.opacity = 1.0;
+                imageLayerB.opacity = 0.0;
+                root.activeLayerIndex = 0;
+            }
         }
     }
 
@@ -362,6 +384,5 @@ WallpaperItem {
     Component.onCompleted: {
         root.scheduleNextTick();
         root.updateWallpaper(true);
-        root.loading = false;
     }
 }

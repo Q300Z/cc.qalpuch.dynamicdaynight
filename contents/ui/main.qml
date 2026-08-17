@@ -26,14 +26,11 @@ WallpaperItem {
     // Effective schedule for period boundaries
     readonly property var currentSchedule: TimeUtils.getEffectiveSchedule(currentTime, root.configuration)
 
-    // Primary screen detection to avoid multi-monitor D-Bus race conditions
-    readonly property bool isPrimaryScreen: Plasmoid.containment ? Plasmoid.containment.screen === 0 : true
-
-    // Dynamic accent color: applied only if enabled in settings and on primary screen.
+    // Dynamic accent color: applied only if enabled in settings.
     // Uses autoPeriod (real temporal cycle) so forcedPeriod previews don't pollute global OS accent color.
     // Evaluates to undefined when disabled, yielding an invalid QColor to cleanly restore default system theme.
-    accentColor: (isPrimaryScreen && root.configuration && root.configuration.DynamicAccentColor)
-        ? TimeUtils.getAccentColorForPeriod(autoPeriod, root.configuration)
+    accentColor: (root.configuration && root.configuration.DynamicAccentColor)
+        ? Qt.color(TimeUtils.getAccentColorForPeriod(autoPeriod, root.configuration))
         : undefined
 
     // Resolved source URL for the active period

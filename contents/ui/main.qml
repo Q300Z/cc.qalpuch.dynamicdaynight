@@ -155,12 +155,12 @@ WallpaperItem {
         id: imageContainer
         anchors.fill: parent
 
-        // Map fill mode integer config to QtQuick Image fillMode enum
+        // Map fill mode integer config (0: Stretch, 1: PreserveAspectCrop, 2: PreserveAspectFit)
         readonly property int resolvedFillMode: {
             switch (root.configuration.FillMode) {
-                case 1:  return Image.Stretch;
-                case 3:  return Image.PreserveAspectFit;
-                case 2:
+                case 0:  return Image.Stretch;
+                case 2:  return Image.PreserveAspectFit;
+                case 1:
                 default: return Image.PreserveAspectCrop;
             }
         }
@@ -174,6 +174,13 @@ WallpaperItem {
             opacity: 1.0
             smooth: true
             mipmap: true
+
+            onStatusChanged: {
+                if (status === Image.Error) {
+                    console.warn("[cc.qalpuch.dynamicdaynight] Failed to load wallpaper: " + source + " - Falling back to default bundled image.");
+                    source = Qt.resolvedUrl("../images/" + root.currentPeriod + ".png");
+                }
+            }
 
             Behavior on opacity {
                 NumberAnimation {
@@ -192,6 +199,13 @@ WallpaperItem {
             opacity: 0.0
             smooth: true
             mipmap: true
+
+            onStatusChanged: {
+                if (status === Image.Error) {
+                    console.warn("[cc.qalpuch.dynamicdaynight] Failed to load wallpaper: " + source + " - Falling back to default bundled image.");
+                    source = Qt.resolvedUrl("../images/" + root.currentPeriod + ".png");
+                }
+            }
 
             Behavior on opacity {
                 NumberAnimation {

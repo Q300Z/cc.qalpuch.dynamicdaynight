@@ -70,19 +70,19 @@
     </entry>
 
     <!-- Custom image file paths (empty string uses the bundled defaults) -->
-    <entry name="MorningImage" type="String">
+    <entry name="MorningImage" type="Path">
       <label>Custom morning image path</label>
       <default></default>
     </entry>
-    <entry name="NoonImage" type="String">
+    <entry name="NoonImage" type="Path">
       <label>Custom noon image path</label>
       <default></default>
     </entry>
-    <entry name="EveningImage" type="String">
+    <entry name="EveningImage" type="Path">
       <label>Custom evening image path</label>
       <default></default>
     </entry>
-    <entry name="NightImage" type="String">
+    <entry name="NightImage" type="Path">
       <label>Custom night image path</label>
       <default></default>
     </entry>
@@ -119,10 +119,12 @@
       <max>10000</max>
     </entry>
 
-    <!-- Fill Mode: 1=Stretch, 2=PreserveAspectCrop, 3=PreserveAspectFit -->
+    <!-- Fill Mode: 0=Stretch, 1=PreserveAspectCrop, 2=PreserveAspectFit -->
     <entry name="FillMode" type="Int">
       <label>Image fill mode</label>
-      <default>2</default>
+      <default>1</default>
+      <min>0</min>
+      <max>2</max>
     </entry>
   </group>
 </kcfg>

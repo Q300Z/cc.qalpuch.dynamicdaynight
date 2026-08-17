@@ -12,20 +12,17 @@ import org.kde.kcmutils as KCM
 import org.kde.config as KConfig
 import "TimeUtils.js" as TimeUtils
 
-Layouts.ColumnLayout {
+Kirigami.FormLayout {
     id: root
 
     // Properties and signals expected by KDE Plasma 6 kcm_wallpaper
     property var configDialog
     property var wallpaperConfiguration
     property var parentLayout
-    property alias formLayout: innerFormLayout
+    property alias formLayout: root
+    twinFormLayouts: parentLayout ? [parentLayout] : []
 
     signal configurationChanged()
-
-    Layouts.Layout.fillWidth: true
-    Layouts.Layout.alignment: Qt.AlignTop
-    spacing: 0
 
     // Automatic calculation option
     property alias cfg_AutoSchedule: autoScheduleCheckBox.checked
@@ -67,7 +64,7 @@ Layouts.ColumnLayout {
         return TimeUtils.calculateSolarSchedule(d, sys.lat, sys.lon);
     }
 
-    // Large Image Preview Dialog
+    // Large Image Preview Dialog properties
     property string previewDialogTitle: ""
     property url previewDialogSource: ""
 
@@ -192,7 +189,7 @@ Layouts.ColumnLayout {
         id: fileRow
 
         property string defaultFileName: ""
-        property color defaultColor: "#1D99F3"
+        property color defaultColor: "#1E3539"
         property color selectedColor: defaultColor
         property string dialogTitle: ""
         property string pathText: ""
@@ -287,7 +284,6 @@ Layouts.ColumnLayout {
                 const extracted = TimeUtils.extractDominantColor(ctx, width, height, fileRow.defaultColor);
                 if (extracted && String(fileRow.selectedColor).toLowerCase() !== String(extracted).toLowerCase()) {
                     fileRow.selectedColor = extracted;
-                    root.configurationChanged();
                 }
                 unloadImage(activeLoadingUrl);
             }
@@ -340,7 +336,6 @@ Layouts.ColumnLayout {
         }
 
         Component.onCompleted: {
-            // If color is not set, extract dynamically from active image
             if (!fileRow.selectedColor || fileRow.selectedColor === "" || String(fileRow.selectedColor) === "#00000000") {
                 colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
             }
@@ -390,323 +385,315 @@ Layouts.ColumnLayout {
         }
     }
 
-    Kirigami.FormLayout {
-        id: innerFormLayout
+    // ==========================================
+    // SECTION 1: Automatic Solar Detection & System Location
+    // ==========================================
+    Kirigami.Separator {
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Schedule Mode")
+    }
 
+    PlasmaComponents.CheckBox {
+        id: autoScheduleCheckBox
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Solar detection:")
+        text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)")
+        checked: true
+        onToggled: root.configurationChanged()
+    }
+
+    // Solar calculation preview message
+    Kirigami.InlineMessage {
+        id: solarInfoMessage
+        visible: autoScheduleCheckBox.checked
+        type: Kirigami.MessageType.Information
         Layouts.Layout.fillWidth: true
-        Layouts.Layout.alignment: Qt.AlignTop
-        twinFormLayouts: root.parentLayout ? [root.parentLayout] : []
+        text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight",
+            "Today's calculated times:\n• Morning (Sunrise): %1\n• Noon (Solar Noon): %2\n• Evening (Sunset): %3\n• Night (Dusk): %4",
+            TimeUtils.formatMinutes(root.currentSolarSchedule.morning),
+            TimeUtils.formatMinutes(root.currentSolarSchedule.noon),
+            TimeUtils.formatMinutes(root.currentSolarSchedule.evening),
+            TimeUtils.formatMinutes(root.currentSolarSchedule.night)
+        )
+    }
 
-        // ==========================================
-        // SECTION 1: Automatic Solar Detection & System Location
-        // ==========================================
-        Kirigami.Separator {
-            Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Schedule Mode")
-        }
+    Layouts.RowLayout {
+        visible: autoScheduleCheckBox.checked
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "System Settings:")
+        spacing: Kirigami.Units.smallSpacing
 
-        PlasmaComponents.CheckBox {
-            id: autoScheduleCheckBox
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Solar detection:")
-            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)")
-            checked: true
-            onToggled: root.configurationChanged()
-        }
-
-        // Solar calculation preview message
-        Kirigami.InlineMessage {
-            id: solarInfoMessage
-            visible: autoScheduleCheckBox.checked
-            type: Kirigami.MessageType.Information
-            Layouts.Layout.fillWidth: true
-            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight",
-                "Today's calculated times:\n• Morning (Sunrise): %1\n• Noon (Solar Noon): %2\n• Evening (Sunset): %3\n• Night (Dusk): %4",
-                TimeUtils.formatMinutes(root.currentSolarSchedule.morning),
-                TimeUtils.formatMinutes(root.currentSolarSchedule.noon),
-                TimeUtils.formatMinutes(root.currentSolarSchedule.evening),
-                TimeUtils.formatMinutes(root.currentSolarSchedule.night)
-            )
-        }
-
-        Layouts.RowLayout {
-            visible: autoScheduleCheckBox.checked
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "System Settings:")
-            spacing: Kirigami.Units.smallSpacing
-
-            PlasmaComponents.Button {
-                icon.name: "preferences-system-time"
-                text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Open System Date, Time & Location Settings...")
-                enabled: KConfig.KAuthorized.authorizeControlModule("kcm_clock")
-                onClicked: {
-                    KCM.KCMLauncher.openSystemSettings("kcm_clock");
-                }
-            }
-
-            PlasmaComponents.Button {
-                icon.name: "redshift-status-on"
-                text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night Light Settings...")
-                enabled: KConfig.KAuthorized.authorizeControlModule("kcm_nightlight")
-                onClicked: {
-                    KCM.KCMLauncher.openSystemSettings("kcm_nightlight");
-                }
+        PlasmaComponents.Button {
+            icon.name: "preferences-system-time"
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Open System Date, Time & Location Settings...")
+            enabled: KConfig.KAuthorized.authorizeControlModule("kcm_clock")
+            onClicked: {
+                KCM.KCMLauncher.openSystemSettings("kcm_clock");
             }
         }
 
-        // ==========================================
-        // SECTION 2: Manual Schedules (if Auto disabled)
-        // ==========================================
-        Kirigami.Separator {
-            visible: !autoScheduleCheckBox.checked
-            Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Manual Time Periods")
-        }
-
-        TimeInputRow {
-            id: morningTimeRow
-            visible: !autoScheduleCheckBox.checked
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning starts at:")
-
-            PlasmaComponents.SpinBox {
-                id: morningHourSpin
-                from: 0
-                to: 23
-                editable: true
-                value: 6
-                onValueModified: root.configurationChanged()
-            }
-            PlasmaComponents.Label {
-                text: ":"
-                font.bold: true
-            }
-            PlasmaComponents.SpinBox {
-                id: morningMinuteSpin
-                from: 0
-                to: 59
-                editable: true
-                value: 0
-                textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
-                onValueModified: root.configurationChanged()
+        PlasmaComponents.Button {
+            icon.name: "redshift-status-on"
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night Light Settings...")
+            enabled: KConfig.KAuthorized.authorizeControlModule("kcm_nightlight")
+            onClicked: {
+                KCM.KCMLauncher.openSystemSettings("kcm_nightlight");
             }
         }
+    }
 
-        TimeInputRow {
-            id: noonTimeRow
-            visible: !autoScheduleCheckBox.checked
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon starts at:")
+    // ==========================================
+    // SECTION 2: Manual Schedules (if Auto disabled)
+    // ==========================================
+    Kirigami.Separator {
+        visible: !autoScheduleCheckBox.checked
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Manual Time Periods")
+    }
 
-            PlasmaComponents.SpinBox {
-                id: noonHourSpin
-                from: 0
-                to: 23
-                editable: true
-                value: 12
-                onValueModified: root.configurationChanged()
-            }
-            PlasmaComponents.Label {
-                text: ":"
-                font.bold: true
-            }
-            PlasmaComponents.SpinBox {
-                id: noonMinuteSpin
-                from: 0
-                to: 59
-                editable: true
-                value: 0
-                textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
-                onValueModified: root.configurationChanged()
-            }
+    TimeInputRow {
+        id: morningTimeRow
+        visible: !autoScheduleCheckBox.checked
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning starts at:")
+
+        PlasmaComponents.SpinBox {
+            id: morningHourSpin
+            from: 0
+            to: 23
+            editable: true
+            value: 6
+            onValueModified: root.configurationChanged()
         }
-
-        TimeInputRow {
-            id: eveningTimeRow
-            visible: !autoScheduleCheckBox.checked
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening starts at:")
-
-            PlasmaComponents.SpinBox {
-                id: eveningHourSpin
-                from: 0
-                to: 23
-                editable: true
-                value: 18
-                onValueModified: root.configurationChanged()
-            }
-            PlasmaComponents.Label {
-                text: ":"
-                font.bold: true
-            }
-            PlasmaComponents.SpinBox {
-                id: eveningMinuteSpin
-                from: 0
-                to: 59
-                editable: true
-                value: 0
-                textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
-                onValueModified: root.configurationChanged()
-            }
+        PlasmaComponents.Label {
+            text: ":"
+            font.bold: true
         }
-
-        TimeInputRow {
-            id: nightTimeRow
-            visible: !autoScheduleCheckBox.checked
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night starts at:")
-
-            PlasmaComponents.SpinBox {
-                id: nightHourSpin
-                from: 0
-                to: 23
-                editable: true
-                value: 22
-                onValueModified: root.configurationChanged()
-            }
-            PlasmaComponents.Label {
-                text: ":"
-                font.bold: true
-            }
-            PlasmaComponents.SpinBox {
-                id: nightMinuteSpin
-                from: 0
-                to: 59
-                editable: true
-                value: 0
-                textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
-                onValueModified: root.configurationChanged()
-            }
+        PlasmaComponents.SpinBox {
+            id: morningMinuteSpin
+            from: 0
+            to: 59
+            editable: true
+            value: 0
+            textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
+            onValueModified: root.configurationChanged()
         }
+    }
 
-        // ==========================================
-        // SECTION 3: Images (Matin, Midi, Soir, Nuit)
-        // ==========================================
-        Kirigami.Separator {
-            Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Images")
+    TimeInputRow {
+        id: noonTimeRow
+        visible: !autoScheduleCheckBox.checked
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon starts at:")
+
+        PlasmaComponents.SpinBox {
+            id: noonHourSpin
+            from: 0
+            to: 23
+            editable: true
+            value: 12
+            onValueModified: root.configurationChanged()
         }
-
-        FilePathRow {
-            id: morningRow
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning wallpaper:")
-            defaultFileName: "matin.png"
-            defaultColor: "#1e3539"
-            selectedColor: root.cfg_MorningColor
-            dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Morning Wallpaper")
-            onSelectedColorChanged: {
-                if (String(root.cfg_MorningColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
-                    root.cfg_MorningColor = selectedColor;
-                    root.configurationChanged();
-                }
-            }
+        PlasmaComponents.Label {
+            text: ":"
+            font.bold: true
         }
-
-        FilePathRow {
-            id: noonRow
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon wallpaper:")
-            defaultFileName: "midi.png"
-            defaultColor: "#446c84"
-            selectedColor: root.cfg_NoonColor
-            dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Noon Wallpaper")
-            onSelectedColorChanged: {
-                if (String(root.cfg_NoonColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
-                    root.cfg_NoonColor = selectedColor;
-                    root.configurationChanged();
-                }
-            }
+        PlasmaComponents.SpinBox {
+            id: noonMinuteSpin
+            from: 0
+            to: 59
+            editable: true
+            value: 0
+            textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
+            onValueModified: root.configurationChanged()
         }
+    }
 
-        FilePathRow {
-            id: eveningRow
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening wallpaper:")
-            defaultFileName: "soir.png"
-            defaultColor: "#322f21"
-            selectedColor: root.cfg_EveningColor
-            dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Evening Wallpaper")
-            onSelectedColorChanged: {
-                if (String(root.cfg_EveningColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
-                    root.cfg_EveningColor = selectedColor;
-                    root.configurationChanged();
-                }
-            }
+    TimeInputRow {
+        id: eveningTimeRow
+        visible: !autoScheduleCheckBox.checked
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening starts at:")
+
+        PlasmaComponents.SpinBox {
+            id: eveningHourSpin
+            from: 0
+            to: 23
+            editable: true
+            value: 18
+            onValueModified: root.configurationChanged()
         }
-
-        FilePathRow {
-            id: nightRow
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night wallpaper:")
-            defaultFileName: "nuit.png"
-            defaultColor: "#48220b"
-            selectedColor: root.cfg_NightColor
-            dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Night Wallpaper")
-            onSelectedColorChanged: {
-                if (String(root.cfg_NightColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
-                    root.cfg_NightColor = selectedColor;
-                    root.configurationChanged();
-                }
-            }
+        PlasmaComponents.Label {
+            text: ":"
+            font.bold: true
         }
-
-        // ==========================================
-        // SECTION 4: Appearance & Transition
-        // ==========================================
-        Kirigami.Separator {
-            Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Appearance")
+        PlasmaComponents.SpinBox {
+            id: eveningMinuteSpin
+            from: 0
+            to: 59
+            editable: true
+            value: 0
+            textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
+            onValueModified: root.configurationChanged()
         }
+    }
 
-        PlasmaComponents.CheckBox {
-            id: dynamicAccentColorCheckBox
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Accent color:")
-            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Synchronize KDE Plasma accent color with active wallpaper period")
-            checked: root.cfg_DynamicAccentColor
-            onToggled: {
-                root.cfg_DynamicAccentColor = checked;
+    TimeInputRow {
+        id: nightTimeRow
+        visible: !autoScheduleCheckBox.checked
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night starts at:")
+
+        PlasmaComponents.SpinBox {
+            id: nightHourSpin
+            from: 0
+            to: 23
+            editable: true
+            value: 22
+            onValueModified: root.configurationChanged()
+        }
+        PlasmaComponents.Label {
+            text: ":"
+            font.bold: true
+        }
+        PlasmaComponents.SpinBox {
+            id: nightMinuteSpin
+            from: 0
+            to: 59
+            editable: true
+            value: 0
+            textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
+            onValueModified: root.configurationChanged()
+        }
+    }
+
+    // ==========================================
+    // SECTION 3: Images (Matin, Midi, Soir, Nuit)
+    // ==========================================
+    Kirigami.Separator {
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Images")
+    }
+
+    FilePathRow {
+        id: morningRow
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning wallpaper:")
+        defaultFileName: "matin.png"
+        defaultColor: "#1e3539"
+        selectedColor: root.cfg_MorningColor
+        dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Morning Wallpaper")
+        onSelectedColorChanged: {
+            if (String(root.cfg_MorningColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
+                root.cfg_MorningColor = selectedColor;
                 root.configurationChanged();
             }
         }
+    }
 
-        PlasmaComponents.ComboBox {
-            id: fillModeCombo
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Fill Mode:")
-            model: [
-                i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Scaled (Stretch)"),
-                i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Zoom / Crop (Preserve Aspect Ratio)"),
-                i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Fit (Preserve Aspect Ratio)")
-            ]
-            currentIndex: 1
-            onActivated: root.configurationChanged()
-        }
-
-        Layouts.RowLayout {
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Transition duration:")
-            spacing: Kirigami.Units.smallSpacing
-
-            PlasmaComponents.SpinBox {
-                id: transitionSpin
-                from: 0
-                to: 10000
-                stepSize: 250
-                value: 1500
-                editable: true
-                onValueModified: root.configurationChanged()
-            }
-
-            PlasmaComponents.Label {
-                text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "ms")
+    FilePathRow {
+        id: noonRow
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon wallpaper:")
+        defaultFileName: "midi.png"
+        defaultColor: "#446c84"
+        selectedColor: root.cfg_NoonColor
+        dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Noon Wallpaper")
+        onSelectedColorChanged: {
+            if (String(root.cfg_NoonColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
+                root.cfg_NoonColor = selectedColor;
+                root.configurationChanged();
             }
         }
+    }
 
-        // ==========================================
-        // SECTION 5: Reset
-        // ==========================================
-        Kirigami.Separator {
-            Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Reset")
+    FilePathRow {
+        id: eveningRow
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening wallpaper:")
+        defaultFileName: "soir.png"
+        defaultColor: "#322f21"
+        selectedColor: root.cfg_EveningColor
+        dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Evening Wallpaper")
+        onSelectedColorChanged: {
+            if (String(root.cfg_EveningColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
+                root.cfg_EveningColor = selectedColor;
+                root.configurationChanged();
+            }
+        }
+    }
+
+    FilePathRow {
+        id: nightRow
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night wallpaper:")
+        defaultFileName: "nuit.png"
+        defaultColor: "#48220b"
+        selectedColor: root.cfg_NightColor
+        dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Night Wallpaper")
+        onSelectedColorChanged: {
+            if (String(root.cfg_NightColor).toLowerCase() !== String(selectedColor).toLowerCase()) {
+                root.cfg_NightColor = selectedColor;
+                root.configurationChanged();
+            }
+        }
+    }
+
+    // ==========================================
+    // SECTION 4: Appearance & Transition
+    // ==========================================
+    Kirigami.Separator {
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Appearance")
+    }
+
+    PlasmaComponents.CheckBox {
+        id: dynamicAccentColorCheckBox
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Accent color:")
+        text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Synchronize KDE Plasma accent color with active wallpaper period")
+        checked: root.cfg_DynamicAccentColor
+        onToggled: {
+            root.cfg_DynamicAccentColor = checked;
+            root.configurationChanged();
+        }
+    }
+
+    PlasmaComponents.ComboBox {
+        id: fillModeCombo
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Fill Mode:")
+        model: [
+            i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Scaled (Stretch)"),
+            i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Zoom / Crop (Preserve Aspect Ratio)"),
+            i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Fit (Preserve Aspect Ratio)")
+        ]
+        currentIndex: 1
+        onActivated: root.configurationChanged()
+    }
+
+    Layouts.RowLayout {
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Transition duration:")
+        spacing: Kirigami.Units.smallSpacing
+
+        PlasmaComponents.SpinBox {
+            id: transitionSpin
+            from: 0
+            to: 10000
+            stepSize: 250
+            value: 1500
+            editable: true
+            onValueModified: root.configurationChanged()
         }
 
-        Layouts.RowLayout {
-            Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Defaults:")
+        PlasmaComponents.Label {
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "ms")
+        }
+    }
 
-            PlasmaComponents.Button {
-                icon.name: "document-revert"
-                text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Restore Default Configuration")
-                onClicked: root.resetToDefaults()
-            }
+    // ==========================================
+    // SECTION 5: Reset
+    // ==========================================
+    Kirigami.Separator {
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Reset")
+    }
+
+    Layouts.RowLayout {
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Defaults:")
+
+        PlasmaComponents.Button {
+            icon.name: "document-revert"
+            text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Restore Default Configuration")
+            onClicked: root.resetToDefaults()
         }
     }
 

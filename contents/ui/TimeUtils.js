@@ -327,7 +327,7 @@ function toSafeFileUrl(rawPath) {
 
     const absPath = localPath.startsWith("/") ? localPath : "/" + localPath;
     try {
-        return "file://" + encodeURI(absPath).replace(/#/g, "%23").replace(/\?/g, "%3F");
+        return "file://" + encodeURI(absPath).replace(/#/g, "%23").replace(/\?/g, "%3F").replace(/\[/g, "%5B").replace(/\]/g, "%5D");
     } catch (e) {
         const safeSegments = absPath.split("/").map((seg) => encodeURIComponent(seg)).join("/");
         return "file://" + safeSegments;

@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
+# This file is distributed under the same license as the cc.qalpuch.dynamicdaynight package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: cc.qalpuch.dynamicdaynight\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-17 01:39+0200\n"
+"POT-Creation-Date: 2026-08-17 03:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,48 +17,60 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: contents/ui/config.qml:209
+#: contents/ui/config.qml:79 contents/ui/main.qml:74
+msgid "Morning"
+msgstr ""
+
+#: contents/ui/config.qml:80 contents/ui/main.qml:76
+msgid "Noon"
+msgstr ""
+
+#: contents/ui/config.qml:81 contents/ui/main.qml:78
+msgid "Evening"
+msgstr ""
+
+#: contents/ui/config.qml:82 contents/ui/main.qml:80
+msgid "Night"
+msgstr ""
+
+#: contents/ui/config.qml:176 contents/ui/config.qml:214
 msgid "Click to enlarge"
 msgstr ""
 
-#: contents/ui/config.qml:254 contents/ui/config.qml:298
+#: contents/ui/config.qml:226 contents/ui/config.qml:247
 msgid "Default"
 msgstr ""
 
-#: contents/ui/config.qml:268
+#: contents/ui/config.qml:240
 msgid "Browse..."
 msgstr ""
 
-#: contents/ui/config.qml:279
-msgid "Accent color: %1 (click to customize)"
-msgstr ""
-
-#: contents/ui/config.qml:312
+#: contents/ui/config.qml:260
 msgid "Image Files (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
 msgstr ""
 
-#: contents/ui/config.qml:313
+#: contents/ui/config.qml:261
 msgid "All Files (*)"
 msgstr ""
 
-#: contents/ui/config.qml:329
-msgid "Select Accent Color"
-msgstr ""
-
-#: contents/ui/config.qml:350
+#: contents/ui/config.qml:280
 msgid "Schedule Mode"
 msgstr ""
 
-#: contents/ui/config.qml:355
+#: contents/ui/config.qml:292
+msgid "Current period: %1 (%2)"
+msgstr ""
+
+#: contents/ui/config.qml:300
 msgid "Solar detection:"
 msgstr ""
 
-#: contents/ui/config.qml:356
+#: contents/ui/config.qml:301
 msgid ""
 "Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)"
 msgstr ""
 
-#: contents/ui/config.qml:368
+#: contents/ui/config.qml:313
 msgid ""
 "Today's calculated times:\n"
 "• Morning (Sunrise): %1\n"
@@ -67,159 +79,135 @@ msgid ""
 "• Night (Dusk): %4"
 msgstr ""
 
-#: contents/ui/config.qml:378
+#: contents/ui/config.qml:323
 msgid "System Settings:"
 msgstr ""
 
-#: contents/ui/config.qml:383
+#: contents/ui/config.qml:328
 msgid "Open System Date, Time & Location Settings..."
 msgstr ""
 
-#: contents/ui/config.qml:392
+#: contents/ui/config.qml:337
 msgid "Night Light Settings..."
 msgstr ""
 
-#: contents/ui/config.qml:406
+#: contents/ui/config.qml:351
 msgid "Manual Time Periods"
 msgstr ""
 
-#: contents/ui/config.qml:412
+#: contents/ui/config.qml:357
 msgid "Morning starts at:"
 msgstr ""
 
-#: contents/ui/config.qml:440
+#: contents/ui/config.qml:387
 msgid "Noon starts at:"
 msgstr ""
 
-#: contents/ui/config.qml:468
+#: contents/ui/config.qml:417
 msgid "Evening starts at:"
 msgstr ""
 
-#: contents/ui/config.qml:496
+#: contents/ui/config.qml:447
 msgid "Night starts at:"
 msgstr ""
 
-#: contents/ui/config.qml:526
+#: contents/ui/config.qml:479
 msgid "Images"
 msgstr ""
 
-#: contents/ui/config.qml:531
+#: contents/ui/config.qml:485
 msgid "Morning wallpaper:"
 msgstr ""
 
-#: contents/ui/config.qml:534
+#: contents/ui/config.qml:487
 msgid "Select Morning Wallpaper"
 msgstr ""
 
-#: contents/ui/config.qml:539
+#: contents/ui/config.qml:493
 msgid "Noon wallpaper:"
 msgstr ""
 
-#: contents/ui/config.qml:542
+#: contents/ui/config.qml:495
 msgid "Select Noon Wallpaper"
 msgstr ""
 
-#: contents/ui/config.qml:547
+#: contents/ui/config.qml:501
 msgid "Evening wallpaper:"
 msgstr ""
 
-#: contents/ui/config.qml:550
+#: contents/ui/config.qml:503
 msgid "Select Evening Wallpaper"
 msgstr ""
 
-#: contents/ui/config.qml:555
+#: contents/ui/config.qml:509
 msgid "Night wallpaper:"
 msgstr ""
 
-#: contents/ui/config.qml:558
+#: contents/ui/config.qml:511
 msgid "Select Night Wallpaper"
 msgstr ""
 
-#: contents/ui/config.qml:566
+#: contents/ui/config.qml:519
 msgid "Appearance"
 msgstr ""
 
-#: contents/ui/config.qml:571
-msgid "Accent color:"
-msgstr ""
-
-#: contents/ui/config.qml:572
-msgid "Synchronize KDE Plasma accent color with active wallpaper period"
-msgstr ""
-
-#: contents/ui/config.qml:579
+#: contents/ui/config.qml:524
 msgid "Fill Mode:"
 msgstr ""
 
-#: contents/ui/config.qml:581
+#: contents/ui/config.qml:526
 msgid "Scaled (Stretch)"
 msgstr ""
 
-#: contents/ui/config.qml:582
+#: contents/ui/config.qml:527
 msgid "Zoom / Crop (Preserve Aspect Ratio)"
 msgstr ""
 
-#: contents/ui/config.qml:583
+#: contents/ui/config.qml:528
 msgid "Fit (Preserve Aspect Ratio)"
 msgstr ""
 
-#: contents/ui/config.qml:590
+#: contents/ui/config.qml:535
 msgid "Transition duration:"
 msgstr ""
 
-#: contents/ui/config.qml:604
+#: contents/ui/config.qml:549
 msgid "ms"
 msgstr ""
 
-#: contents/ui/config.qml:613
+#: contents/ui/config.qml:558
 msgid "Reset"
 msgstr ""
 
-#: contents/ui/config.qml:617
+#: contents/ui/config.qml:562
 msgid "Defaults:"
 msgstr ""
 
-#: contents/ui/config.qml:621
+#: contents/ui/config.qml:566
 msgid "Restore Default Configuration"
 msgstr ""
 
-#: contents/ui/config.qml:653
+#: contents/ui/config.qml:597
 msgid "Close"
 msgstr ""
 
-#: contents/ui/main.qml:60
-msgid "Morning"
-msgstr ""
-
-#: contents/ui/main.qml:62
-msgid "Noon"
-msgstr ""
-
-#: contents/ui/main.qml:64
-msgid "Evening"
-msgstr ""
-
-#: contents/ui/main.qml:66
-msgid "Night"
-msgstr ""
-
-#: contents/ui/main.qml:79
+#: contents/ui/main.qml:93
 msgid "Previewing: %1 (Forced)"
 msgstr ""
 
-#: contents/ui/main.qml:86
+#: contents/ui/main.qml:100
 msgid "Current cycle: %1 (%2 - %3)"
 msgstr ""
 
-#: contents/ui/main.qml:99 contents/ui/main.qml:108 contents/ui/main.qml:117
-#: contents/ui/main.qml:126
+#: contents/ui/main.qml:113 contents/ui/main.qml:125 contents/ui/main.qml:137
+#: contents/ui/main.qml:149
 msgid "Preview: %1"
 msgstr ""
 
-#: contents/ui/main.qml:135
+#: contents/ui/main.qml:161
 msgid "Resume automatic cycle"
 msgstr ""
 
-#: contents/ui/main.qml:144
+#: contents/ui/main.qml:170
 msgid "Update Dynamic Wallpaper"
 msgstr ""

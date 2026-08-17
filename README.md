@@ -166,5 +166,4 @@ cp contents/locale/fr/LC_MESSAGES/plasma_wallpaper_cc.qalpuch.dynamicdaynight.mo
 
 ## Licence
 
-Ce projet est distribué sous licence **GPL-3.0-or-later** conformément aux standards du projet KDE.  
-Auteur : **Q300Z** (<Q300Zhomas@gmail.com>) - [https://qalpuch.cc](https://qalpuch.cc)
+Ce projet est distribué sous licence **GPL-3.0-or-later** conformément aux standards du projet KDE.

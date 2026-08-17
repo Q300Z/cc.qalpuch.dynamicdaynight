@@ -1,9 +1,18 @@
-# KDE / Plasma cache & backup files
+# Build / local artifacts & translations
+contents/locale/
+*.mo
+*.gmo
+*.qmlc
+*.jsc
+
+# KDE / Plasma cache & editor backup files
 *.kate-swp
+*.swp
+*.swo
 *~
 *.orig
 *.bak
+*.po~
+*.pot~
+.directory
 
-# Build / local artifacts
-*.qmlc
-*.jsc

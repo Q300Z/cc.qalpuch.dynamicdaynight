@@ -136,6 +136,12 @@ Kirigami.FormLayout {
         property string pathText: ""
         property string periodKey: ""
 
+        onPathTextChanged: {
+            if (pathField.text !== pathText) {
+                pathField.text = pathText;
+            }
+        }
+
         readonly property bool isCustom: pathText.trim().length > 0
         readonly property bool isActivePeriod: periodKey !== "" && periodKey === root.currentActivePeriod
 
@@ -370,6 +376,7 @@ Kirigami.FormLayout {
             editable: true
             value: 0
             textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
+            valueFromText: function(text, locale) { return parseInt(text, 10) || 0; }
             onValueModified: root.configurationChanged()
         }
     }
@@ -399,6 +406,7 @@ Kirigami.FormLayout {
             editable: true
             value: 0
             textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
+            valueFromText: function(text, locale) { return parseInt(text, 10) || 0; }
             onValueModified: root.configurationChanged()
         }
     }
@@ -428,6 +436,7 @@ Kirigami.FormLayout {
             editable: true
             value: 0
             textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
+            valueFromText: function(text, locale) { return parseInt(text, 10) || 0; }
             onValueModified: root.configurationChanged()
         }
     }
@@ -457,6 +466,7 @@ Kirigami.FormLayout {
             editable: true
             value: 0
             textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
+            valueFromText: function(text, locale) { return parseInt(text, 10) || 0; }
             onValueModified: root.configurationChanged()
         }
     }

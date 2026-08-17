@@ -80,6 +80,7 @@ mkdir -p "${TARGET_LOCALE_DIR}"
 
 # 3. Création du lien symbolique vers le paquet
 echo "🔗 Liaison du plugin dans ${TARGET_PLUGIN_PATH}..."
+rm -rf "${TARGET_PLUGIN_PATH}"
 ln -sfn "${SCRIPT_DIR}" "${TARGET_PLUGIN_PATH}"
 
 # 4. Déploiement des traductions

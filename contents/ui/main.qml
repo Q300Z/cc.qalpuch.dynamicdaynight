@@ -39,8 +39,8 @@ WallpaperItem {
     // Flag indicating whether the first wallpaper has loaded
     property bool initialLoadDone: false
 
-    // Declarative loading state: active until initial load completes or while active layer is loading
-    loading: !initialLoadDone || (activeLayerIndex === 0 ? imageLayerA.status === Image.Loading : imageLayerB.status === Image.Loading)
+    // Declarative loading state: active until initial load completes or while any layer is loading
+    loading: !initialLoadDone || imageLayerA.status === Image.Loading || imageLayerB.status === Image.Loading
 
 
 
@@ -225,7 +225,7 @@ WallpaperItem {
                     duration: imageContainer.transitionDuration
                     easing.type: Easing.InOutQuad
                     onRunningChanged: {
-                        if (!running && imageLayerA.opacity === 0.0) {
+                        if (!running && imageLayerA.opacity === 0.0 && root.activeLayerIndex === 1 && String(imageLayerA.source) !== String(root.targetImageSource)) {
                             imageLayerA.source = "";
                         }
                     }
@@ -262,7 +262,7 @@ WallpaperItem {
                     duration: imageContainer.transitionDuration
                     easing.type: Easing.InOutQuad
                     onRunningChanged: {
-                        if (!running && imageLayerB.opacity === 0.0) {
+                        if (!running && imageLayerB.opacity === 0.0 && root.activeLayerIndex === 0 && String(imageLayerB.source) !== String(root.targetImageSource)) {
                             imageLayerB.source = "";
                         }
                     }

@@ -210,34 +210,7 @@ Kirigami.FormLayout {
             }
         }
 
-        // Active indicator badge
-        Rectangle {
-            visible: fileRow.isActivePeriod
-            Layouts.Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.3)
-            Layouts.Layout.preferredWidth: activeBadgeContent.implicitWidth + Kirigami.Units.smallSpacing * 2
-            radius: Kirigami.Units.smallSpacing
-            color: Kirigami.Theme.highlightColor
 
-            Layouts.RowLayout {
-                id: activeBadgeContent
-                anchors.centerIn: parent
-                spacing: Kirigami.Units.smallSpacing / 2
-
-                Kirigami.Icon {
-                    source: "emblem-checked"
-                    implicitWidth: Math.round(Kirigami.Units.iconSizes.small * 0.8)
-                    implicitHeight: Math.round(Kirigami.Units.iconSizes.small * 0.8)
-                    color: Kirigami.Theme.highlightedTextColor
-                }
-
-                PlasmaComponents.Label {
-                    text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Active now")
-                    font.bold: true
-                    font.pointSize: Kirigami.Theme.smallFont.pointSize
-                    color: Kirigami.Theme.highlightedTextColor
-                }
-            }
-        }
 
         // Path field
         PlasmaComponents.TextField {

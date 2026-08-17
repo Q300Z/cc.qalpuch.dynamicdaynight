@@ -294,30 +294,170 @@ function getCurrentPeriod(date, cfg) {
 }
 
 /**
- * Safely converts a file system path or string to a standard file:// or qrc:/ URL.
- * Handles URL encoding, special characters (#, ?), and existing URL schemes.
+ * Converts any supported color representation (Hex #RGB, #ARGB, #RRGGBB, #AARRGGBB, KConfigXT CSV "r,g,b")
+ * into a canonical 6-digit uppercase Hex string (#RRGGBB).
  *
- * @param {string} path - Local file path or URL
- * @returns {string} Safe file URL string
+ * @param {*} colorVal - Color value in various formats
+ * @param {string} [fallbackHex="#1D99F3"] - Default hex color if parsing fails
+ * @returns {string} Canonical Hex color string (#RRGGBB)
  */
-function toSafeFileUrl(path) {
-    if (!path || typeof path !== "string") {
+function sanitizeColor(colorVal, fallbackHex) {
+    const defaultFallback = (typeof fallbackHex === "string" && fallbackHex.trim().length > 0)
+        ? fallbackHex.trim()
+        : "#1D99F3";
+
+    if (colorVal === null || colorVal === undefined) {
+        return defaultFallback.startsWith("#") ? defaultFallback.toUpperCase() : "#" + defaultFallback.toUpperCase();
+    }
+
+    const str = String(colorVal).trim();
+    if (str.length === 0 || str === "transparent" || str === "#00000000") {
+        return defaultFallback.startsWith("#") ? defaultFallback.toUpperCase() : "#" + defaultFallback.toUpperCase();
+    }
+
+    // 1. KConfigXT CSV format: "r,g,b" or "r, g, b" or "r,g,b,a"
+    const csvMatch = str.match(/^([0-9]+(?:\.[0-9]+)?)\s*,\s*([0-9]+(?:\.[0-9]+)?)\s*,\s*([0-9]+(?:\.[0-9]+)?)(?:\s*,\s*([0-9]+(?:\.[0-9]+)?))?$/);
+    if (csvMatch) {
+        const r = Math.max(0, Math.min(255, Math.round(parseFloat(csvMatch[1]))));
+        const g = Math.max(0, Math.min(255, Math.round(parseFloat(csvMatch[2]))));
+        const b = Math.max(0, Math.min(255, Math.round(parseFloat(csvMatch[3]))));
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+    }
+
+    // 2. Hex color format (#RGB, #ARGB, #RRGGBB, #AARRGGBB)
+    const cleanHex = str.replace(/^#/, "");
+    if (/^[0-9A-Fa-f]+$/.test(cleanHex)) {
+        if (cleanHex.length === 3) {
+            // #RGB -> #RRGGBB
+            const r = cleanHex[0] + cleanHex[0];
+            const g = cleanHex[1] + cleanHex[1];
+            const b = cleanHex[2] + cleanHex[2];
+            return ("#" + r + g + b).toUpperCase();
+        }
+        if (cleanHex.length === 4) {
+            // #ARGB -> #RRGGBB (drop alpha channel)
+            const r = cleanHex[1] + cleanHex[1];
+            const g = cleanHex[2] + cleanHex[2];
+            const b = cleanHex[3] + cleanHex[3];
+            return ("#" + r + g + b).toUpperCase();
+        }
+        if (cleanHex.length === 6) {
+            // #RRGGBB
+            return ("#" + cleanHex).toUpperCase();
+        }
+        if (cleanHex.length === 8) {
+            // #AARRGGBB -> #RRGGBB (drop alpha channel)
+            return ("#" + cleanHex.substring(2)).toUpperCase();
+        }
+    }
+
+    // If parsing fails, normalize and return fallback
+    if (defaultFallback !== str) {
+        return sanitizeColor(defaultFallback, "#1D99F3");
+    }
+    return "#1D99F3";
+}
+
+/**
+ * Robustly converts a local filesystem path or URL into a safe QML/Qt file:// URL.
+ * Handles spaces, '#' hash characters, '?' question marks, and special characters.
+ *
+ * @param {string} rawPath - Raw path or URL
+ * @returns {string} Fully encoded, safe URL
+ */
+function toSafeFileUrl(rawPath) {
+    if (!rawPath || typeof rawPath !== "string") {
         return "";
     }
-    const trimmed = path.trim();
+    const trimmed = rawPath.trim();
     if (trimmed.length === 0) {
         return "";
     }
-    if (trimmed.startsWith("file://") || trimmed.startsWith("qrc:/")) {
+
+    if (trimmed.startsWith("qrc:/") || trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
         return trimmed;
     }
-    const rawPath = trimmed.startsWith("/") ? trimmed : "/" + trimmed;
+
+    let localPath = trimmed;
+    if (trimmed.startsWith("file://")) {
+        localPath = trimmed.substring(7);
+        try {
+            localPath = decodeURIComponent(localPath);
+        } catch (e) {
+            // keep as-is if decode fails
+        }
+    }
+
+    const absPath = localPath.startsWith("/") ? localPath : "/" + localPath;
     try {
-        return "file://" + encodeURI(rawPath).replace(/#/g, "%23").replace(/\?/g, "%3F");
+        return "file://" + encodeURI(absPath).replace(/#/g, "%23").replace(/\?/g, "%3F");
     } catch (e) {
-        const safeSegments = rawPath.split("/").map((seg) => encodeURIComponent(seg)).join("/");
+        const safeSegments = absPath.split("/").map((seg) => encodeURIComponent(seg)).join("/");
         return "file://" + safeSegments;
     }
+}
+
+/**
+ * Clamps RGB color into Breeze-compliant saturation [0.35, 0.85] and lightness [0.32, 0.68]
+ * ranges, guaranteeing high contrast and WCAG readability across both Breeze Light & Breeze Dark themes.
+ *
+ * @param {number} r - Red channel (0..255)
+ * @param {number} g - Green channel (0..255)
+ * @param {number} b - Blue channel (0..255)
+ * @returns {string} Canonical Hex string (#RRGGBB)
+ */
+function clampColorForBreeze(r, g, b) {
+    const rn = Math.max(0, Math.min(255, Number(r) || 0)) / 255;
+    const gn = Math.max(0, Math.min(255, Number(g) || 0)) / 255;
+    const bn = Math.max(0, Math.min(255, Number(b) || 0)) / 255;
+
+    const max = Math.max(rn, gn, bn);
+    const min = Math.min(rn, gn, bn);
+    let l = (max + min) / 2;
+    let h = 0;
+    let s = 0;
+
+    if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case rn: h = (gn - bn) / d + (gn < bn ? 6 : 0); break;
+            case gn: h = (bn - rn) / d + 2; break;
+            case bn: h = (rn - gn) / d + 4; break;
+        }
+        h /= 6;
+    }
+
+    // Clamp saturation to [0.35, 0.85] and lightness to [0.32, 0.68] for Breeze theme compatibility
+    s = Math.max(0.35, Math.min(0.85, s));
+    l = Math.max(0.32, Math.min(0.68, l));
+
+    function hue2rgb(p, q, t) {
+        let tt = t;
+        if (tt < 0) tt += 1;
+        if (tt > 1) tt -= 1;
+        if (tt < 1 / 6) return p + (q - p) * 6 * tt;
+        if (tt < 1 / 2) return q;
+        if (tt < 2 / 3) return p + (q - p) * (2 / 3 - tt) * 6;
+        return p;
+    }
+
+    let red, green, blue;
+    if (s === 0) {
+        red = green = blue = l;
+    } else {
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        red = hue2rgb(p, q, h + 1 / 3);
+        green = hue2rgb(p, q, h);
+        blue = hue2rgb(p, q, h - 1 / 3);
+    }
+
+    const R = Math.max(0, Math.min(255, Math.round(red * 255)));
+    const G = Math.max(0, Math.min(255, Math.round(green * 255)));
+    const B = Math.max(0, Math.min(255, Math.round(blue * 255)));
+
+    return "#" + ((1 << 24) + (R << 16) + (G << 8) + B).toString(16).slice(1).toUpperCase();
 }
 
 /**
@@ -445,158 +585,86 @@ function getMsUntilNextPeriod(date, cfg) {
 }
 
 /**
- * Normalizes any color value (Hex, KConfig "r,g,b" CSV, rgba) into a canonical #RRGGBB hex string.
- *
- * @param {any} colorVal - Input color
- * @param {string} [fallbackHex="#1D99F3"] - Default fallback
- * @returns {string} Hex color string (#RRGGBB)
- */
-function sanitizeColor(colorVal, fallbackHex) {
-    const fallback = fallbackHex || "#1D99F3";
-    if (!colorVal) return fallback;
-
-    const str = String(colorVal).trim();
-    if (str === "" || str === "transparent" || str === "#00000000") {
-        return fallback;
-    }
-
-    if (str.startsWith("#")) {
-        if (str.length === 4) {
-            return "#" + str[1] + str[1] + str[2] + str[2] + str[3] + str[3];
-        }
-        if (str.length === 9) {
-            // #AARRGGBB -> #RRGGBB
-            return "#" + str.substring(3, 9);
-        }
-        if (str.length === 7) {
-            return str;
-        }
-    }
-
-    if (str.indexOf(",") !== -1) {
-        const parts = str.split(",").map(p => parseInt(p.trim(), 10));
-        if (parts.length >= 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
-            const r = Math.min(255, Math.max(0, parts[0]));
-            const g = Math.min(255, Math.max(0, parts[1]));
-            const b = Math.min(255, Math.max(0, parts[2]));
-            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-        }
-    }
-
-    return fallback;
-}
-
-/**
- * Adjusts and clamps RGB colors into safe Breeze / WCAG contrast boundaries.
- * Ensures saturation in [0.35, 0.85] and lightness in [0.32, 0.68].
- *
- * @param {number} r - Red [0..255]
- * @param {number} g - Green [0..255]
- * @param {number} b - Blue [0..255]
- * @returns {string} Hex color string (#RRGGBB)
- */
-function clampColorForBreeze(r, g, b) {
-    const rn = r / 255, gn = g / 255, bn = b / 255;
-    const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
-    let h = 0, s = 0, l = (max + min) / 2;
-
-    if (max !== min) {
-        const d = max - min;
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-        switch (max) {
-            case rn: h = (gn - bn) / d + (gn < bn ? 6 : 0); break;
-            case gn: h = (bn - rn) / d + 2; break;
-            case bn: h = (rn - gn) / d + 4; break;
-        }
-        h /= 6;
-    }
-
-    // Breeze readability clamp
-    s = Math.max(0.35, Math.min(0.85, s));
-    l = Math.max(0.32, Math.min(0.68, l));
-
-    function hue2rgb(p, q, t) {
-        let val = t;
-        if (val < 0) val += 1;
-        if (val > 1) val -= 1;
-        if (val < 1/6) return p + (q - p) * 6 * val;
-        if (val < 1/2) return q;
-        if (val < 2/3) return p + (q - p) * (2/3 - val) * 6;
-        return p;
-    }
-
-    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-    const p = 2 * l - q;
-    const finalR = Math.round(hue2rgb(p, q, h + 1/3) * 255);
-    const finalG = Math.round(hue2rgb(p, q, h) * 255);
-    const finalB = Math.round(hue2rgb(p, q, h - 1/3) * 255);
-
-    return "#" + ((1 << 24) + (finalR << 16) + (finalG << 8) + finalB).toString(16).slice(1);
-}
-
-/**
  * Returns the optimal accent color for a given daylight period.
  * Checks configuration first, then falls back to default period palette.
+ * Canonicalizes and sanitizes all color outputs.
  *
  * @param {string} period - 'morning', 'noon', 'evening', 'night'
  * @param {Object} [cfg] - Configuration object
- * @returns {string} Hex color code
+ * @returns {string} Canonical hex color code (#RRGGBB)
  */
 function getAccentColorForPeriod(period, cfg) {
-    const defaults = {
-        morning: "#1E3539",
-        noon:    "#446C84",
-        evening: "#322F21",
-        night:   "#48220B"
-    };
-    const fallback = defaults[period] || "#446C84";
-    if (cfg) {
-        if (period === "morning" && cfg.MorningColor) return sanitizeColor(cfg.MorningColor, fallback);
-        if (period === "noon" && cfg.NoonColor) return sanitizeColor(cfg.NoonColor, fallback);
-        if (period === "evening" && cfg.EveningColor) return sanitizeColor(cfg.EveningColor, fallback);
-        if (period === "night" && cfg.NightColor) return sanitizeColor(cfg.NightColor, fallback);
+    let rawColor = null;
+    let fallbackHex = "#446C84";
+
+    switch (period) {
+        case "morning":
+            rawColor = cfg ? cfg.MorningColor : null;
+            fallbackHex = "#1E3539";
+            break;
+        case "noon":
+            rawColor = cfg ? cfg.NoonColor : null;
+            fallbackHex = "#446C84";
+            break;
+        case "evening":
+            rawColor = cfg ? cfg.EveningColor : null;
+            fallbackHex = "#322F21";
+            break;
+        case "night":
+        default:
+            rawColor = cfg ? cfg.NightColor : null;
+            fallbackHex = "#48220B";
+            break;
     }
-    return fallback;
+
+    return sanitizeColor(rawColor, fallbackHex);
 }
 
 /**
  * Extracts a vibrant dominant color from an image rendered onto a 2D Canvas context.
- * Performs two-pass analysis with chromatic bucket priority, monochrome fallback,
- * and Breeze WCAG contrast clamping.
+ * Uses a robust two-pass strategy:
+ * - Pass 1: Select the highest-scoring chromatic bucket, filtered and clamped for Breeze themes.
+ * - Pass 2: Fallback to opaque pixel averaging for monochrome/greyscale/transparent images, clamped for Breeze.
  *
  * @param {CanvasRenderingContext2D} ctx - 2D rendering context containing the image
  * @param {number} width - Canvas width
  * @param {number} height - Canvas height
  * @param {string} [fallbackColor="#1D99F3"] - Fallback hex color
- * @returns {string} Hex color string (#RRGGBB)
+ * @returns {string} Canonical Hex color string (#RRGGBB)
  */
 function extractDominantColor(ctx, width, height, fallbackColor) {
-    const defaultColor = sanitizeColor(fallbackColor, "#1D99F3");
+    const defaultHex = sanitizeColor(fallbackColor, "#1D99F3");
     if (!ctx || !width || !height || width <= 0 || height <= 0) {
-        return defaultColor;
+        return defaultHex;
     }
     try {
         const imgData = ctx.getImageData(0, 0, width, height);
         if (!imgData || !imgData.data) {
-            return defaultColor;
+            return defaultHex;
         }
         const data = imgData.data;
         const colorBuckets = {};
-        let totalOpaquePixels = 0;
-        let sumR = 0, sumG = 0, sumB = 0;
         let maxScore = -1;
         let bestBucket = null;
 
+        let totalOpaqueR = 0;
+        let totalOpaqueG = 0;
+        let totalOpaqueB = 0;
+        let opaqueCount = 0;
+
+        // 1st Pass: Analyze chromatic distribution and accumulate opaque pixels
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i];
             const g = data[i + 1];
             const b = data[i + 2];
             const a = data[i + 3];
 
-            if (a < 64) continue; // Skip transparent pixels
+            if (a < 128) continue; // Skip transparent pixels
 
-            totalOpaquePixels++;
-            sumR += r; sumG += g; sumB += b;
+            totalOpaqueR += r;
+            totalOpaqueG += g;
+            totalOpaqueB += b;
+            opaqueCount++;
 
             // Convert to HSL
             const rn = r / 255;
@@ -604,7 +672,9 @@ function extractDominantColor(ctx, width, height, fallbackColor) {
             const bn = b / 255;
             const max = Math.max(rn, gn, bn);
             const min = Math.min(rn, gn, bn);
-            let h = 0, s = 0, l = (max + min) / 2;
+            let l = (max + min) / 2;
+            let h = 0;
+            let s = 0;
 
             if (max !== min) {
                 const d = max - min;
@@ -617,15 +687,15 @@ function extractDominantColor(ctx, width, height, fallbackColor) {
                 h /= 6;
             }
 
-            // Filter for rich chromatic colors
-            if (l < 0.10 || l > 0.90 || s < 0.08) {
+            // Filter out extreme blacks (L < 0.12), extreme whites (L > 0.88), and near-greys (S < 0.10)
+            if (l < 0.12 || l > 0.88 || s < 0.10) {
                 continue;
             }
 
             // Quantize hue into 24 bins (15 deg each) and lightness into 4 bins
             const hueBin = Math.floor(h * 24);
             const lightBin = Math.floor(l * 4);
-            const key = `${hueBin}_${lightBin}`;
+            const key = hueBin + "_" + lightBin;
 
             if (!colorBuckets[key]) {
                 colorBuckets[key] = {
@@ -633,8 +703,8 @@ function extractDominantColor(ctx, width, height, fallbackColor) {
                     totalR: 0,
                     totalG: 0,
                     totalB: 0,
-                    saturation: s,
-                    lightness: l
+                    saturationSum: 0,
+                    lightnessSum: 0
                 };
             }
 
@@ -642,13 +712,17 @@ function extractDominantColor(ctx, width, height, fallbackColor) {
             colorBuckets[key].totalR += r;
             colorBuckets[key].totalG += g;
             colorBuckets[key].totalB += b;
+            colorBuckets[key].saturationSum += s;
+            colorBuckets[key].lightnessSum += l;
         }
 
-        // Pass 1: Find best vibrant chromatic bucket
+        // Find the bucket with the highest vibrancy score
         for (const key in colorBuckets) {
             const bucket = colorBuckets[key];
-            const lightnessPenalty = 1 - Math.abs(bucket.lightness - 0.5) * 1.4;
-            const score = bucket.count * (bucket.saturation * 1.6) * Math.max(0.2, lightnessPenalty);
+            const avgSat = bucket.saturationSum / bucket.count;
+            const avgLight = bucket.lightnessSum / bucket.count;
+            const lightnessPenalty = 1 - Math.abs(avgLight - 0.5) * 1.5;
+            const score = bucket.count * (avgSat * 1.5) * Math.max(0.2, lightnessPenalty);
 
             if (score > maxScore) {
                 maxScore = score;
@@ -656,23 +730,25 @@ function extractDominantColor(ctx, width, height, fallbackColor) {
             }
         }
 
+        // If a dominant chromatic bucket was found, clamp and return its color
         if (bestBucket && bestBucket.count > 0) {
-            const avgR = Math.round(bestBucket.totalR / bestBucket.count);
-            const avgG = Math.round(bestBucket.totalG / bestBucket.count);
-            const avgB = Math.round(bestBucket.totalB / bestBucket.count);
+            const avgR = bestBucket.totalR / bestBucket.count;
+            const avgG = bestBucket.totalG / bestBucket.count;
+            const avgB = bestBucket.totalB / bestBucket.count;
             return clampColorForBreeze(avgR, avgG, avgB);
         }
 
-        // Pass 2: Fallback to average of all opaque pixels (monochrome / low saturation)
-        if (totalOpaquePixels > 0) {
-            const avgR = Math.round(sumR / totalOpaquePixels);
-            const avgG = Math.round(sumG / totalOpaquePixels);
-            const avgB = Math.round(sumB / totalOpaquePixels);
+        // 2nd Pass / Fallback: Opaque pixel average for monochrome/greyscale images
+        if (opaqueCount > 0) {
+            const avgR = totalOpaqueR / opaqueCount;
+            const avgG = totalOpaqueG / opaqueCount;
+            const avgB = totalOpaqueB / opaqueCount;
             return clampColorForBreeze(avgR, avgG, avgB);
         }
 
-        return defaultColor;
+        // No opaque pixels found (fully transparent image)
+        return defaultHex;
     } catch (e) {
-        return defaultColor;
+        return defaultHex;
     }
 }

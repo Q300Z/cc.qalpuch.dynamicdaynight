@@ -11,43 +11,39 @@ import "TimeUtils.js" as TimeUtils
 WallpaperItem {
     id: root
 
-    // Fill the screen area
+    // Occupe tout l'espace de l'écran
     anchors.fill: parent
 
-    // Forced period override for preview mode ("" = automatic, "morning" | "noon" | "evening" | "night")
+    // Période forcée pour le mode prévisualisation ("" = automatique)
     property string forcedPeriod: ""
 
-    // Automatically calculated period from system time and configuration
+    // Période calculée automatiquement selon l'heure et la configuration
     readonly property string autoPeriod: TimeUtils.getCurrentPeriod(currentTime, root.configuration)
 
-    // Currently active period: forced period if specified, otherwise the automatically calculated one
+    // Période active (forcée si définie, sinon automatique)
     readonly property string currentPeriod: forcedPeriod !== "" ? forcedPeriod : autoPeriod
 
-    // Effective schedule for period boundaries
+    // Plages horaires effectives de la journée
     readonly property var currentSchedule: TimeUtils.getEffectiveSchedule(currentTime, root.configuration)
 
-    // Resolved source URL for the active period
+    // URL résolue du fond d'écran pour la période active
     readonly property url targetImageSource: TimeUtils.getImageForPeriod(
         currentPeriod,
         root.configuration,
         (file) => Qt.resolvedUrl(file)
     )
 
-    // Keep track of current system time
+    // Horloge système courante
     property var currentTime: new Date()
 
-    // Flag indicating whether the first wallpaper has loaded
+    // Indicateur du premier chargement initial
     property bool initialLoadDone: false
 
-    // Declarative loading state: active until initial load completes or while any layer is loading
+    // État de chargement déclaratif pour Plasma
     loading: !initialLoadDone || imageLayerA.status === Image.Loading || imageLayerB.status === Image.Loading
 
-
-
     /**
-     * Resolves default bundled image URL for a given period.
-     * @param {string} period - 'morning', 'noon', 'evening', 'night'
-     * @returns {url}
+     * Retourne l'URL de l'image embarquée par défaut pour une période donnée.
      */
     function getBundledImageSource(period) {
         switch (period) {
@@ -64,9 +60,7 @@ WallpaperItem {
     }
 
     /**
-     * Localized display name for a period identifier.
-     * @param {string} period - 'morning', 'noon', 'evening', 'night'
-     * @returns {string}
+     * Nom localisé de la période pour l'interface.
      */
     function getPeriodDisplayName(period) {
         switch (period) {
@@ -83,7 +77,7 @@ WallpaperItem {
         }
     }
 
-    // Contextual actions providing a complete desktop right-click menu
+    // Actions contextuelles du menu clic droit sur le bureau
     contextualActions: [
         PlasmaCore.Action {
             text: {
@@ -176,12 +170,12 @@ WallpaperItem {
         }
     ]
 
-    // Crossfade layer A and B
+    // Conteneur de transition en fondu enchaîné (Crossfade)
     Item {
         id: imageContainer
         anchors.fill: parent
 
-        // Map fill mode integer config (0: Stretch, 1: PreserveAspectCrop, 2: PreserveAspectFit)
+        // Mode de remplissage (0: Étiré, 1: Recadré/Zoom, 2: Ajusté)
         readonly property int resolvedFillMode: {
             const mode = (root.configuration && root.configuration.FillMode !== undefined) ? root.configuration.FillMode : 1;
             switch (mode) {
@@ -196,6 +190,7 @@ WallpaperItem {
             ? root.configuration.TransitionDuration
             : 1500
 
+        // Calque d'image A
         Image {
             id: imageLayerA
             anchors.fill: parent
@@ -212,7 +207,7 @@ WallpaperItem {
                     imageLayerB.opacity = 0.0;
                     root.activeLayerIndex = 0;
                 } else if (status === Image.Error) {
-                    console.warn("[cc.qalpuch.dynamicdaynight] Failed to load wallpaper: " + source + " - Falling back to default bundled image.");
+                    console.warn("[cc.qalpuch.dynamicdaynight] Échec chargement : " + source + " - Repli sur l'image par défaut.");
                     const fallbackUrl = root.getBundledImageSource(root.currentPeriod);
                     if (source !== fallbackUrl) {
                         source = fallbackUrl;
@@ -233,6 +228,7 @@ WallpaperItem {
             }
         }
 
+        // Calque d'image B
         Image {
             id: imageLayerB
             anchors.fill: parent
@@ -249,7 +245,7 @@ WallpaperItem {
                     imageLayerA.opacity = 0.0;
                     root.activeLayerIndex = 1;
                 } else if (status === Image.Error) {
-                    console.warn("[cc.qalpuch.dynamicdaynight] Failed to load wallpaper: " + source + " - Falling back to default bundled image.");
+                    console.warn("[cc.qalpuch.dynamicdaynight] Échec chargement : " + source + " - Repli sur l'image par défaut.");
                     const fallbackUrl = root.getBundledImageSource(root.currentPeriod);
                     if (source !== fallbackUrl) {
                         source = fallbackUrl;
@@ -271,18 +267,17 @@ WallpaperItem {
         }
     }
 
-    // Active layer tracker (0: layer A active, 1: layer B active)
+    // Index du calque actuellement affiché (0: Calque A, 1: Calque B)
     property int activeLayerIndex: 0
 
     /**
-     * Updates wallpaper image sources with crossfade transition.
-     * @param {boolean} force - Force update even if target URL has not changed
+     * Met à jour les sources d'images et déclenche la transition fluide.
      */
     function updateWallpaper(force) {
         const nextUrl = root.targetImageSource;
 
         if (!root.initialLoadDone) {
-            // First load: set image instantly without fade delay
+            // Premier chargement immédiat sans délai de transition
             imageLayerA.source = nextUrl;
             imageLayerA.opacity = 1.0;
             imageLayerB.opacity = 0.0;
@@ -315,8 +310,7 @@ WallpaperItem {
     }
 
     /**
-     * Reschedules dynamic timer tick according to exact remaining milliseconds
-     * and refreshes current timestamp.
+     * Planifie le prochain réveil du minuteur selon le temps restant exact.
      */
     function scheduleNextTick() {
         root.currentTime = new Date();
@@ -325,12 +319,12 @@ WallpaperItem {
         timeTicker.restart();
     }
 
-    // React to target image source changes
+    // Déclenchement automatique lors d'un changement de source d'image
     onTargetImageSourceChanged: {
         root.updateWallpaper(false);
     }
 
-    // Dynamic timer scheduled to trigger at the next period transition
+    // Minuteur dynamique calculé pour la prochaine bascule horaire
     Timer {
         id: timeTicker
         interval: Math.max(5000, TimeUtils.getMsUntilNextPeriod(root.currentTime, root.configuration))
@@ -341,7 +335,7 @@ WallpaperItem {
         }
     }
 
-    // Heartbeat Watchdog Timer (30s interval) to detect system wake-up from suspend/sleep immediately
+    // Watchdog de battement cardiaque (30s) pour détecter le réveil après mise en veille (suspend)
     property double lastHeartbeatTime: Date.now()
 
     Timer {
@@ -354,9 +348,9 @@ WallpaperItem {
             const elapsed = now - root.lastHeartbeatTime;
             root.lastHeartbeatTime = now;
 
-            // If elapsed time > 45s, a system suspend or severe clock jump occurred
+            // Détection d'un saut temporel > 45s (reprise après veille du système)
             if (elapsed > 45000) {
-                console.log("[cc.qalpuch.dynamicdaynight] System wake/clock jump detected (" + elapsed + "ms elapsed). Resynchronizing.");
+                console.log("[cc.qalpuch.dynamicdaynight] Réveil système détecté (" + elapsed + " ms). Resynchronisation.");
                 root.scheduleNextTick();
             } else {
                 root.currentTime = new Date();
@@ -364,7 +358,7 @@ WallpaperItem {
         }
     }
 
-    // Refresh on system wake / application activation
+    // Rafraîchissement lors de l'activation de l'application / session Plasma
     Connections {
         target: Qt.application
         function onStateChanged() {

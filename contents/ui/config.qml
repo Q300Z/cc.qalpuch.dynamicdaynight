@@ -15,7 +15,7 @@ import "TimeUtils.js" as TimeUtils
 Kirigami.FormLayout {
     id: root
 
-    // Properties and signals expected by KDE Plasma 6 kcm_wallpaper
+    // Propriétés et signaux requis par le KCM de fond d'écran KDE Plasma 6
     property var configDialog
     property var wallpaperConfiguration
     property var parentLayout
@@ -24,7 +24,7 @@ Kirigami.FormLayout {
 
     signal configurationChanged()
 
-    // 100% Declarative KConfigXT bindings
+    // Liaisons déclaratives KConfigXT
     property alias cfg_AutoSchedule: autoScheduleCheckBox.checked
 
     property alias cfg_MorningHour: morningHourSpin.value
@@ -47,7 +47,7 @@ Kirigami.FormLayout {
     property alias cfg_FillMode: fillModeCombo.currentIndex
     property alias cfg_TransitionDuration: transitionSpin.value
 
-    // Real-time tracking of current time and active period
+    // Horloge système et calcul en temps réel de la période active
     property var currentTime: new Date()
 
     Timer {
@@ -84,14 +84,14 @@ Kirigami.FormLayout {
         }
     }
 
-    // Real-time solar preview calculation for today based on system timezone/location
+    // Calcul des éphémérides solaires du jour selon la localisation système
     readonly property var currentSolarSchedule: {
         const d = new Date();
         const sys = TimeUtils.getSystemCoordinates();
         return TimeUtils.calculateSolarSchedule(d, sys.lat, sys.lon);
     }
 
-    // Large Image Preview Dialog properties
+    // Propriétés de la boîte de dialogue d'aperçu agrandi
     property string previewDialogTitle: ""
     property url previewDialogSource: ""
 
@@ -102,7 +102,7 @@ Kirigami.FormLayout {
     }
 
     /**
-     * Resets all parameters to their initial factory default values.
+     * Restaure l'ensemble des paramètres aux valeurs d'origine.
      */
     function resetToDefaults() {
         autoScheduleCheckBox.checked = true;
@@ -127,7 +127,7 @@ Kirigami.FormLayout {
         root.configurationChanged();
     }
 
-    // Helper component for single-line file selection with compact inline 16:9 preview
+    // Composant réutilisable pour la sélection d'image avec miniature 16:9
     component FilePathRow: Layouts.RowLayout {
         id: fileRow
 
@@ -155,7 +155,7 @@ Kirigami.FormLayout {
         spacing: Kirigami.Units.smallSpacing
         Layouts.Layout.fillWidth: true
 
-        // Compact 16:9 Thumbnail preview (clickable to open large preview, accessible via keyboard)
+        // Cadre de prévisualisation miniature 16:9 (accessible au clavier)
         Rectangle {
             id: thumbFrame
             Layouts.Layout.preferredWidth: Math.round(Kirigami.Units.gridUnit * 3.2)
@@ -190,7 +190,7 @@ Kirigami.FormLayout {
                 mipmap: true
             }
 
-            // Zoom icon overlay on hover or active focus
+            // Icône de zoom au survol ou focus clavier
             Rectangle {
                 anchors.fill: parent
                 color: Qt.rgba(0, 0, 0, 0.4)
@@ -216,9 +216,7 @@ Kirigami.FormLayout {
             }
         }
 
-
-
-        // Path field
+        // Champ de saisie du chemin de fichier
         PlasmaComponents.TextField {
             id: pathField
             Layouts.Layout.fillWidth: true
@@ -233,7 +231,7 @@ Kirigami.FormLayout {
             }
         }
 
-        // Browse button
+        // Bouton Parcourir
         PlasmaComponents.Button {
             id: browseBtn
             icon.name: "document-open"
@@ -241,7 +239,7 @@ Kirigami.FormLayout {
             onClicked: fileDialog.open()
         }
 
-        // Reset to default button
+        // Bouton Restaurer par défaut
         PlasmaComponents.Button {
             icon.name: "edit-undo"
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default")
@@ -273,14 +271,14 @@ Kirigami.FormLayout {
     }
 
     // ==========================================
-    // SECTION 1: Automatic Solar Detection & System Location
+    // SECTION 1 : Détection solaire automatique & Localisation
     // ==========================================
     Kirigami.Separator {
         Kirigami.FormData.isSection: true
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Schedule Mode")
     }
 
-    // Active period notification banner
+    // Bannière d'état de la période en cours
     Kirigami.InlineMessage {
         id: activePeriodBanner
         type: Kirigami.MessageType.Positive
@@ -303,7 +301,7 @@ Kirigami.FormLayout {
         onToggled: root.configurationChanged()
     }
 
-    // Solar calculation preview message
+    // Message d'information sur les horaires solaires calculés
     Kirigami.InlineMessage {
         id: solarInfoMessage
         visible: autoScheduleCheckBox.checked
@@ -343,7 +341,7 @@ Kirigami.FormLayout {
     }
 
     // ==========================================
-    // SECTION 2: Manual Schedules (if Auto disabled)
+    // SECTION 2 : Plages horaires manuelles (si mode auto désactivé)
     // ==========================================
     Kirigami.Separator {
         visible: !autoScheduleCheckBox.checked
@@ -472,7 +470,7 @@ Kirigami.FormLayout {
     }
 
     // ==========================================
-    // SECTION 3: Images (Matin, Midi, Soir, Nuit)
+    // SECTION 3 : Images (Matin, Midi, Soir, Nuit)
     // ==========================================
     Kirigami.Separator {
         Kirigami.FormData.isSection: true
@@ -512,7 +510,7 @@ Kirigami.FormLayout {
     }
 
     // ==========================================
-    // SECTION 4: Appearance & Transition
+    // SECTION 4 : Apparence & Transitions
     // ==========================================
     Kirigami.Separator {
         Kirigami.FormData.isSection: true
@@ -551,7 +549,7 @@ Kirigami.FormLayout {
     }
 
     // ==========================================
-    // SECTION 5: Reset
+    // SECTION 5 : Réinitialisation
     // ==========================================
     Kirigami.Separator {
         Kirigami.FormData.isSection: true
@@ -568,7 +566,7 @@ Kirigami.FormLayout {
         }
     }
 
-    // Modal popup to display the wallpaper image in full / large view
+    // Fenêtre modale d'aperçu d'image en grand format
     PlasmaComponents.Popup {
         id: imagePreviewPopup
         anchors.centerIn: parent

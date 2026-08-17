@@ -4,10 +4,7 @@
 .pragma library
 
 /**
- * Converts hours and minutes into minutes from the beginning of the day (0..1439).
- * @param {number} hour
- * @param {number} minute
- * @returns {number}
+ * Convertit des heures et minutes en minutes depuis minuit (0..1439).
  */
 function toMinutes(hour, minute) {
     const h = Number(hour);
@@ -16,9 +13,7 @@ function toMinutes(hour, minute) {
 }
 
 /**
- * Formats minutes from midnight into "HH:mm".
- * @param {number} minutes
- * @returns {string}
+ * Formate des minutes depuis minuit au format "HH:mm".
  */
 function formatMinutes(minutes) {
     const num = Number(minutes);
@@ -30,8 +25,8 @@ function formatMinutes(minutes) {
 }
 
 /**
- * Approximate coordinates mapping for common system timezones
- * to provide instant, offline auto-detection without network calls.
+ * Table de correspondance de coordonnées pour les fuseaux horaires courants
+ * (permet une détection hors-ligne instantanée sans appel réseau).
  */
 const TIMEZONE_COORDINATES = {
     "Europe/Paris": { lat: 48.8566, lon: 2.3522 },
@@ -60,12 +55,8 @@ const TIMEZONE_COORDINATES = {
 };
 
 /**
- * Returns estimated coordinates from the system timezone.
- * Falls back to dynamic longitude estimation based on UTC timezone offset if timezone is not hardcoded.
- * Detects Southern Hemisphere timezones to assign a realistic austral latitude (-33.8688) instead of boreal (+48.8566).
- *
- * @param {Date} [date] - Reference date for timezone offset calculation
- * @returns {{lat: number, lon: number}}
+ * Retourne les coordonnées géographiques estimées selon le fuseau horaire du système.
+ * Estime la longitude via le décalage UTC et détecte l'hémisphère sud en cas de repli.
  */
 function getSystemCoordinates(date) {
     const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
@@ -78,17 +69,14 @@ function getSystemCoordinates(date) {
             }
         }
     } catch (e) {
-        // Fallback to offset calculation
+        // Repli sur le calcul par décalage
     }
 
-    // Dynamic longitude approximation: Earth rotates 360° in 1440 minutes (1° every 4 minutes)
-    // Date.prototype.getTimezoneOffset() returns minutes behind UTC (e.g. UTC+2 is -120, UTC-5 is +300)
-    // Therefore: offsetMinutesFromUtc = -d.getTimezoneOffset()
-    // approxLon = offsetMinutesFromUtc / 4.0
+    // Approximation de la longitude : 360° en 1440 min (1° toutes les 4 min)
     const tzOffsetMinutes = -d.getTimezoneOffset();
     const approxLon = tzOffsetMinutes / 4.0;
 
-    // Detect Southern Hemisphere timezones to assign realistic austral latitude (-33.8688) instead of boreal (+48.8566)
+    // Détection des fuseaux de l'hémisphère sud pour attribuer une latitude australe réaliste
     const southernPrefixes = [
         "Australia/",
         "Pacific/",
@@ -105,16 +93,9 @@ function getSystemCoordinates(date) {
 }
 
 /**
- * Calculates accurate astronomical solar cycle (Sunrise, Solar Noon, Sunset, Dusk/Night)
- * using standard NOAA solar ephemeris algorithms.
- *
- * Handles leap years, pure UTC day-of-year calculations (DST immune),
- * and polar extremes (Polar Night cosHA > 1, Midnight Sun cosHA < -1).
- *
- * @param {Date} [date] - Reference date
- * @param {number} [lat=48.8566] - Latitude in decimal degrees
- * @param {number} [lon=2.3522] - Longitude in decimal degrees
- * @returns {{morning: number, noon: number, evening: number, night: number}} minutes from midnight [0..1439]
+ * Calcule les horaires astronomiques du cycle solaire (Lever, Zénith, Coucher, Crépuscule)
+ * via les algorithmes d'éphémérides NOAA standard.
+ * Gère les années bissextiles, le calcul UTC (immunisé au DST) et les extrêmes polaires.
  */
 function calculateSolarSchedule(date, lat, lon) {
     const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
@@ -124,83 +105,75 @@ function calculateSolarSchedule(date, lat, lon) {
     const rad = Math.PI / 180.0;
     const deg = 180.0 / Math.PI;
 
-    // 1. Day of the year calculated in pure UTC (avoids DST 1-hour shift artifacts)
+    // 1. Jour de l'année calculé en UTC pur (immunisé contre le décalage DST)
     const year = d.getFullYear();
     const startOfYearUtc = Date.UTC(year, 0, 1);
     const dateUtc = Date.UTC(year, d.getMonth(), d.getDate());
     const dayOfYear = Math.floor((dateUtc - startOfYearUtc) / 86400000) + 1;
 
-    // 2. Fractional year in radians taking leap years into account
+    // 2. Année fractionnaire en radians avec prise en compte des années bissextiles
     const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
     const daysInYear = isLeap ? 366.0 : 365.0;
     const gamma = (2.0 * Math.PI / daysInYear) * (dayOfYear - 1 + ((d.getHours() - 12) / 24.0));
 
-    // 3. NOAA Equation of Time (in minutes)
+    // 3. Équation du temps NOAA (en minutes)
     const eqTime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma)
                    - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
 
-    // 4. Solar Declination (in radians)
+    // 4. Déclinaison solaire (en radians)
     const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma)
                  - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma);
 
-    // 5. Timezone offset in minutes (local time relative to UTC)
+    // 5. Décalage horaire local par rapport à UTC (en minutes)
     const tzOffsetMinutes = -d.getTimezoneOffset();
 
-    // 6. True Solar Noon in local minutes from midnight
+    // 6. Midi solaire réel en minutes locales depuis minuit
     const solarNoonMinutes = 720.0 - 4.0 * longitude - eqTime + tzOffsetMinutes;
 
     /**
-     * Calculates the Hour Angle for a given solar zenith angle.
-     * Evaluates polar cases:
-     * - cosHA > 1.0 : Polar Night (Sun never rises above zenith angle)
-     * - cosHA < -1.0: Midnight Sun (Sun never drops below zenith angle)
-     *
-     * @param {number} zenithDeg
-     * @returns {{ status: string, ha: number|null }} status: 'NORMAL' | 'POLAR_NIGHT' | 'MIDNIGHT_SUN'
+     * Calcule l'angle horaire pour un zénith donné et évalue les cas polaires :
+     * - cosHA > 1.0 : Nuit polaire (le soleil ne se lève pas)
+     * - cosHA < -1.0 : Soleil de minuit (le soleil ne se couche pas)
      */
     function evaluateHourAngle(zenithDeg) {
         const cosHA = (Math.cos(zenithDeg * rad) - Math.sin(latitude * rad) * Math.sin(decl)) /
                       (Math.cos(latitude * rad) * Math.cos(decl));
 
         if (cosHA > 1.0) {
-            // Sun remains below zenith all day -> Polar Night
             return { status: "POLAR_NIGHT", ha: null };
         }
         if (cosHA < -1.0) {
-            // Sun remains above zenith all day -> Midnight Sun
             return { status: "MIDNIGHT_SUN", ha: null };
         }
         return { status: "NORMAL", ha: Math.acos(cosHA) * deg };
     }
 
-    // 90.833° = standard sunrise/sunset zenith (including 34' refraction and 16' solar semi-diameter)
+    // 90.833° = Zénith standard de lever/coucher (réfraction 34' et demi-diamètre solaire 16')
     const sunriseEval = evaluateHourAngle(90.833);
-    // 96.0° = Civil dusk / twilight zenith
+    // 96.0° = Zénith du crépuscule civil
     const duskEval = evaluateHourAngle(96.0);
 
     let sunriseMin, sunsetMin, duskMin;
 
     if (sunriseEval.status === "POLAR_NIGHT") {
-        // Polar Night: The sun does not rise above the horizon.
+        // Nuit polaire : le soleil reste sous l'horizon
         if (duskEval.status === "NORMAL" && duskEval.ha !== null) {
-            // Civil twilight glow occurs around solar noon
             const halfTwilight = duskEval.ha * 4.0;
             sunriseMin = solarNoonMinutes - halfTwilight;
             sunsetMin  = solarNoonMinutes + halfTwilight;
             duskMin    = sunsetMin + 30.0;
         } else {
-            // Total polar night: 24 hours of darkness
             sunriseMin = solarNoonMinutes - 60.0;
             sunsetMin  = solarNoonMinutes + 60.0;
             duskMin    = solarNoonMinutes + 120.0;
         }
     } else if (sunriseEval.status === "MIDNIGHT_SUN") {
-        // Midnight Sun: The sun does not set below the horizon (24 hours of sunlight).
-        sunriseMin = solarNoonMinutes - 360.0; // ~6 hours before solar noon
-        sunsetMin  = solarNoonMinutes + 360.0; // ~6 hours after solar noon
-        duskMin    = solarNoonMinutes + 540.0; // ~9 hours after solar noon
+        // Soleil de minuit : le soleil reste au-dessus de l'horizon
+        sunriseMin = solarNoonMinutes - 360.0;
+        sunsetMin  = solarNoonMinutes + 360.0;
+        duskMin    = solarNoonMinutes + 540.0;
     } else {
-        // Standard sunrise, sunset, and twilight calculation
+        // Calcul standard du lever, coucher et crépuscule
         const haSunrise = sunriseEval.ha;
         sunriseMin = solarNoonMinutes - haSunrise * 4.0;
         sunsetMin  = solarNoonMinutes + haSunrise * 4.0;
@@ -223,11 +196,7 @@ function calculateSolarSchedule(date, lat, lon) {
 }
 
 /**
- * Returns effective schedule in minutes for the given configuration.
- *
- * @param {Date} [date]
- * @param {Object} [cfg]
- * @returns {{morning: number, noon: number, evening: number, night: number}}
+ * Retourne les plages horaires effectives en minutes selon la configuration.
  */
 function getEffectiveSchedule(date, cfg) {
     const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
@@ -246,11 +215,7 @@ function getEffectiveSchedule(date, cfg) {
 }
 
 /**
- * Determines which time period is active based on current time and configured schedule.
- *
- * @param {Date} [date] - The date to check
- * @param {Object} [cfg] - The configuration object
- * @returns {string} One of: 'morning', 'noon', 'evening', 'night'
+ * Détermine la période active (morning, noon, evening, night) selon l'heure et la planification.
  */
 function getCurrentPeriod(date, cfg) {
     const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
@@ -262,7 +227,7 @@ function getCurrentPeriod(date, cfg) {
     const eveningMin = schedule.evening;
     const nightMin   = schedule.night;
 
-    // Chronological slot check
+    // Ordre chronologique standard
     if (nightMin > eveningMin && eveningMin > noonMin && noonMin > morningMin) {
         if (currentMinutes >= nightMin || currentMinutes < morningMin) {
             return "night";
@@ -276,7 +241,7 @@ function getCurrentPeriod(date, cfg) {
         return "morning";
     }
 
-    // Fallback for custom unordered periods
+    // Repli pour les configurations manuelles non triées
     const slots = [
         { name: "morning", start: morningMin },
         { name: "noon",    start: noonMin },
@@ -293,14 +258,8 @@ function getCurrentPeriod(date, cfg) {
     return activeSlot;
 }
 
-
-
 /**
- * Robustly converts a local filesystem path or URL into a safe QML/Qt file:// URL.
- * Handles spaces, '#' hash characters, '?' question marks, and special characters.
- *
- * @param {string} rawPath - Raw path or URL
- * @returns {string} Fully encoded, safe URL
+ * Convertit de manière robuste un chemin local en URL file:// valide (gestion des espaces, #, ?, [ ]).
  */
 function toSafeFileUrl(rawPath) {
     if (!rawPath || typeof rawPath !== "string") {
@@ -321,7 +280,7 @@ function toSafeFileUrl(rawPath) {
         try {
             localPath = decodeURIComponent(localPath);
         } catch (e) {
-            // keep as-is if decode fails
+            // Conserver tel quel en cas d'échec de décodage
         }
     }
 
@@ -334,15 +293,8 @@ function toSafeFileUrl(rawPath) {
     }
 }
 
-
-
 /**
- * Resolves the appropriate image URL for a given time period.
- *
- * @param {string} period - 'morning', 'noon', 'evening', 'night'
- * @param {Object} [cfg] - Configuration object
- * @param {function} [resolveLocalUrl] - Function to resolve package-relative URLs
- * @returns {string}
+ * Résout l'URL de l'image correspondant à la période demandée.
  */
 function getImageForPeriod(period, cfg, resolveLocalUrl) {
     const c = cfg || {};
@@ -378,11 +330,7 @@ function getImageForPeriod(period, cfg, resolveLocalUrl) {
 }
 
 /**
- * Returns the start and end minutes for a given period in the schedule.
- *
- * @param {string} period - 'morning', 'noon', 'evening', 'night'
- * @param {Object} schedule - { morning: number, noon: number, evening: number, night: number }
- * @returns {{start: number, end: number}}
+ * Retourne les minutes de début et de fin d'une période dans la planification.
  */
 function getPeriodRange(period, schedule) {
     if (!schedule || typeof schedule !== "object") {
@@ -407,10 +355,7 @@ function getPeriodRange(period, schedule) {
 }
 
 /**
- * Returns an appropriate icon name for a given period.
- *
- * @param {string} period - 'morning', 'noon', 'evening', 'night'
- * @returns {string}
+ * Retourne le nom d'icône système Plasma adapté à la période.
  */
 function getPeriodIcon(period) {
     switch (period) {
@@ -428,11 +373,7 @@ function getPeriodIcon(period) {
 }
 
 /**
- * Calculates the exact number of milliseconds remaining until the next period change.
- *
- * @param {Date} [date] - Reference date (defaults to current date if omitted)
- * @param {Object} [cfg] - Configuration object
- * @returns {number} Milliseconds remaining until the next transition
+ * Calcule le nombre exact de millisecondes restantes avant le prochain changement de période.
  */
 function getMsUntilNextPeriod(date, cfg) {
     const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
@@ -440,7 +381,7 @@ function getMsUntilNextPeriod(date, cfg) {
 
     const currentMs = ((d.getHours() * 60 + d.getMinutes()) * 60 + d.getSeconds()) * 1000 + d.getMilliseconds();
 
-    // Distinct transition points in milliseconds from midnight
+    // Points de transition distincts en millisecondes depuis minuit
     const points = [
         schedule.morning * 60000,
         schedule.noon * 60000,
@@ -448,14 +389,14 @@ function getMsUntilNextPeriod(date, cfg) {
         schedule.night * 60000
     ].sort((a, b) => a - b);
 
-    // Find the next transition point strictly after currentMs
+    // Recherche du prochain point de transition strictement futur
     for (let i = 0; i < points.length; ++i) {
         if (points[i] > currentMs) {
             return points[i] - currentMs;
         }
     }
 
-    // If current time is past all transitions today, next transition is tomorrow's first point
+    // Si toutes les transitions du jour sont passées, le prochain point est le premier de demain
     const msUntilMidnight = 86400000 - currentMs;
     return msUntilMidnight + points[0];
 }

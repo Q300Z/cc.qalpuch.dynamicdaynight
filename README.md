@@ -32,11 +32,12 @@ Ce plugin est conçu nativement pour **KDE Plasma 6** (Qt 6 / KF6) selon les sta
 
 ## Fonctionnalités
 
-- ☀️ **Détection solaire automatique :** Synchronisation sur le cycle réel du soleil sans connexion Internet requise.
+- ☀️ **Détection solaire automatique :** Synchronisation sur le cycle réel du soleil sans connexion Internet requise (éphémérides NOAA hors-ligne).
 - 🕒 **Mode horaire manuel :** Possibilité de définir des plages horaires fixes personnalisées.
-- 🖼️ **Images personnalisables :** Remplacement possible de chaque image (Matin, Midi, Soir, Nuit) via un sélecteur de fichier avec bouton de réinitialisation.
-- 🎨 **Modes de remplissage :** Étiré, Recadré / Zoom (conserve les proportions), Ajusté.
-- ⏱️ **Durée de transition ajustable :** Réglage précis de la durée du fondu (en ms).
+- 🖼️ **Images personnalisables :** Remplacement possible de chaque image (Matin, Midi, Soir, Nuit) avec miniatures 16:9 et bouton de réinitialisation.
+- 🎨 **Couleur d'accentuation dynamique native :** Compatible à 100% avec l'extraction automatique de couleur de KDE Plasma 6 (*Paramètres $\rightarrow$ Couleurs $\rightarrow$ Générer depuis le fond d'écran*).
+- 📐 **Modes de remplissage :** Étiré, Recadré / Zoom (conserve les proportions), Ajusté.
+- ⏱️ **Durée de transition ajustable :** Réglage précis de la durée du fondu enchaîné (*crossfade* en ms).
 - 🌍 **Internationalisation (i18n) :** Support multilingue complet (Français et Anglais inclus).
 - 🔄 **Bouton de réinitialisation :** Restauration des réglages d'origine en un seul clic.
 

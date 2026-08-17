@@ -10,13 +10,13 @@
   <kcfgfile name=""/>
 
   <group name="General">
-    <!-- Automatic mode: calculates switch times automatically based on solar ephemeris -->
+    <!-- Mode automatique : calcule les heures de bascule selon les éphémérides solaires -->
     <entry name="AutoSchedule" type="Bool">
       <label>Automatically calculate switch times from sunrise and sunset</label>
       <default>true</default>
     </entry>
 
-    <!-- Manual schedule times for each time slot (in 24-hour format) -->
+    <!-- Plages horaires manuelles pour chaque période (format 24 heures) -->
     <entry name="MorningHour" type="Int">
       <label>Morning start hour (0-23)</label>
       <default>6</default>
@@ -69,7 +69,7 @@
       <max>59</max>
     </entry>
 
-    <!-- Custom image file paths (empty string uses the bundled defaults) -->
+    <!-- Chemins des images personnalisées (chaîne vide = image embarquée par défaut) -->
     <entry name="MorningImage" type="Path">
       <label>Custom morning image path</label>
       <default></default>
@@ -87,9 +87,7 @@
       <default></default>
     </entry>
 
-
-
-    <!-- Transition settings -->
+    <!-- Paramètres de transition (durée en millisecondes) -->
     <entry name="TransitionDuration" type="Int">
       <label>Crossfade transition duration in milliseconds</label>
       <default>1500</default>
@@ -97,7 +95,7 @@
       <max>10000</max>
     </entry>
 
-    <!-- Fill Mode: 0=Stretch, 1=PreserveAspectCrop, 2=PreserveAspectFit -->
+    <!-- Mode de remplissage : 0=Étiré, 1=Recadré/Zoom, 2=Ajusté -->
     <entry name="FillMode" type="Int">
       <label>Image fill mode</label>
       <default>1</default>

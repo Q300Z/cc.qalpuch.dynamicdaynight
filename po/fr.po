@@ -226,6 +226,14 @@ msgstr "Prévisualiser : %1"
 msgid "Resume automatic cycle"
 msgstr "Reprendre le cycle automatique"
 
+#: contents/ui/config.qml:228
+msgid "Active now"
+msgstr "Actif actuellement"
+
+#: contents/ui/config.qml:278
+msgid "Current period: %1 (%2)"
+msgstr "Période en cours : %1 (%2)"
+
 #: contents/ui/main.qml:144
 msgid "Update Dynamic Wallpaper"
 msgstr "Mettre à jour le fond d'écran dynamique"

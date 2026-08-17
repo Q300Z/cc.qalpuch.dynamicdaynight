@@ -47,6 +47,43 @@ Kirigami.FormLayout {
     property alias cfg_FillMode: fillModeCombo.currentIndex
     property alias cfg_TransitionDuration: transitionSpin.value
 
+    // Real-time tracking of current time and active period
+    property var currentTime: new Date()
+
+    Timer {
+        interval: 10000
+        running: true
+        repeat: true
+        onTriggered: {
+            root.currentTime = new Date();
+        }
+    }
+
+    readonly property string currentActivePeriod: {
+        const cfg = {
+            AutoSchedule: root.cfg_AutoSchedule,
+            MorningHour: root.cfg_MorningHour,
+            MorningMinute: root.cfg_MorningMinute,
+            NoonHour: root.cfg_NoonHour,
+            NoonMinute: root.cfg_NoonMinute,
+            EveningHour: root.cfg_EveningHour,
+            EveningMinute: root.cfg_EveningMinute,
+            NightHour: root.cfg_NightHour,
+            NightMinute: root.cfg_NightMinute
+        };
+        return TimeUtils.getCurrentPeriod(root.currentTime, cfg);
+    }
+
+    function getPeriodDisplayName(period) {
+        switch (period) {
+            case "morning": return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning");
+            case "noon":    return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon");
+            case "evening": return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening");
+            case "night":   return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night");
+            default:        return "";
+        }
+    }
+
     // Real-time solar preview calculation for today based on system timezone/location
     readonly property var currentSolarSchedule: {
         const d = new Date();
@@ -97,8 +134,10 @@ Kirigami.FormLayout {
         property string defaultFileName: ""
         property string dialogTitle: ""
         property string pathText: ""
+        property string periodKey: ""
 
         readonly property bool isCustom: pathText.trim().length > 0
+        readonly property bool isActivePeriod: periodKey !== "" && periodKey === root.currentActivePeriod
 
         readonly property url resolvedImageSource: {
             if (fileRow.isCustom) {
@@ -117,8 +156,10 @@ Kirigami.FormLayout {
             Layouts.Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.8)
             radius: Kirigami.Units.smallSpacing / 2
             color: Kirigami.Theme.alternateBackgroundColor
-            border.color: (thumbMouseArea.containsMouse || thumbFrame.activeFocus) ? Kirigami.Theme.highlightColor : (fileRow.isCustom ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor)
-            border.width: (thumbMouseArea.containsMouse || thumbFrame.activeFocus || fileRow.isCustom) ? 1.5 : 1
+            border.color: fileRow.isActivePeriod
+                ? Kirigami.Theme.highlightColor
+                : ((thumbMouseArea.containsMouse || thumbFrame.activeFocus) ? Kirigami.Theme.highlightColor : (fileRow.isCustom ? Kirigami.Theme.highlightColor : Kirigami.Theme.disabledTextColor))
+            border.width: fileRow.isActivePeriod ? 2 : ((thumbMouseArea.containsMouse || thumbFrame.activeFocus || fileRow.isCustom) ? 1.5 : 1)
             clip: true
 
             focus: true
@@ -166,6 +207,35 @@ Kirigami.FormLayout {
 
                 PlasmaComponents.ToolTip.text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Click to enlarge")
                 PlasmaComponents.ToolTip.visible: containsMouse
+            }
+        }
+
+        // Active indicator badge
+        Rectangle {
+            visible: fileRow.isActivePeriod
+            Layouts.Layout.preferredHeight: Math.round(Kirigami.Units.gridUnit * 1.3)
+            Layouts.Layout.preferredWidth: activeBadgeContent.implicitWidth + Kirigami.Units.smallSpacing * 2
+            radius: Kirigami.Units.smallSpacing
+            color: Kirigami.Theme.highlightColor
+
+            Layouts.RowLayout {
+                id: activeBadgeContent
+                anchors.centerIn: parent
+                spacing: Kirigami.Units.smallSpacing / 2
+
+                Kirigami.Icon {
+                    source: "emblem-checked"
+                    implicitWidth: Math.round(Kirigami.Units.iconSizes.small * 0.8)
+                    implicitHeight: Math.round(Kirigami.Units.iconSizes.small * 0.8)
+                    color: Kirigami.Theme.highlightedTextColor
+                }
+
+                PlasmaComponents.Label {
+                    text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Active now")
+                    font.bold: true
+                    font.pointSize: Kirigami.Theme.smallFont.pointSize
+                    color: Kirigami.Theme.highlightedTextColor
+                }
             }
         }
 
@@ -229,6 +299,21 @@ Kirigami.FormLayout {
     Kirigami.Separator {
         Kirigami.FormData.isSection: true
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Schedule Mode")
+    }
+
+    // Active period notification banner
+    Kirigami.InlineMessage {
+        id: activePeriodBanner
+        type: Kirigami.MessageType.Positive
+        showCloseButton: false
+        visible: true
+        Layouts.Layout.fillWidth: true
+        text: i18nd(
+            "plasma_wallpaper_cc.qalpuch.dynamicdaynight",
+            "Current period: %1 (%2)",
+            root.getPeriodDisplayName(root.currentActivePeriod),
+            Qt.formatTime(root.currentTime, "hh:mm")
+        )
     }
 
     PlasmaComponents.CheckBox {
@@ -413,6 +498,7 @@ Kirigami.FormLayout {
 
     FilePathRow {
         id: morningRow
+        periodKey: "morning"
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning wallpaper:")
         defaultFileName: "matin.png"
         dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Morning Wallpaper")
@@ -420,6 +506,7 @@ Kirigami.FormLayout {
 
     FilePathRow {
         id: noonRow
+        periodKey: "noon"
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon wallpaper:")
         defaultFileName: "midi.png"
         dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Noon Wallpaper")
@@ -427,6 +514,7 @@ Kirigami.FormLayout {
 
     FilePathRow {
         id: eveningRow
+        periodKey: "evening"
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening wallpaper:")
         defaultFileName: "soir.png"
         dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Evening Wallpaper")
@@ -434,6 +522,7 @@ Kirigami.FormLayout {
 
     FilePathRow {
         id: nightRow
+        periodKey: "night"
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night wallpaper:")
         defaultFileName: "nuit.png"
         dialogTitle: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Night Wallpaper")

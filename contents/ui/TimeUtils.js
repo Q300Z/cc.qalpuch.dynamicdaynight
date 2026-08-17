@@ -294,6 +294,33 @@ function getCurrentPeriod(date, cfg) {
 }
 
 /**
+ * Safely converts a file system path or string to a standard file:// or qrc:/ URL.
+ * Handles URL encoding, special characters (#, ?), and existing URL schemes.
+ *
+ * @param {string} path - Local file path or URL
+ * @returns {string} Safe file URL string
+ */
+function toSafeFileUrl(path) {
+    if (!path || typeof path !== "string") {
+        return "";
+    }
+    const trimmed = path.trim();
+    if (trimmed.length === 0) {
+        return "";
+    }
+    if (trimmed.startsWith("file://") || trimmed.startsWith("qrc:/")) {
+        return trimmed;
+    }
+    const rawPath = trimmed.startsWith("/") ? trimmed : "/" + trimmed;
+    try {
+        return "file://" + encodeURI(rawPath).replace(/#/g, "%23").replace(/\?/g, "%3F");
+    } catch (e) {
+        const safeSegments = rawPath.split("/").map((seg) => encodeURIComponent(seg)).join("/");
+        return "file://" + safeSegments;
+    }
+}
+
+/**
  * Resolves the appropriate image URL for a given time period.
  *
  * @param {string} period - 'morning', 'noon', 'evening', 'night'
@@ -328,17 +355,7 @@ function getImageForPeriod(period, cfg, resolveLocalUrl) {
     }
 
     if (customImage && String(customImage).trim().length > 0) {
-        const trimmed = String(customImage).trim();
-        if (trimmed.startsWith("file://") || trimmed.startsWith("qrc:/")) {
-            return trimmed;
-        }
-        const rawPath = trimmed.startsWith("/") ? trimmed : "/" + trimmed;
-        try {
-            return "file://" + encodeURI(rawPath).replace(/#/g, "%23").replace(/\?/g, "%3F");
-        } catch (e) {
-            const safeSegments = rawPath.split("/").map((seg) => encodeURIComponent(seg)).join("/");
-            return "file://" + safeSegments;
-        }
+        return toSafeFileUrl(String(customImage));
     }
 
     return safeResolve(defaultFile);
@@ -428,6 +445,96 @@ function getMsUntilNextPeriod(date, cfg) {
 }
 
 /**
+ * Normalizes any color value (Hex, KConfig "r,g,b" CSV, rgba) into a canonical #RRGGBB hex string.
+ *
+ * @param {any} colorVal - Input color
+ * @param {string} [fallbackHex="#1D99F3"] - Default fallback
+ * @returns {string} Hex color string (#RRGGBB)
+ */
+function sanitizeColor(colorVal, fallbackHex) {
+    const fallback = fallbackHex || "#1D99F3";
+    if (!colorVal) return fallback;
+
+    const str = String(colorVal).trim();
+    if (str === "" || str === "transparent" || str === "#00000000") {
+        return fallback;
+    }
+
+    if (str.startsWith("#")) {
+        if (str.length === 4) {
+            return "#" + str[1] + str[1] + str[2] + str[2] + str[3] + str[3];
+        }
+        if (str.length === 9) {
+            // #AARRGGBB -> #RRGGBB
+            return "#" + str.substring(3, 9);
+        }
+        if (str.length === 7) {
+            return str;
+        }
+    }
+
+    if (str.indexOf(",") !== -1) {
+        const parts = str.split(",").map(p => parseInt(p.trim(), 10));
+        if (parts.length >= 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+            const r = Math.min(255, Math.max(0, parts[0]));
+            const g = Math.min(255, Math.max(0, parts[1]));
+            const b = Math.min(255, Math.max(0, parts[2]));
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
+    }
+
+    return fallback;
+}
+
+/**
+ * Adjusts and clamps RGB colors into safe Breeze / WCAG contrast boundaries.
+ * Ensures saturation in [0.35, 0.85] and lightness in [0.32, 0.68].
+ *
+ * @param {number} r - Red [0..255]
+ * @param {number} g - Green [0..255]
+ * @param {number} b - Blue [0..255]
+ * @returns {string} Hex color string (#RRGGBB)
+ */
+function clampColorForBreeze(r, g, b) {
+    const rn = r / 255, gn = g / 255, bn = b / 255;
+    const max = Math.max(rn, gn, bn), min = Math.min(rn, gn, bn);
+    let h = 0, s = 0, l = (max + min) / 2;
+
+    if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case rn: h = (gn - bn) / d + (gn < bn ? 6 : 0); break;
+            case gn: h = (bn - rn) / d + 2; break;
+            case bn: h = (rn - gn) / d + 4; break;
+        }
+        h /= 6;
+    }
+
+    // Breeze readability clamp
+    s = Math.max(0.35, Math.min(0.85, s));
+    l = Math.max(0.32, Math.min(0.68, l));
+
+    function hue2rgb(p, q, t) {
+        let val = t;
+        if (val < 0) val += 1;
+        if (val > 1) val -= 1;
+        if (val < 1/6) return p + (q - p) * 6 * val;
+        if (val < 1/2) return q;
+        if (val < 2/3) return p + (q - p) * (2/3 - val) * 6;
+        return p;
+    }
+
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    const finalR = Math.round(hue2rgb(p, q, h + 1/3) * 255);
+    const finalG = Math.round(hue2rgb(p, q, h) * 255);
+    const finalB = Math.round(hue2rgb(p, q, h - 1/3) * 255);
+
+    return "#" + ((1 << 24) + (finalR << 16) + (finalG << 8) + finalB).toString(16).slice(1);
+}
+
+/**
  * Returns the optimal accent color for a given daylight period.
  * Checks configuration first, then falls back to default period palette.
  *
@@ -436,29 +543,26 @@ function getMsUntilNextPeriod(date, cfg) {
  * @returns {string} Hex color code
  */
 function getAccentColorForPeriod(period, cfg) {
+    const defaults = {
+        morning: "#1E3539",
+        noon:    "#446C84",
+        evening: "#322F21",
+        night:   "#48220B"
+    };
+    const fallback = defaults[period] || "#446C84";
     if (cfg) {
-        if (period === "morning" && cfg.MorningColor) return String(cfg.MorningColor);
-        if (period === "noon" && cfg.NoonColor) return String(cfg.NoonColor);
-        if (period === "evening" && cfg.EveningColor) return String(cfg.EveningColor);
-        if (period === "night" && cfg.NightColor) return String(cfg.NightColor);
+        if (period === "morning" && cfg.MorningColor) return sanitizeColor(cfg.MorningColor, fallback);
+        if (period === "noon" && cfg.NoonColor) return sanitizeColor(cfg.NoonColor, fallback);
+        if (period === "evening" && cfg.EveningColor) return sanitizeColor(cfg.EveningColor, fallback);
+        if (period === "night" && cfg.NightColor) return sanitizeColor(cfg.NightColor, fallback);
     }
-
-    switch (period) {
-        case "morning":
-            return "#1E3539"; // Extracted morning palette
-        case "noon":
-            return "#446C84"; // Extracted noon palette
-        case "evening":
-            return "#322F21"; // Extracted evening palette
-        case "night":
-            return "#48220B"; // Extracted night palette
-        default:
-            return "#446C84";
-    }
+    return fallback;
 }
 
 /**
  * Extracts a vibrant dominant color from an image rendered onto a 2D Canvas context.
+ * Performs two-pass analysis with chromatic bucket priority, monochrome fallback,
+ * and Breeze WCAG contrast clamping.
  *
  * @param {CanvasRenderingContext2D} ctx - 2D rendering context containing the image
  * @param {number} width - Canvas width
@@ -467,7 +571,7 @@ function getAccentColorForPeriod(period, cfg) {
  * @returns {string} Hex color string (#RRGGBB)
  */
 function extractDominantColor(ctx, width, height, fallbackColor) {
-    const defaultColor = fallbackColor || "#1D99F3";
+    const defaultColor = sanitizeColor(fallbackColor, "#1D99F3");
     if (!ctx || !width || !height || width <= 0 || height <= 0) {
         return defaultColor;
     }
@@ -478,8 +582,10 @@ function extractDominantColor(ctx, width, height, fallbackColor) {
         }
         const data = imgData.data;
         const colorBuckets = {};
-        let bestColor = null;
+        let totalOpaquePixels = 0;
+        let sumR = 0, sumG = 0, sumB = 0;
         let maxScore = -1;
+        let bestBucket = null;
 
         for (let i = 0; i < data.length; i += 4) {
             const r = data[i];
@@ -487,7 +593,10 @@ function extractDominantColor(ctx, width, height, fallbackColor) {
             const b = data[i + 2];
             const a = data[i + 3];
 
-            if (a < 128) continue; // Skip transparent pixels
+            if (a < 64) continue; // Skip transparent pixels
+
+            totalOpaquePixels++;
+            sumR += r; sumG += g; sumB += b;
 
             // Convert to HSL
             const rn = r / 255;
@@ -508,8 +617,8 @@ function extractDominantColor(ctx, width, height, fallbackColor) {
                 h /= 6;
             }
 
-            // Filter out extreme blacks (L < 0.12), extreme whites (L > 0.88), and near-greys (S < 0.10)
-            if (l < 0.12 || l > 0.88 || s < 0.10) {
+            // Filter for rich chromatic colors
+            if (l < 0.10 || l > 0.90 || s < 0.08) {
                 continue;
             }
 
@@ -535,23 +644,34 @@ function extractDominantColor(ctx, width, height, fallbackColor) {
             colorBuckets[key].totalB += b;
         }
 
-        // Find the bucket with the highest vibrancy score
+        // Pass 1: Find best vibrant chromatic bucket
         for (const key in colorBuckets) {
             const bucket = colorBuckets[key];
-            // Prefer vibrant, well-balanced colors
-            const lightnessPenalty = 1 - Math.abs(bucket.lightness - 0.5) * 1.5;
-            const score = bucket.count * (bucket.saturation * 1.5) * Math.max(0.2, lightnessPenalty);
+            const lightnessPenalty = 1 - Math.abs(bucket.lightness - 0.5) * 1.4;
+            const score = bucket.count * (bucket.saturation * 1.6) * Math.max(0.2, lightnessPenalty);
 
             if (score > maxScore) {
                 maxScore = score;
-                const avgR = Math.round(bucket.totalR / bucket.count);
-                const avgG = Math.round(bucket.totalG / bucket.count);
-                const avgB = Math.round(bucket.totalB / bucket.count);
-                bestColor = "#" + ((1 << 24) + (avgR << 16) + (avgG << 8) + avgB).toString(16).slice(1);
+                bestBucket = bucket;
             }
         }
 
-        return bestColor || defaultColor;
+        if (bestBucket && bestBucket.count > 0) {
+            const avgR = Math.round(bestBucket.totalR / bestBucket.count);
+            const avgG = Math.round(bestBucket.totalG / bestBucket.count);
+            const avgB = Math.round(bestBucket.totalB / bestBucket.count);
+            return clampColorForBreeze(avgR, avgG, avgB);
+        }
+
+        // Pass 2: Fallback to average of all opaque pixels (monochrome / low saturation)
+        if (totalOpaquePixels > 0) {
+            const avgR = Math.round(sumR / totalOpaquePixels);
+            const avgG = Math.round(sumG / totalOpaquePixels);
+            const avgB = Math.round(sumB / totalOpaquePixels);
+            return clampColorForBreeze(avgR, avgG, avgB);
+        }
+
+        return defaultColor;
     } catch (e) {
         return defaultColor;
     }

@@ -116,11 +116,7 @@ Kirigami.FormLayout {
 
         readonly property url resolvedImageSource: {
             if (fileRow.isCustom) {
-                const trimmed = pathText.trim();
-                if (trimmed.startsWith("file://") || trimmed.startsWith("qrc:/")) {
-                    return trimmed;
-                }
-                return "file://" + encodeURI(trimmed.startsWith("/") ? trimmed : "/" + trimmed);
+                return TimeUtils.toSafeFileUrl(pathText);
             }
             return Qt.resolvedUrl("../images/" + defaultFileName);
         }
@@ -160,8 +156,10 @@ Kirigami.FormLayout {
                 smooth: true
                 mipmap: true
                 onStatusChanged: {
-                    if (status === Image.Error) {
-                        colorExtractorCanvas.activeLoadingUrl = "";
+                    if (status === Image.Ready) {
+                        colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
+                    } else if (status === Image.Error) {
+                        colorExtractorCanvas.resetState();
                     }
                 }
             }
@@ -205,8 +203,21 @@ Kirigami.FormLayout {
             function extractFromUrl(urlToLoad) {
                 if (!urlToLoad) return;
                 const strUrl = urlToLoad.toString();
+                if (activeLoadingUrl === strUrl && isImageLoaded(strUrl)) {
+                    requestPaint();
+                    return;
+                }
                 activeLoadingUrl = strUrl;
                 loadImage(strUrl);
+            }
+
+            function resetState() {
+                if (activeLoadingUrl) {
+                    if (isImageLoaded(activeLoadingUrl)) {
+                        unloadImage(activeLoadingUrl);
+                    }
+                    activeLoadingUrl = "";
+                }
             }
 
             onImageLoaded: {
@@ -239,9 +250,7 @@ Kirigami.FormLayout {
                 root.configurationChanged();
             }
             onEditingFinished: {
-                if (text.trim().length > 0) {
-                    colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
-                }
+                fileRow.pathText = text;
             }
         }
 
@@ -277,7 +286,7 @@ Kirigami.FormLayout {
         }
 
         Component.onCompleted: {
-            if (!fileRow.selectedColor || fileRow.selectedColor === "" || String(fileRow.selectedColor) === "#00000000") {
+            if (previewImage.status === Image.Ready && (!fileRow.selectedColor || fileRow.selectedColor === "" || String(fileRow.selectedColor) === "#00000000")) {
                 colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
             }
         }
@@ -291,7 +300,6 @@ Kirigami.FormLayout {
                 fileRow.pathText = "";
                 pathField.text = "";
                 fileRow.selectedColor = fileRow.defaultColor;
-                colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
                 root.configurationChanged();
             }
         }
@@ -310,7 +318,6 @@ Kirigami.FormLayout {
                 }
                 fileRow.pathText = selected;
                 pathField.text = selected;
-                colorExtractorCanvas.extractFromUrl(fileRow.resolvedImageSource);
                 root.configurationChanged();
             }
         }

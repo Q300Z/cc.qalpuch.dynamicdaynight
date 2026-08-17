@@ -75,6 +75,9 @@ Kirigami.FormLayout {
     }
 
     onWallpaperConfigurationChanged: {
+        if (configDialog && configDialog.currentWallpaper && configDialog.currentWallpaper !== "cc.qalpuch.dynamicdaynight") {
+            return;
+        }
         if (wallpaperConfiguration) {
             if (wallpaperConfiguration["DynamicAccentColor"] !== undefined) {
                 root.cfg_DynamicAccentColor = Boolean(wallpaperConfiguration["DynamicAccentColor"]);
@@ -98,6 +101,9 @@ Kirigami.FormLayout {
      * Called by KDE Plasma kcm_wallpaper before committing configuration changes to disk.
      */
     function saveConfig() {
+        if (configDialog && configDialog.currentWallpaper && configDialog.currentWallpaper !== "cc.qalpuch.dynamicdaynight") {
+            return;
+        }
         if (wallpaperConfiguration) {
             wallpaperConfiguration["AutoSchedule"] = root.cfg_AutoSchedule;
             wallpaperConfiguration["MorningHour"] = root.cfg_MorningHour;

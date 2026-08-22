@@ -317,8 +317,7 @@ function updateWallpaper(force) {
  */
 function scheduleNextTick() {
     root.currentTime = new Date();
-    const nextDelay = Math.max(5000, TimeUtils.getMsUntilNextPeriod(root.currentTime, root.configuration));
-    timeTicker.interval = nextDelay;
+    timeTicker.interval = Math.max(5000, TimeUtils.getMsUntilNextPeriod(root.currentTime, root.configuration));
     timeTicker.restart();
 }
 

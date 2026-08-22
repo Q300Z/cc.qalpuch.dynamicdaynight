@@ -98,7 +98,7 @@ Kirigami.FormLayout {
 
     // Propriétés de la boîte de dialogue d'aperçu agrandi
     property string previewDialogTitle: ""
-    property url previewDialogSource: ""
+    property url previewDialogSource
 
     function openLargePreview(title, sourceUrl) {
         previewDialogTitle = title;

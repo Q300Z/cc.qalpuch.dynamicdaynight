@@ -72,19 +72,19 @@
         <!-- Chemins des images personnalisées (chaîne vide = image embarquée par défaut) -->
         <entry name="MorningImage" type="Path">
             <label>Custom morning image path</label>
-            <default></default>
+            <default/>
         </entry>
         <entry name="NoonImage" type="Path">
             <label>Custom noon image path</label>
-            <default></default>
+            <default/>
         </entry>
         <entry name="EveningImage" type="Path">
             <label>Custom evening image path</label>
-            <default></default>
+            <default/>
         </entry>
         <entry name="NightImage" type="Path">
             <label>Custom night image path</label>
-            <default></default>
+            <default/>
         </entry>
 
         <!-- Paramètres de transition (durée en millisecondes) -->

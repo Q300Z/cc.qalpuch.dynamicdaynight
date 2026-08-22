@@ -1,5 +1,3 @@
-.pragma library
-
 // SPDX-FileCopyrightText: 2026 Q300Z <Q300Zhomas@gmail.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
 

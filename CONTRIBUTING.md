@@ -1,8 +1,10 @@
 # Contributing to Dynamic Day & Night Wallpaper
 
-First off, thank you for considering contributing to **Dynamic Day & Night Wallpaper** (`cc.qalpuch.dynamicdaynight`)! 🎉
+First off, thank you for considering contributing to **Dynamic Day & Night Wallpaper** (`cc.qalpuch.dynamicdaynight`)!
+🎉
 
-Contributions from the community are what make open source projects great. Whether you are fixing a bug, proposing a new feature, improving documentation, or translating into new languages, your help is warmly welcomed.
+Contributions from the community are what make open source projects great. Whether you are fixing a bug, proposing a new
+feature, improving documentation, or translating into new languages, your help is warmly welcomed.
 
 ---
 
@@ -22,7 +24,9 @@ Contributions from the community are what make open source projects great. Wheth
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report any unacceptable behavior to **Q300Zhomas@gmail.com**.
+This project and everyone participating in it is governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By
+participating, you are expected to uphold this code. Please report any unacceptable behavior to
+**Q300Zhomas@gmail.com**.
 
 ---
 
@@ -97,13 +101,14 @@ QT_LOGGING_RULES="plasma*.debug=true;qml.debug=true" plasmashell --replace
 Before creating a bug report, please check existing issues to make sure the problem hasn't already been reported.
 
 When creating a bug report, please include:
+
 - **A clear, descriptive title**.
 - **Steps to reproduce the issue** with expected vs. actual behavior.
 - **Your environment details**:
-  - KDE Plasma version (`plasmashell --version`)
-  - KDE Frameworks / Qt version
-  - Linux distribution and graphics server (Wayland or X11)
-  - Screen resolution / multi-monitor setup if relevant
+    - KDE Plasma version (`plasmashell --version`)
+    - KDE Frameworks / Qt version
+    - Linux distribution and graphics server (Wayland or X11)
+    - Screen resolution / multi-monitor setup if relevant
 - **Log outputs** from `journalctl --user -u plasma-plasmashell` or terminal.
 - **Screenshots or screencasts** if the issue is visual.
 
@@ -112,16 +117,19 @@ When creating a bug report, please include:
 ## Proposing Features
 
 Feature suggestions and enhancements are encouraged! To submit a feature proposal:
+
 - Open an issue describing the proposed feature.
 - Explain **why** this feature would be useful and what problem it solves.
 - Describe the **proposed user experience / UI** and configuration options if applicable.
-- Keep the KDE design philosophy in mind: *Simple by default, powerful when needed*, and adhere to the [KDE Human Interface Guidelines (HIG)](https://develop.kde.org/hig/).
+- Keep the KDE design philosophy in mind: *Simple by default, powerful when needed*, and adhere to
+  the [KDE Human Interface Guidelines (HIG)](https://develop.kde.org/hig/).
 
 ---
 
 ## Commit Message Conventions
 
-We adhere to the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. This keeps the commit history structured and enables automated changelogs.
+We adhere to the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. This keeps the
+commit history structured and enables automated changelogs.
 
 ### Format
 
@@ -162,7 +170,8 @@ docs(contributing): document gettext extraction and compilation workflow
 
 This project is licensed under the **GNU General Public License v3.0 or later (GPL-3.0-or-later)**.
 
-All source files (`.qml`, `.js`, `.xml`, `.sh`) must include standard [SPDX License Identifiers](https://spdx.dev/ids/) following the [REUSE Specification](https://reuse.software/):
+All source files (`.qml`, `.js`, `.xml`, `.sh`) must include standard [SPDX License Identifiers](https://spdx.dev/ids/)
+following the [REUSE Specification](https://reuse.software/):
 
 ```qml
 // SPDX-FileCopyrightText: 2026 Q300Z <Q300Zhomas@gmail.com>
@@ -183,6 +192,7 @@ For shell scripts or XML:
 This project uses the standard KDE gettext domain `plasma_wallpaper_cc.qalpuch.dynamicdaynight`.
 
 In QML and JavaScript files, all user-facing strings must use `i18nd` functions:
+
 ```qml
 i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning")
 ```
@@ -248,7 +258,8 @@ Before submitting a Pull Request (PR), please verify:
 1. [ ] **Branching**: Your changes are on a dedicated feature or bugfix branch created from `main`.
 2. [ ] **Code Quality**: Code follows KDE QML/JavaScript guidelines, is clean, readable, and properly indented.
 3. [ ] **SPDX Headers**: New or modified files include appropriate SPDX copyright and license headers.
-4. [ ] **i18n**: All UI strings are wrapped with `i18nd` and `po/template.pot` has been regenerated if UI strings changed.
+4. [ ] **i18n**: All UI strings are wrapped with `i18nd` and `po/template.pot` has been regenerated if UI strings
+   changed.
 5. [ ] **Testing**: Tested locally on KDE Plasma 6 (Wayland and/or X11) without console errors or regressions.
 6. [ ] **Commit Messages**: Commits follow the Conventional Commits specification.
 7. [ ] **Documentation**: `README.md` or relevant documentation is updated if new options or dependencies are added.

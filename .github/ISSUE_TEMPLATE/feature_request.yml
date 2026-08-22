@@ -1,7 +1,7 @@
 name: "✨ Proposition de fonctionnalité / Feature Request"
 description: Proposer une idée, une amélioration ou une nouvelle fonctionnalité.
 title: "[Feature]: "
-labels: ["enhancement"]
+labels: [ "enhancement" ]
 body:
   - type: markdown
     attributes:

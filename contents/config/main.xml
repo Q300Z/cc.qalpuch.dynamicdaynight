@@ -3,104 +3,104 @@
     SPDX-FileCopyrightText: 2026 Q300Z <Q300Zhomas@gmail.com>
     SPDX-License-Identifier: GPL-3.0-or-later
 -->
-<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<kcfg xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.kde.org/standards/kcfg/1.0"
       xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
-      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
-  <kcfgfile name=""/>
+      https://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name=""/>
 
-  <group name="General">
-    <!-- Mode automatique : calcule les heures de bascule selon les éphémérides solaires -->
-    <entry name="AutoSchedule" type="Bool">
-      <label>Automatically calculate switch times from sunrise and sunset</label>
-      <default>true</default>
-    </entry>
+    <group name="General">
+        <!-- Mode automatique : calcule les heures de bascule selon les éphémérides solaires -->
+        <entry name="AutoSchedule" type="Bool">
+            <label>Automatically calculate switch times from sunrise and sunset</label>
+            <default>true</default>
+        </entry>
 
-    <!-- Plages horaires manuelles pour chaque période (format 24 heures) -->
-    <entry name="MorningHour" type="Int">
-      <label>Morning start hour (0-23)</label>
-      <default>6</default>
-      <min>0</min>
-      <max>23</max>
-    </entry>
-    <entry name="MorningMinute" type="Int">
-      <label>Morning start minute (0-59)</label>
-      <default>0</default>
-      <min>0</min>
-      <max>59</max>
-    </entry>
+        <!-- Plages horaires manuelles pour chaque période (format 24 heures) -->
+        <entry name="MorningHour" type="Int">
+            <label>Morning start hour (0-23)</label>
+            <default>6</default>
+            <min>0</min>
+            <max>23</max>
+        </entry>
+        <entry name="MorningMinute" type="Int">
+            <label>Morning start minute (0-59)</label>
+            <default>0</default>
+            <min>0</min>
+            <max>59</max>
+        </entry>
 
-    <entry name="NoonHour" type="Int">
-      <label>Noon start hour (0-23)</label>
-      <default>12</default>
-      <min>0</min>
-      <max>23</max>
-    </entry>
-    <entry name="NoonMinute" type="Int">
-      <label>Noon start minute (0-59)</label>
-      <default>0</default>
-      <min>0</min>
-      <max>59</max>
-    </entry>
+        <entry name="NoonHour" type="Int">
+            <label>Noon start hour (0-23)</label>
+            <default>12</default>
+            <min>0</min>
+            <max>23</max>
+        </entry>
+        <entry name="NoonMinute" type="Int">
+            <label>Noon start minute (0-59)</label>
+            <default>0</default>
+            <min>0</min>
+            <max>59</max>
+        </entry>
 
-    <entry name="EveningHour" type="Int">
-      <label>Evening start hour (0-23)</label>
-      <default>18</default>
-      <min>0</min>
-      <max>23</max>
-    </entry>
-    <entry name="EveningMinute" type="Int">
-      <label>Evening start minute (0-59)</label>
-      <default>0</default>
-      <min>0</min>
-      <max>59</max>
-    </entry>
+        <entry name="EveningHour" type="Int">
+            <label>Evening start hour (0-23)</label>
+            <default>18</default>
+            <min>0</min>
+            <max>23</max>
+        </entry>
+        <entry name="EveningMinute" type="Int">
+            <label>Evening start minute (0-59)</label>
+            <default>0</default>
+            <min>0</min>
+            <max>59</max>
+        </entry>
 
-    <entry name="NightHour" type="Int">
-      <label>Night start hour (0-23)</label>
-      <default>22</default>
-      <min>0</min>
-      <max>23</max>
-    </entry>
-    <entry name="NightMinute" type="Int">
-      <label>Night start minute (0-59)</label>
-      <default>0</default>
-      <min>0</min>
-      <max>59</max>
-    </entry>
+        <entry name="NightHour" type="Int">
+            <label>Night start hour (0-23)</label>
+            <default>22</default>
+            <min>0</min>
+            <max>23</max>
+        </entry>
+        <entry name="NightMinute" type="Int">
+            <label>Night start minute (0-59)</label>
+            <default>0</default>
+            <min>0</min>
+            <max>59</max>
+        </entry>
 
-    <!-- Chemins des images personnalisées (chaîne vide = image embarquée par défaut) -->
-    <entry name="MorningImage" type="Path">
-      <label>Custom morning image path</label>
-      <default></default>
-    </entry>
-    <entry name="NoonImage" type="Path">
-      <label>Custom noon image path</label>
-      <default></default>
-    </entry>
-    <entry name="EveningImage" type="Path">
-      <label>Custom evening image path</label>
-      <default></default>
-    </entry>
-    <entry name="NightImage" type="Path">
-      <label>Custom night image path</label>
-      <default></default>
-    </entry>
+        <!-- Chemins des images personnalisées (chaîne vide = image embarquée par défaut) -->
+        <entry name="MorningImage" type="Path">
+            <label>Custom morning image path</label>
+            <default></default>
+        </entry>
+        <entry name="NoonImage" type="Path">
+            <label>Custom noon image path</label>
+            <default></default>
+        </entry>
+        <entry name="EveningImage" type="Path">
+            <label>Custom evening image path</label>
+            <default></default>
+        </entry>
+        <entry name="NightImage" type="Path">
+            <label>Custom night image path</label>
+            <default></default>
+        </entry>
 
-    <!-- Paramètres de transition (durée en millisecondes) -->
-    <entry name="TransitionDuration" type="Int">
-      <label>Crossfade transition duration in milliseconds</label>
-      <default>1500</default>
-      <min>0</min>
-      <max>10000</max>
-    </entry>
+        <!-- Paramètres de transition (durée en millisecondes) -->
+        <entry name="TransitionDuration" type="Int">
+            <label>Crossfade transition duration in milliseconds</label>
+            <default>1500</default>
+            <min>0</min>
+            <max>10000</max>
+        </entry>
 
-    <!-- Mode de remplissage : 0=Étiré, 1=Recadré/Zoom, 2=Ajusté -->
-    <entry name="FillMode" type="Int">
-      <label>Image fill mode</label>
-      <default>1</default>
-      <min>0</min>
-      <max>2</max>
-    </entry>
-  </group>
+        <!-- Mode de remplissage : 0=Étiré, 1=Recadré/Zoom, 2=Ajusté -->
+        <entry name="FillMode" type="Int">
+            <label>Image fill mode</label>
+            <default>1</default>
+            <min>0</min>
+            <max>2</max>
+        </entry>
+    </group>
 </kcfg>

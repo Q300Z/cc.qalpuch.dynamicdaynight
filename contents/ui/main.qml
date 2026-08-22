@@ -30,7 +30,7 @@ WallpaperItem {
     readonly property url targetImageSource: TimeUtils.getImageForPeriod(
         currentPeriod,
         root.configuration,
-        (file) => Qt.resolvedUrl(file)
+            (file) => Qt.resolvedUrl(file)
     )
 
     // Horloge système courante
@@ -80,7 +80,7 @@ WallpaperItem {
     // Actions contextuelles du menu clic droit sur le bureau
     contextualActions: [
         PlasmaCore.Action {
-            text: {
+            text: (function() {
                 if (root.forcedPeriod !== "") {
                     return i18nd(
                         "plasma_wallpaper_cc.qalpuch.dynamicdaynight",
@@ -96,7 +96,7 @@ WallpaperItem {
                     TimeUtils.formatMinutes(range.start),
                     TimeUtils.formatMinutes(range.end)
                 );
-            }
+            })()
             icon.name: root.forcedPeriod !== "" ? "document-preview" : TimeUtils.getPeriodIcon(root.autoPeriod)
             onTriggered: {
                 root.scheduleNextTick();
@@ -170,206 +170,210 @@ WallpaperItem {
         }
     ]
 
-    // Conteneur de transition en fondu enchaîné (Crossfade)
-    Item {
-        id: imageContainer
-        anchors.fill: parent
+// Conteneur de transition en fondu enchaîné (Crossfade)
+Item {
+    id: imageContainer
+    anchors.fill: parent
 
-        // Mode de remplissage (0: Étiré, 1: Recadré/Zoom, 2: Ajusté)
-        readonly property int resolvedFillMode: {
-            const mode = (root.configuration && root.configuration.FillMode !== undefined) ? root.configuration.FillMode : 1;
-            switch (mode) {
-                case 0:  return Image.Stretch;
-                case 2:  return Image.PreserveAspectFit;
-                case 1:
-                default: return Image.PreserveAspectCrop;
-            }
-        }
-
-        readonly property int transitionDuration: (root.configuration && root.configuration.TransitionDuration !== undefined)
-            ? root.configuration.TransitionDuration
-            : 1500
-
-        // Calque d'image A
-        Image {
-            id: imageLayerA
-            anchors.fill: parent
-            fillMode: imageContainer.resolvedFillMode
-            asynchronous: true
-            cache: true
-            opacity: 1.0
-            smooth: true
-            mipmap: true
-
-            onStatusChanged: {
-                if (status === Image.Ready && root.activeLayerIndex === 1 && String(imageLayerA.source) !== "") {
-                    imageLayerA.opacity = 1.0;
-                    imageLayerB.opacity = 0.0;
-                    root.activeLayerIndex = 0;
-                } else if (status === Image.Error) {
-                    console.warn("[cc.qalpuch.dynamicdaynight] Échec chargement : " + source + " - Repli sur l'image par défaut.");
-                    const fallbackUrl = root.getBundledImageSource(root.currentPeriod);
-                    if (source !== fallbackUrl) {
-                        source = fallbackUrl;
-                    }
-                }
-            }
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: imageContainer.transitionDuration
-                    easing.type: Easing.InOutQuad
-                    onRunningChanged: {
-                        if (!running && imageLayerA.opacity === 0.0 && root.activeLayerIndex === 1 && String(imageLayerA.source) !== String(root.targetImageSource)) {
-                            imageLayerA.source = "";
-                        }
-                    }
-                }
-            }
-        }
-
-        // Calque d'image B
-        Image {
-            id: imageLayerB
-            anchors.fill: parent
-            fillMode: imageContainer.resolvedFillMode
-            asynchronous: true
-            cache: true
-            opacity: 0.0
-            smooth: true
-            mipmap: true
-
-            onStatusChanged: {
-                if (status === Image.Ready && root.activeLayerIndex === 0 && String(imageLayerB.source) !== "") {
-                    imageLayerB.opacity = 1.0;
-                    imageLayerA.opacity = 0.0;
-                    root.activeLayerIndex = 1;
-                } else if (status === Image.Error) {
-                    console.warn("[cc.qalpuch.dynamicdaynight] Échec chargement : " + source + " - Repli sur l'image par défaut.");
-                    const fallbackUrl = root.getBundledImageSource(root.currentPeriod);
-                    if (source !== fallbackUrl) {
-                        source = fallbackUrl;
-                    }
-                }
-            }
-
-            Behavior on opacity {
-                NumberAnimation {
-                    duration: imageContainer.transitionDuration
-                    easing.type: Easing.InOutQuad
-                    onRunningChanged: {
-                        if (!running && imageLayerB.opacity === 0.0 && root.activeLayerIndex === 0 && String(imageLayerB.source) !== String(root.targetImageSource)) {
-                            imageLayerB.source = "";
-                        }
-                    }
-                }
-            }
+    // Mode de remplissage (0: Étiré, 1: Recadré/Zoom, 2: Ajusté)
+    readonly property int resolvedFillMode: {
+        const mode = (root.configuration && root.configuration.FillMode !== undefined) ? root.configuration.FillMode : 1;
+        switch (mode) {
+            case 0:
+                return Image.Stretch;
+            case 2:
+                return Image.PreserveAspectFit;
+            case 1:
+            default:
+                return Image.PreserveAspectCrop;
         }
     }
 
-    // Index du calque actuellement affiché (0: Calque A, 1: Calque B)
-    property int activeLayerIndex: 0
+    readonly property int transitionDuration: (root.configuration && root.configuration.TransitionDuration !== undefined)
+        ? root.configuration.TransitionDuration
+        : 1500
 
-    /**
-     * Met à jour les sources d'images et déclenche la transition fluide.
-     */
-    function updateWallpaper(force) {
-        const nextUrl = root.targetImageSource;
+    // Calque d'image A
+    Image {
+        id: imageLayerA
+        anchors.fill: parent
+        fillMode: imageContainer.resolvedFillMode
+        asynchronous: true
+        cache: true
+        opacity: 1.0
+        smooth: true
+        mipmap: true
 
-        if (!root.initialLoadDone) {
-            // Premier chargement immédiat sans délai de transition
-            imageLayerA.source = nextUrl;
-            imageLayerA.opacity = 1.0;
-            imageLayerB.opacity = 0.0;
-            imageLayerB.source = "";
-            root.activeLayerIndex = 0;
-            root.initialLoadDone = true;
-            return;
-        }
-
-        const currentActiveSource = (root.activeLayerIndex === 0) ? imageLayerA.source : imageLayerB.source;
-        if (!force && String(currentActiveSource) === String(nextUrl)) {
-            return;
-        }
-
-        if (root.activeLayerIndex === 0) {
-            imageLayerB.source = nextUrl;
-            if (imageLayerB.status === Image.Ready) {
-                imageLayerB.opacity = 1.0;
-                imageLayerA.opacity = 0.0;
-                root.activeLayerIndex = 1;
-            }
-        } else {
-            imageLayerA.source = nextUrl;
-            if (imageLayerA.status === Image.Ready) {
+        onStatusChanged: {
+            if (status === Image.Ready && root.activeLayerIndex === 1 && String(imageLayerA.source) !== "") {
                 imageLayerA.opacity = 1.0;
                 imageLayerB.opacity = 0.0;
                 root.activeLayerIndex = 0;
+            } else if (status === Image.Error) {
+                console.warn("[cc.qalpuch.dynamicdaynight] Échec chargement : " + source + " - Repli sur l'image par défaut.");
+                const fallbackUrl = root.getBundledImageSource(root.currentPeriod);
+                if (imageLayerA.source !== fallbackUrl) {
+                    imageLayerA.source = fallbackUrl;
+                }
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: imageContainer.transitionDuration
+                easing.type: Easing.InOutQuad
+                onRunningChanged: {
+                    if (!running && imageLayerA.opacity === 0.0 && root.activeLayerIndex === 1 && String(imageLayerA.source) !== String(root.targetImageSource)) {
+                        imageLayerA.source = "";
+                    }
+                }
             }
         }
     }
 
-    /**
-     * Planifie le prochain réveil du minuteur selon le temps restant exact.
-     */
-    function scheduleNextTick() {
-        root.currentTime = new Date();
-        const nextDelay = Math.max(5000, TimeUtils.getMsUntilNextPeriod(root.currentTime, root.configuration));
-        timeTicker.interval = nextDelay;
-        timeTicker.restart();
+    // Calque d'image B
+    Image {
+        id: imageLayerB
+        anchors.fill: parent
+        fillMode: imageContainer.resolvedFillMode
+        asynchronous: true
+        cache: true
+        opacity: 0.0
+        smooth: true
+        mipmap: true
+
+        onStatusChanged: {
+            if (status === Image.Ready && root.activeLayerIndex === 0 && String(imageLayerB.source) !== "") {
+                imageLayerB.opacity = 1.0;
+                imageLayerA.opacity = 0.0;
+                root.activeLayerIndex = 1;
+            } else if (status === Image.Error) {
+                console.warn("[cc.qalpuch.dynamicdaynight] Échec chargement : " + source + " - Repli sur l'image par défaut.");
+                const fallbackUrl = root.getBundledImageSource(root.currentPeriod);
+                if (imageLayerB.source !== fallbackUrl) {
+                    imageLayerB.source = fallbackUrl;
+                }
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: imageContainer.transitionDuration
+                easing.type: Easing.InOutQuad
+                onRunningChanged: {
+                    if (!running && imageLayerB.opacity === 0.0 && root.activeLayerIndex === 0 && String(imageLayerB.source) !== String(root.targetImageSource)) {
+                        imageLayerB.source = "";
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Index du calque actuellement affiché (0: Calque A, 1: Calque B)
+property int activeLayerIndex: 0
+
+/**
+ * Met à jour les sources d'images et déclenche la transition fluide.
+ */
+function updateWallpaper(force) {
+    const nextUrl = root.targetImageSource;
+
+    if (!root.initialLoadDone) {
+        // Premier chargement immédiat sans délai de transition
+        imageLayerA.source = nextUrl;
+        imageLayerA.opacity = 1.0;
+        imageLayerB.opacity = 0.0;
+        imageLayerB.source = "";
+        root.activeLayerIndex = 0;
+        root.initialLoadDone = true;
+        return;
     }
 
-    // Déclenchement automatique lors d'un changement de source d'image
-    onTargetImageSourceChanged: {
-        root.updateWallpaper(false);
+    const currentActiveSource = (root.activeLayerIndex === 0) ? imageLayerA.source : imageLayerB.source;
+    if (!force && String(currentActiveSource) === String(nextUrl)) {
+        return;
     }
 
-    // Minuteur dynamique calculé pour la prochaine bascule horaire
-    Timer {
-        id: timeTicker
-        interval: Math.max(5000, TimeUtils.getMsUntilNextPeriod(root.currentTime, root.configuration))
-        running: true
-        repeat: false
-        onTriggered: {
+    if (root.activeLayerIndex === 0) {
+        imageLayerB.source = nextUrl;
+        if (imageLayerB.status === Image.Ready) {
+            imageLayerB.opacity = 1.0;
+            imageLayerA.opacity = 0.0;
+            root.activeLayerIndex = 1;
+        }
+    } else {
+        imageLayerA.source = nextUrl;
+        if (imageLayerA.status === Image.Ready) {
+            imageLayerA.opacity = 1.0;
+            imageLayerB.opacity = 0.0;
+            root.activeLayerIndex = 0;
+        }
+    }
+}
+
+/**
+ * Planifie le prochain réveil du minuteur selon le temps restant exact.
+ */
+function scheduleNextTick() {
+    root.currentTime = new Date();
+    const nextDelay = Math.max(5000, TimeUtils.getMsUntilNextPeriod(root.currentTime, root.configuration));
+    timeTicker.interval = nextDelay;
+    timeTicker.restart();
+}
+
+// Déclenchement automatique lors d'un changement de source d'image
+onTargetImageSourceChanged: {
+    root.updateWallpaper(false);
+}
+
+// Minuteur dynamique calculé pour la prochaine bascule horaire
+Timer {
+    id: timeTicker
+    interval: Math.max(5000, TimeUtils.getMsUntilNextPeriod(root.currentTime, root.configuration))
+    running: true
+    repeat: false
+    onTriggered: {
+        root.scheduleNextTick();
+    }
+}
+
+// Watchdog de battement cardiaque (30s) pour détecter le réveil après mise en veille (suspend)
+property double lastHeartbeatTime: Date.now()
+
+Timer {
+    id: heartbeatWatchdog
+    interval: 30000
+    repeat: true
+    running: true
+    onTriggered: {
+        const now = Date.now();
+        const elapsed = now - root.lastHeartbeatTime;
+        root.lastHeartbeatTime = now;
+
+        // Détection d'un saut temporel > 45s (reprise après veille du système)
+        if (elapsed > 45000) {
+            console.log("[cc.qalpuch.dynamicdaynight] Réveil système détecté (" + elapsed + " ms). Resynchronisation.");
+            root.scheduleNextTick();
+        } else {
+            root.currentTime = new Date();
+        }
+    }
+}
+
+// Rafraîchissement lors de l'activation de l'application / session Plasma
+Connections {
+    target: Qt.application
+
+    function onStateChanged() {
+        if (Qt.application.state === Qt.ApplicationActive) {
             root.scheduleNextTick();
         }
     }
+}
 
-    // Watchdog de battement cardiaque (30s) pour détecter le réveil après mise en veille (suspend)
-    property double lastHeartbeatTime: Date.now()
-
-    Timer {
-        id: heartbeatWatchdog
-        interval: 30000
-        repeat: true
-        running: true
-        onTriggered: {
-            const now = Date.now();
-            const elapsed = now - root.lastHeartbeatTime;
-            root.lastHeartbeatTime = now;
-
-            // Détection d'un saut temporel > 45s (reprise après veille du système)
-            if (elapsed > 45000) {
-                console.log("[cc.qalpuch.dynamicdaynight] Réveil système détecté (" + elapsed + " ms). Resynchronisation.");
-                root.scheduleNextTick();
-            } else {
-                root.currentTime = new Date();
-            }
-        }
-    }
-
-    // Rafraîchissement lors de l'activation de l'application / session Plasma
-    Connections {
-        target: Qt.application
-        function onStateChanged() {
-            if (Qt.application.state === Qt.ApplicationActive) {
-                root.scheduleNextTick();
-            }
-        }
-    }
-
-    Component.onCompleted: {
-        root.scheduleNextTick();
-        root.updateWallpaper(true);
-    }
+Component.onCompleted: {
+    root.scheduleNextTick();
+    root.updateWallpaper(true);
+}
 }

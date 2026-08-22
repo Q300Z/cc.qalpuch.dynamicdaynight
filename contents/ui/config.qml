@@ -76,11 +76,16 @@ Kirigami.FormLayout {
 
     function getPeriodDisplayName(period) {
         switch (period) {
-            case "morning": return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning");
-            case "noon":    return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon");
-            case "evening": return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening");
-            case "night":   return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night");
-            default:        return "";
+            case "morning":
+                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning");
+            case "noon":
+                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon");
+            case "evening":
+                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening");
+            case "night":
+                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night");
+            default:
+                return "";
         }
     }
 
@@ -128,7 +133,9 @@ Kirigami.FormLayout {
     }
 
     // Composant réutilisable pour la sélection d'image avec miniature 16:9
-    component FilePathRow: Layouts.RowLayout {
+    component
+    FilePathRow: Layouts.RowLayout
+    {
         id: fileRow
 
         property string defaultFileName: ""
@@ -373,8 +380,12 @@ Kirigami.FormLayout {
             to: 59
             editable: true
             value: 0
-            textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
-            valueFromText: function(text, locale) { return parseInt(text, 10) || 0; }
+            textFromValue: function (v) {
+                return (v < 10 ? "0" : "") + v;
+            }
+            valueFromText: function (text) {
+                return parseInt(text, 10) || 0;
+            }
             onValueModified: root.configurationChanged()
         }
     }
@@ -403,8 +414,12 @@ Kirigami.FormLayout {
             to: 59
             editable: true
             value: 0
-            textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
-            valueFromText: function(text, locale) { return parseInt(text, 10) || 0; }
+            textFromValue: function (v) {
+                return (v < 10 ? "0" : "") + v;
+            }
+            valueFromText: function (text) {
+                return parseInt(text, 10) || 0;
+            }
             onValueModified: root.configurationChanged()
         }
     }
@@ -433,8 +448,12 @@ Kirigami.FormLayout {
             to: 59
             editable: true
             value: 0
-            textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
-            valueFromText: function(text, locale) { return parseInt(text, 10) || 0; }
+            textFromValue: function (v) {
+                return (v < 10 ? "0" : "") + v;
+            }
+            valueFromText: function (text) {
+                return parseInt(text, 10) || 0;
+            }
             onValueModified: root.configurationChanged()
         }
     }
@@ -463,8 +482,12 @@ Kirigami.FormLayout {
             to: 59
             editable: true
             value: 0
-            textFromValue: function(v) { return (v < 10 ? "0" : "") + v; }
-            valueFromText: function(text, locale) { return parseInt(text, 10) || 0; }
+            textFromValue: function (v) {
+                return (v < 10 ? "0" : "") + v;
+            }
+            valueFromText: function (text) {
+                return parseInt(text, 10) || 0;
+            }
             onValueModified: root.configurationChanged()
         }
     }
@@ -577,7 +600,8 @@ Kirigami.FormLayout {
         height: Math.min(root.height * 0.9, Kirigami.Units.gridUnit * 26)
         padding: Kirigami.Units.largeSpacing
 
-        contentItem: Layouts.ColumnLayout {
+        contentItem: Layouts.ColumnLayout
+        {
             spacing: Kirigami.Units.smallSpacing
 
             Layouts.RowLayout {

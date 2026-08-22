@@ -1,6 +1,8 @@
 # Fond d'écran dynamique Jour & Nuit (KDE Plasma 6)
 
-Plugin de fond d'écran dynamique pour **KDE Plasma 6** (`cc.qalpuch.dynamicdaynight`) qui adapte automatiquement votre fond d'écran selon le cycle de la journée (**Matin**, **Midi**, **Soir**, **Nuit**), avec transition fluide en fondu enchaîné (*crossfade*), calculs astronomiques de la position solaire et personnalisation complète.
+Plugin de fond d'écran dynamique pour **KDE Plasma 6** (`cc.qalpuch.dynamicdaynight`) qui adapte automatiquement votre
+fond d'écran selon le cycle de la journée (**Matin**, **Midi**, **Soir**, **Nuit**), avec transition fluide en fondu
+enchaîné (*crossfade*), calculs astronomiques de la position solaire et personnalisation complète.
 
 ---
 
@@ -9,13 +11,13 @@ Plugin de fond d'écran dynamique pour **KDE Plasma 6** (`cc.qalpuch.dynamicdayn
 - [Présentation](#présentation)
 - [Fonctionnalités](#fonctionnalités)
 - [Installation](#installation)
-  - [1. Installation automatique (Recommandé)](#1-installation-automatique-recommandé)
-  - [2. Installation manuelle](#2-installation-manuelle)
+    - [1. Installation automatique (Recommandé)](#1-installation-automatique-recommandé)
+    - [2. Installation manuelle](#2-installation-manuelle)
 - [Utilisation](#utilisation)
 - [Développement & Architecture](#développement--architecture)
-  - [Structure du projet](#structure-du-projet)
-  - [Internationalisation (i18n)](#internationalisation-i18n)
-  - [Commandes utiles](#commandes-utiles)
+    - [Structure du projet](#structure-du-projet)
+    - [Internationalisation (i18n)](#internationalisation-i18n)
+    - [Commandes utiles](#commandes-utiles)
 - [Contribution & Communauté](#contribution--communauté)
 - [Licence](#licence)
 
@@ -23,20 +25,28 @@ Plugin de fond d'écran dynamique pour **KDE Plasma 6** (`cc.qalpuch.dynamicdayn
 
 ## Présentation
 
-Ce plugin est conçu nativement pour **KDE Plasma 6** (Qt 6 / KF6) selon les standards et conventions de la communauté KDE :
-- **Clé en main (*Out-of-the-box*) :** Embarque 4 illustrations haute qualité pour chaque moment de la journée dans `contents/images/`.
-- **Calculs solaires automatiques :** Calcule les heures réelles du lever, du zénith, du coucher de soleil et du crépuscule en fonction du fuseau horaire de votre système (algorithme éphémérides solaires NOAA 100% hors-ligne).
+Ce plugin est conçu nativement pour **KDE Plasma 6** (Qt 6 / KF6) selon les standards et conventions de la communauté
+KDE :
+
+- **Clé en main (*Out-of-the-box*) :** Embarque 4 illustrations haute qualité pour chaque moment de la journée dans
+  `contents/images/`.
+- **Calculs solaires automatiques :** Calcule les heures réelles du lever, du zénith, du coucher de soleil et du
+  crépuscule en fonction du fuseau horaire de votre système (algorithme éphémérides solaires NOAA 100% hors-ligne).
 - **Transitions douces :** Animation de fondu réglable (*crossfade*) pour éviter tout changement brusque.
-- **Respect des principes KISS & DRY :** Code modulaire, séparation stricte des responsabilités (logique métier dans `TimeUtils.js`, schéma KConfigXT dans `main.xml`, interface déclarative dans `config.qml`).
+- **Respect des principes KISS & DRY :** Code modulaire, séparation stricte des responsabilités (logique métier dans
+  `TimeUtils.js`, schéma KConfigXT dans `main.xml`, interface déclarative dans `config.qml`).
 
 ---
 
 ## Fonctionnalités
 
-- ☀️ **Détection solaire automatique :** Synchronisation sur le cycle réel du soleil sans connexion Internet requise (éphémérides NOAA hors-ligne).
+- ☀️ **Détection solaire automatique :** Synchronisation sur le cycle réel du soleil sans connexion Internet requise
+  (éphémérides NOAA hors-ligne).
 - 🕒 **Mode horaire manuel :** Possibilité de définir des plages horaires fixes personnalisées.
-- 🖼️ **Images personnalisables :** Remplacement possible de chaque image (Matin, Midi, Soir, Nuit) avec miniatures 16:9 et bouton de réinitialisation.
-- 🎨 **Couleur d'accentuation dynamique native :** Compatible à 100% avec l'extraction automatique de couleur de KDE Plasma 6 (*Paramètres $\rightarrow$ Couleurs $\rightarrow$ Générer depuis le fond d'écran*).
+- 🖼️ **Images personnalisables :** Remplacement possible de chaque image (Matin, Midi, Soir, Nuit) avec miniatures 16:9
+  et bouton de réinitialisation.
+- 🎨 **Couleur d'accentuation dynamique native :** Compatible à 100% avec l'extraction automatique de couleur de KDE
+  Plasma 6 (*Paramètres $\rightarrow$ Couleurs $\rightarrow$ Générer depuis le fond d'écran*).
 - 📐 **Modes de remplissage :** Étiré, Recadré / Zoom (conserve les proportions), Ajusté.
 - ⏱️ **Durée de transition ajustable :** Réglage précis de la durée du fondu enchaîné (*crossfade* en ms).
 - 🌍 **Internationalisation (i18n) :** Support multilingue complet (Français et Anglais inclus).
@@ -84,6 +94,7 @@ cp contents/locale/fr/LC_MESSAGES/plasma_wallpaper_cc.qalpuch.dynamicdaynight.mo
 ```
 
 *Alternative via `kpackagetool6` (depuis la racine du dossier) :*
+
 ```bash
 kpackagetool6 --type Plasma/Wallpaper --install .
 ```
@@ -97,9 +108,9 @@ kpackagetool6 --type Plasma/Wallpaper --install .
 3. Dans le menu déroulant **Type de fond d'écran**, sélectionnez :  
    `Fond d'écran dynamique Jour & Nuit`
 4. Ajustez vos préférences dans la fenêtre de réglages :
-   - **Mode de planification :** Cochez *Détection solaire* ou définissez vos heures manuellement.
-   - **Images :** Conservez les images d'origine ou sélectionnez vos propres fichiers.
-   - **Apparence :** Réglez le mode de redimensionnement et la durée du fondu.
+    - **Mode de planification :** Cochez *Détection solaire* ou définissez vos heures manuellement.
+    - **Images :** Conservez les images d'origine ou sélectionnez vos propres fichiers.
+    - **Apparence :** Réglez le mode de redimensionnement et la durée du fondu.
 5. Cliquez sur **Appliquer** ou **OK**.
 
 ---
@@ -167,15 +178,19 @@ cp contents/locale/fr/LC_MESSAGES/plasma_wallpaper_cc.qalpuch.dynamicdaynight.mo
 
 ## Contribution & Communauté
 
-Les contributions sont les bienvenues ! Que ce soit pour signaler un bug, proposer une fonctionnalité, améliorer la documentation ou ajouter une nouvelle langue :
+Les contributions sont les bienvenues ! Que ce soit pour signaler un bug, proposer une fonctionnalité, améliorer la
+documentation ou ajouter une nouvelle langue :
 
-- 📘 **Guide de contribution :** Consultez [`CONTRIBUTING.md`](CONTRIBUTING.md) pour les prérequis, le workflow de développement KDE Plasma 6, les conventions de commits et la gestion des traductions Gettext.
+- 📘 **Guide de contribution :** Consultez [`CONTRIBUTING.md`](CONTRIBUTING.md) pour les prérequis, le workflow de
+  développement KDE Plasma 6, les conventions de commits et la gestion des traductions Gettext.
 - 🤝 **Code de conduite :** Notre communauté applique les principes du [Contributor Covenant v2.1](CODE_OF_CONDUCT.md).
-- 🔒 **Politique de sécurité :** Pour signaler une vulnérabilité de manière responsable, consultez [`SECURITY.md`](SECURITY.md).
+- 🔒 **Politique de sécurité :** Pour signaler une vulnérabilité de manière responsable, consultez [
+  `SECURITY.md`](SECURITY.md).
 
 ---
 
 ## Licence
 
-Ce projet est un logiciel libre distribué sous licence **GNU General Public License v3.0 or later (GPL-3.0-or-later)** conformément aux standards de la communauté KDE.  
+Ce projet est un logiciel libre distribué sous licence **GNU General Public License v3.0 or later (GPL-3.0-or-later)**
+conformément aux standards de la communauté KDE.  
 Consultez le fichier [`LICENSE`](LICENSE) pour le texte intégral des termes et conditions.

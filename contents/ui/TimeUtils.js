@@ -1,7 +1,7 @@
+.pragma library
+
 // SPDX-FileCopyrightText: 2026 Q300Z <Q300Zhomas@gmail.com>
 // SPDX-License-Identifier: GPL-3.0-or-later
-
-.pragma library
 
 /**
  * Convertit des heures et minutes en minutes depuis minuit (0..1439).
@@ -29,29 +29,29 @@ function formatMinutes(minutes) {
  * (permet une détection hors-ligne instantanée sans appel réseau).
  */
 const TIMEZONE_COORDINATES = {
-    "Europe/Paris": { lat: 48.8566, lon: 2.3522 },
-    "Europe/London": { lat: 51.5074, lon: -0.1278 },
-    "Europe/Berlin": { lat: 52.5200, lon: 13.4050 },
-    "Europe/Madrid": { lat: 40.4168, lon: -3.7038 },
-    "Europe/Rome": { lat: 41.9028, lon: 12.4964 },
-    "Europe/Brussels": { lat: 50.8503, lon: 4.3517 },
-    "Europe/Amsterdam": { lat: 52.3676, lon: 4.9041 },
-    "Europe/Zurich": { lat: 47.3769, lon: 8.5417 },
-    "America/New_York": { lat: 40.7128, lon: -74.0060 },
-    "America/Chicago": { lat: 41.8781, lon: -87.6298 },
-    "America/Denver": { lat: 39.7392, lon: -104.9903 },
-    "America/Los_Angeles": { lat: 34.0522, lon: -118.2437 },
-    "America/Montreal": { lat: 45.5017, lon: -73.5673 },
-    "America/Toronto": { lat: 43.6532, lon: -79.3832 },
-    "America/Vancouver": { lat: 49.2827, lon: -123.1207 },
-    "America/Sao_Paulo": { lat: -23.5505, lon: -46.6333 },
-    "Asia/Tokyo": { lat: 35.6762, lon: 139.6503 },
-    "Asia/Shanghai": { lat: 31.2304, lon: 121.4737 },
-    "Asia/Hong_Kong": { lat: 22.3193, lon: 114.1694 },
-    "Asia/Singapore": { lat: 1.3521, lon: 103.8198 },
-    "Asia/Dubai": { lat: 25.2048, lon: 55.2708 },
-    "Australia/Sydney": { lat: -33.8688, lon: 151.2093 },
-    "Pacific/Auckland": { lat: -36.8485, lon: 174.7633 }
+    "Europe/Paris": {lat: 48.8566, lon: 2.3522},
+    "Europe/London": {lat: 51.5074, lon: -0.1278},
+    "Europe/Berlin": {lat: 52.5200, lon: 13.4050},
+    "Europe/Madrid": {lat: 40.4168, lon: -3.7038},
+    "Europe/Rome": {lat: 41.9028, lon: 12.4964},
+    "Europe/Brussels": {lat: 50.8503, lon: 4.3517},
+    "Europe/Amsterdam": {lat: 52.3676, lon: 4.9041},
+    "Europe/Zurich": {lat: 47.3769, lon: 8.5417},
+    "America/New_York": {lat: 40.7128, lon: -74.0060},
+    "America/Chicago": {lat: 41.8781, lon: -87.6298},
+    "America/Denver": {lat: 39.7392, lon: -104.9903},
+    "America/Los_Angeles": {lat: 34.0522, lon: -118.2437},
+    "America/Montreal": {lat: 45.5017, lon: -73.5673},
+    "America/Toronto": {lat: 43.6532, lon: -79.3832},
+    "America/Vancouver": {lat: 49.2827, lon: -123.1207},
+    "America/Sao_Paulo": {lat: -23.5505, lon: -46.6333},
+    "Asia/Tokyo": {lat: 35.6762, lon: 139.6503},
+    "Asia/Shanghai": {lat: 31.2304, lon: 121.4737},
+    "Asia/Hong_Kong": {lat: 22.3193, lon: 114.1694},
+    "Asia/Singapore": {lat: 1.3521, lon: 103.8198},
+    "Asia/Dubai": {lat: 25.2048, lon: 55.2708},
+    "Australia/Sydney": {lat: -33.8688, lon: 151.2093},
+    "Pacific/Auckland": {lat: -36.8485, lon: 174.7633}
 };
 
 /**
@@ -89,7 +89,7 @@ function getSystemCoordinates(date) {
     const isSouthern = detectedTz && southernPrefixes.some((prefix) => detectedTz.startsWith(prefix));
     const approxLat = isSouthern ? -33.8688 : 48.8566;
 
-    return { lat: approxLat, lon: approxLon };
+    return {lat: approxLat, lon: approxLon};
 }
 
 /**
@@ -118,11 +118,11 @@ function calculateSolarSchedule(date, lat, lon) {
 
     // 3. Équation du temps NOAA (en minutes)
     const eqTime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma)
-                   - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
+        - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
 
     // 4. Déclinaison solaire (en radians)
     const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma)
-                 - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma);
+        - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma);
 
     // 5. Décalage horaire local par rapport à UTC (en minutes)
     const tzOffsetMinutes = -d.getTimezoneOffset();
@@ -137,15 +137,15 @@ function calculateSolarSchedule(date, lat, lon) {
      */
     function evaluateHourAngle(zenithDeg) {
         const cosHA = (Math.cos(zenithDeg * rad) - Math.sin(latitude * rad) * Math.sin(decl)) /
-                      (Math.cos(latitude * rad) * Math.cos(decl));
+            (Math.cos(latitude * rad) * Math.cos(decl));
 
         if (cosHA > 1.0) {
-            return { status: "POLAR_NIGHT", ha: null };
+            return {status: "POLAR_NIGHT", ha: null};
         }
         if (cosHA < -1.0) {
-            return { status: "MIDNIGHT_SUN", ha: null };
+            return {status: "MIDNIGHT_SUN", ha: null};
         }
-        return { status: "NORMAL", ha: Math.acos(cosHA) * deg };
+        return {status: "NORMAL", ha: Math.acos(cosHA) * deg};
     }
 
     // 90.833° = Zénith standard de lever/coucher (réfraction 34' et demi-diamètre solaire 16')
@@ -160,23 +160,23 @@ function calculateSolarSchedule(date, lat, lon) {
         if (duskEval.status === "NORMAL" && duskEval.ha !== null) {
             const halfTwilight = duskEval.ha * 4.0;
             sunriseMin = solarNoonMinutes - halfTwilight;
-            sunsetMin  = solarNoonMinutes + halfTwilight;
-            duskMin    = sunsetMin + 30.0;
+            sunsetMin = solarNoonMinutes + halfTwilight;
+            duskMin = sunsetMin + 30.0;
         } else {
             sunriseMin = solarNoonMinutes - 60.0;
-            sunsetMin  = solarNoonMinutes + 60.0;
-            duskMin    = solarNoonMinutes + 120.0;
+            sunsetMin = solarNoonMinutes + 60.0;
+            duskMin = solarNoonMinutes + 120.0;
         }
     } else if (sunriseEval.status === "MIDNIGHT_SUN") {
         // Soleil de minuit : le soleil reste au-dessus de l'horizon
         sunriseMin = solarNoonMinutes - 360.0;
-        sunsetMin  = solarNoonMinutes + 360.0;
-        duskMin    = solarNoonMinutes + 540.0;
+        sunsetMin = solarNoonMinutes + 360.0;
+        duskMin = solarNoonMinutes + 540.0;
     } else {
         // Calcul standard du lever, coucher et crépuscule
         const haSunrise = sunriseEval.ha;
         sunriseMin = solarNoonMinutes - haSunrise * 4.0;
-        sunsetMin  = solarNoonMinutes + haSunrise * 4.0;
+        sunsetMin = solarNoonMinutes + haSunrise * 4.0;
 
         if (duskEval.status === "NORMAL" && duskEval.ha !== null) {
             duskMin = solarNoonMinutes + duskEval.ha * 4.0;
@@ -208,9 +208,9 @@ function getEffectiveSchedule(date, cfg) {
 
     return {
         morning: toMinutes(c.MorningHour !== undefined ? c.MorningHour : 6, c.MorningMinute !== undefined ? c.MorningMinute : 0),
-        noon:    toMinutes(c.NoonHour !== undefined ? c.NoonHour : 12, c.NoonMinute !== undefined ? c.NoonMinute : 0),
+        noon: toMinutes(c.NoonHour !== undefined ? c.NoonHour : 12, c.NoonMinute !== undefined ? c.NoonMinute : 0),
         evening: toMinutes(c.EveningHour !== undefined ? c.EveningHour : 18, c.EveningMinute !== undefined ? c.EveningMinute : 0),
-        night:   toMinutes(c.NightHour !== undefined ? c.NightHour : 22, c.NightMinute !== undefined ? c.NightMinute : 0)
+        night: toMinutes(c.NightHour !== undefined ? c.NightHour : 22, c.NightMinute !== undefined ? c.NightMinute : 0)
     };
 }
 
@@ -223,9 +223,9 @@ function getCurrentPeriod(date, cfg) {
     const schedule = getEffectiveSchedule(d, cfg);
 
     const morningMin = schedule.morning;
-    const noonMin    = schedule.noon;
+    const noonMin = schedule.noon;
     const eveningMin = schedule.evening;
-    const nightMin   = schedule.night;
+    const nightMin = schedule.night;
 
     // Ordre chronologique standard
     if (nightMin > eveningMin && eveningMin > noonMin && noonMin > morningMin) {
@@ -243,10 +243,10 @@ function getCurrentPeriod(date, cfg) {
 
     // Repli pour les configurations manuelles non triées
     const slots = [
-        { name: "morning", start: morningMin },
-        { name: "noon",    start: noonMin },
-        { name: "evening", start: eveningMin },
-        { name: "night",   start: nightMin }
+        {name: "morning", start: morningMin},
+        {name: "noon", start: noonMin},
+        {name: "evening", start: eveningMin},
+        {name: "night", start: nightMin}
     ].sort((a, b) => a.start - b.start);
 
     let activeSlot = slots[slots.length - 1].name;
@@ -286,7 +286,7 @@ function toSafeFileUrl(rawPath) {
 
     const absPath = localPath.startsWith("/") ? localPath : "/" + localPath;
     try {
-        return "file://" + encodeURI(absPath).replace(/#/g, "%23").replace(/\?/g, "%3F").replace(/\[/g, "%5B").replace(/\]/g, "%5D");
+        return "file://" + encodeURI(absPath).replace(/#/g, "%23").replace(/\?/g, "%3F").replace(/\[/g, "%5B").replace(/]/g, "%5D");
     } catch (e) {
         const safeSegments = absPath.split("/").map((seg) => encodeURIComponent(seg)).join("/");
         return "file://" + safeSegments;
@@ -299,8 +299,8 @@ function toSafeFileUrl(rawPath) {
 function getImageForPeriod(period, cfg, resolveLocalUrl) {
     const c = cfg || {};
     const safeResolve = (typeof resolveLocalUrl === "function") ? resolveLocalUrl : ((p) => p);
-    let customImage = "";
-    let defaultFile = "";
+    let customImage;
+    let defaultFile;
 
     switch (period) {
         case "morning":
@@ -334,23 +334,23 @@ function getImageForPeriod(period, cfg, resolveLocalUrl) {
  */
 function getPeriodRange(period, schedule) {
     if (!schedule || typeof schedule !== "object") {
-        return { start: 0, end: 0 };
+        return {start: 0, end: 0};
     }
     const morning = schedule.morning !== undefined ? schedule.morning : 360;
-    const noon    = schedule.noon !== undefined ? schedule.noon : 720;
+    const noon = schedule.noon !== undefined ? schedule.noon : 720;
     const evening = schedule.evening !== undefined ? schedule.evening : 1080;
-    const night   = schedule.night !== undefined ? schedule.night : 1320;
+    const night = schedule.night !== undefined ? schedule.night : 1320;
 
     switch (period) {
         case "morning":
-            return { start: morning, end: noon };
+            return {start: morning, end: noon};
         case "noon":
-            return { start: noon, end: evening };
+            return {start: noon, end: evening};
         case "evening":
-            return { start: evening, end: night };
+            return {start: evening, end: night};
         case "night":
         default:
-            return { start: night, end: morning };
+            return {start: night, end: morning};
     }
 }
 

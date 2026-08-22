@@ -16,3 +16,7 @@ contents/locale/
 *.pot~
 .directory
 
+# IDE / Editor configuration
+.idea/
+.codex/
+*.iml

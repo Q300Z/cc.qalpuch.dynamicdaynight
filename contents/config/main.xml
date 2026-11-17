@@ -102,5 +102,11 @@
             <min>0</min>
             <max>2</max>
         </entry>
+
+        <!-- Couleur d'arrière-plan utilisée notamment en mode Ajusté (Fit) -->
+        <entry name="BackgroundColor" type="Color">
+            <label>Background color for fit mode</label>
+            <default>#000000</default>
+        </entry>
     </group>
 </kcfg>

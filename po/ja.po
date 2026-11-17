@@ -1,0 +1,221 @@
+# Japanese translations for cc.qalpuch.dynamicdaynight package.
+# Copyright (C) 2026 Q300Z
+# This file is distributed under the same license as the cc.qalpuch.dynamicdaynight package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cc.qalpuch.dynamicdaynight 1.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-17 15:13+0100\n"
+"PO-Revision-Date: 2026-11-17 15:18+0100\n"
+"Last-Translator: Plasma Developer <contact@kde.org>\n"
+"Language-Team: Japanese <kde-i18n-ja@kde.org>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contents/ui/config.qml:192 contents/ui/config.qml:230
+msgid "Click to enlarge"
+msgstr "クリックして拡大"
+
+#: contents/ui/config.qml:240 contents/ui/config.qml:261
+msgid "Default"
+msgstr "デフォルト"
+
+#: contents/ui/config.qml:254
+msgid "Browse..."
+msgstr "参照..."
+
+#: contents/ui/config.qml:274
+msgid "Image Files (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+msgstr "画像ファイル (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+
+#: contents/ui/config.qml:275
+msgid "All Files (*)"
+msgstr "すべてのファイル (*)"
+
+#: contents/ui/config.qml:294
+msgid "Schedule Mode"
+msgstr "スケジュールモード"
+
+#: contents/ui/config.qml:306
+msgid "Current period: %1 (%2)"
+msgstr "現在の時間帯: %1 (%2)"
+
+#: contents/ui/config.qml:314
+msgid "Solar detection:"
+msgstr "太陽位置の自動検出:"
+
+#: contents/ui/config.qml:315
+msgid ""
+"Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)"
+msgstr "切り替え時刻を自動計算（日の出、南中、日の入り、薄暮）"
+
+#: contents/ui/config.qml:327
+msgid ""
+"Today's calculated times:\n"
+"• Morning (Sunrise): %1\n"
+"• Noon (Solar Noon): %2\n"
+"• Evening (Sunset): %3\n"
+"• Night (Dusk): %4"
+msgstr ""
+"本日の計算時刻:\n"
+"• 朝（日の出）: %1\n"
+"• 昼（南中）: %2\n"
+"• 夕方（日の入り）: %3\n"
+"• 夜（薄暮）: %4"
+
+#: contents/ui/config.qml:337
+msgid "System Settings:"
+msgstr "システム設定:"
+
+#: contents/ui/config.qml:342
+msgid "Open System Date, Time & Location Settings..."
+msgstr "日付・時刻・位置情報のシステム設定を開く..."
+
+#: contents/ui/config.qml:351
+msgid "Night Light Settings..."
+msgstr "Night Light の設定..."
+
+#: contents/ui/config.qml:365
+msgid "Manual Time Periods"
+msgstr "手動の時間帯"
+
+#: contents/ui/config.qml:371
+msgid "Morning starts at:"
+msgstr "朝の開始時刻:"
+
+#: contents/ui/config.qml:405
+msgid "Noon starts at:"
+msgstr "昼の開始時刻:"
+
+#: contents/ui/config.qml:439
+msgid "Evening starts at:"
+msgstr "夕方の開始時刻:"
+
+#: contents/ui/config.qml:473
+msgid "Night starts at:"
+msgstr "夜の開始時刻:"
+
+#: contents/ui/config.qml:509
+msgid "Images"
+msgstr "画像"
+
+#: contents/ui/config.qml:515
+msgid "Morning wallpaper:"
+msgstr "朝の壁紙:"
+
+#: contents/ui/config.qml:517
+msgid "Select Morning Wallpaper"
+msgstr "朝の壁紙を選択"
+
+#: contents/ui/config.qml:523
+msgid "Noon wallpaper:"
+msgstr "昼の壁紙:"
+
+#: contents/ui/config.qml:525
+msgid "Select Noon Wallpaper"
+msgstr "昼の壁紙を選択"
+
+#: contents/ui/config.qml:531
+msgid "Evening wallpaper:"
+msgstr "夕方の壁紙:"
+
+#: contents/ui/config.qml:533
+msgid "Select Evening Wallpaper"
+msgstr "夕方の壁紙を選択"
+
+#: contents/ui/config.qml:539
+msgid "Night wallpaper:"
+msgstr "夜の壁紙:"
+
+#: contents/ui/config.qml:541
+msgid "Select Night Wallpaper"
+msgstr "夜の壁紙を選択"
+
+#: contents/ui/config.qml:549
+msgid "Appearance"
+msgstr "外観"
+
+#: contents/ui/config.qml:554
+msgid "Fill Mode:"
+msgstr "表示方法:"
+
+#: contents/ui/config.qml:556
+msgid "Scaled (Stretch)"
+msgstr "引き伸ばし"
+
+#: contents/ui/config.qml:557
+msgid "Zoom / Crop (Preserve Aspect Ratio)"
+msgstr "拡大 / トリミング（アスペクト比を維持）"
+
+#: contents/ui/config.qml:558
+msgid "Fit (Preserve Aspect Ratio)"
+msgstr "合わせる（アスペクト比を維持）"
+
+#: contents/ui/config.qml:566
+msgid "Background color:"
+msgstr "背景色:"
+
+#: contents/ui/config.qml:572 contents/ui/config.qml:595
+msgid "Select Background Color"
+msgstr "背景色を選択"
+
+#: contents/ui/config.qml:605
+msgid "Transition duration:"
+msgstr "フェード時間:"
+
+#: contents/ui/config.qml:619
+msgid "ms"
+msgstr "ミリ秒"
+
+#: contents/ui/config.qml:628
+msgid "Reset"
+msgstr "リセット"
+
+#: contents/ui/config.qml:632
+msgid "Defaults:"
+msgstr "デフォルト:"
+
+#: contents/ui/config.qml:636
+msgid "Restore Default Configuration"
+msgstr "デフォルト設定に戻す"
+
+#: contents/ui/main.qml:96
+msgid "Previewing: %1 (Forced)"
+msgstr "プレビュー中: %1（固定）"
+
+#: contents/ui/main.qml:103
+msgid "Current cycle: %1 (%2 - %3)"
+msgstr "現在のサイクル: %1 (%2 - %3)"
+
+#: contents/ui/main.qml:116 contents/ui/main.qml:128 contents/ui/main.qml:140
+#: contents/ui/main.qml:152
+msgid "Preview: %1"
+msgstr "プレビュー: %1"
+
+#: contents/ui/main.qml:164
+msgid "Resume automatic cycle"
+msgstr "自動サイクルを再開"
+
+#: contents/ui/main.qml:173
+msgid "Update Dynamic Wallpaper"
+msgstr "動的壁紙を更新"
+
+#: contents/ui/TimeUtils.js:371
+msgid "Morning"
+msgstr "朝"
+
+#: contents/ui/TimeUtils.js:373
+msgid "Noon"
+msgstr "昼"
+
+#: contents/ui/TimeUtils.js:375
+msgid "Evening"
+msgstr "夕方"
+
+#: contents/ui/TimeUtils.js:377
+msgid "Night"
+msgstr "夜"

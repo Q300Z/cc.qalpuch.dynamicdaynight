@@ -11,8 +11,38 @@ import "TimeUtils.js" as TimeUtils
 WallpaperItem {
     id: root
 
-    // Occupe tout l'espace de l'écran
-    anchors.fill: parent
+    // Prise en charge du glisser-déposer d'une image sur le bureau pour la période active
+    onOpenUrlRequested: (url) => {
+        let localPath = url.toString();
+        try {
+            localPath = decodeURIComponent(localPath);
+        } catch (e) {
+            // Conserver l'URL brute si le décodage échoue
+        }
+        if (localPath.startsWith("file://")) {
+            localPath = localPath.substring(7);
+        }
+        if (localPath.trim().length === 0) {
+            return;
+        }
+
+        switch (root.currentPeriod) {
+            case "morning":
+                root.configuration.MorningImage = localPath;
+                break;
+            case "noon":
+                root.configuration.NoonImage = localPath;
+                break;
+            case "evening":
+                root.configuration.EveningImage = localPath;
+                break;
+            case "night":
+            default:
+                root.configuration.NightImage = localPath;
+                break;
+        }
+        root.configuration.writeConfig();
+    }
 
     // Période forcée pour le mode prévisualisation ("" = automatique)
     property string forcedPeriod: ""
@@ -46,35 +76,14 @@ WallpaperItem {
      * Retourne l'URL de l'image embarquée par défaut pour une période donnée.
      */
     function getBundledImageSource(period) {
-        switch (period) {
-            case "morning":
-                return Qt.resolvedUrl("../images/matin.png");
-            case "noon":
-                return Qt.resolvedUrl("../images/midi.png");
-            case "evening":
-                return Qt.resolvedUrl("../images/soir.png");
-            case "night":
-            default:
-                return Qt.resolvedUrl("../images/nuit.png");
-        }
+        return TimeUtils.getDefaultImageForPeriod(period, (file) => Qt.resolvedUrl(file));
     }
 
     /**
      * Nom localisé de la période pour l'interface.
      */
     function getPeriodDisplayName(period) {
-        switch (period) {
-            case "morning":
-                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning");
-            case "noon":
-                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon");
-            case "evening":
-                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening");
-            case "night":
-                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night");
-            default:
-                return "";
-        }
+        return TimeUtils.getPeriodDisplayName(period, i18nd);
     }
 
     // Actions contextuelles du menu clic droit sur le bureau
@@ -175,6 +184,20 @@ Item {
     id: imageContainer
     anchors.fill: parent
 
+    // Résolution cible pour le décodage mémoire (évite de décoder en 4K/8K sur un écran plus petit)
+    readonly property size targetSourceSize: Qt.size(
+        Math.max(1, Math.round(imageContainer.width * Screen.devicePixelRatio)),
+        Math.max(1, Math.round(imageContainer.height * Screen.devicePixelRatio))
+    )
+
+    // Couleur de fond visible notamment en mode Ajusté (Fit)
+    Rectangle {
+        anchors.fill: parent
+        color: (root.configuration && root.configuration.BackgroundColor)
+            ? root.configuration.BackgroundColor
+            : "#000000"
+    }
+
     // Mode de remplissage (0: Étiré, 1: Recadré/Zoom, 2: Ajusté)
     readonly property int resolvedFillMode: {
         const mode = (root.configuration && root.configuration.FillMode !== undefined) ? root.configuration.FillMode : 1;
@@ -198,6 +221,7 @@ Item {
         id: imageLayerA
         anchors.fill: parent
         fillMode: imageContainer.resolvedFillMode
+        sourceSize: imageContainer.targetSourceSize
         asynchronous: true
         cache: true
         opacity: 1.0
@@ -236,6 +260,7 @@ Item {
         id: imageLayerB
         anchors.fill: parent
         fillMode: imageContainer.resolvedFillMode
+        sourceSize: imageContainer.targetSourceSize
         asynchronous: true
         cache: true
         opacity: 0.0

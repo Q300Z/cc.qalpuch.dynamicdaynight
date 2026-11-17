@@ -91,14 +91,31 @@ function getSystemCoordinates(date) {
 }
 
 /**
+ * Cache journalier des éphémérides solaires (clé : YYYY-MM-DD|lat|lon|tzOffset).
+ */
+let _solarScheduleCache = {};
+
+function clearSolarCache() {
+    _solarScheduleCache = {};
+}
+
+/**
  * Calcule les horaires astronomiques du cycle solaire (Lever, Zénith, Coucher, Crépuscule)
  * via les algorithmes d'éphémérides NOAA standard.
- * Gère les années bissextiles, le calcul UTC (immunisé au DST) et les extrêmes polaires.
+ * Gère les années bissextiles, le calcul UTC (immunisé au DST), les extrêmes polaires
+ * et met en cache le résultat pour la journée courante.
  */
 function calculateSolarSchedule(date, lat, lon) {
     const d = (date instanceof Date && !isNaN(date.getTime())) ? date : new Date();
     const latitude = (typeof lat === "number" && !isNaN(lat)) ? lat : 48.8566;
     const longitude = (typeof lon === "number" && !isNaN(lon)) ? lon : 2.3522;
+    const tzOffsetMinutes = -d.getTimezoneOffset();
+
+    const cacheKey = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate()
+        + "|" + latitude.toFixed(4) + "|" + longitude.toFixed(4) + "|" + tzOffsetMinutes;
+    if (_solarScheduleCache[cacheKey]) {
+        return _solarScheduleCache[cacheKey];
+    }
 
     const rad = Math.PI / 180.0;
     const deg = 180.0 / Math.PI;
@@ -112,7 +129,8 @@ function calculateSolarSchedule(date, lat, lon) {
     // 2. Année fractionnaire en radians avec prise en compte des années bissextiles
     const isLeap = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
     const daysInYear = isLeap ? 366.0 : 365.0;
-    const gamma = (2.0 * Math.PI / daysInYear) * (dayOfYear - 1 + ((d.getHours() - 12) / 24.0));
+    // Calcul centré sur midi local (12h) pour que l'éphéméride journalière reste stable sur toute la journée
+    const gamma = (2.0 * Math.PI / daysInYear) * (dayOfYear - 1);
 
     // 3. Équation du temps NOAA (en minutes)
     const eqTime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma)
@@ -122,10 +140,7 @@ function calculateSolarSchedule(date, lat, lon) {
     const decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma)
         - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma);
 
-    // 5. Décalage horaire local par rapport à UTC (en minutes)
-    const tzOffsetMinutes = -d.getTimezoneOffset();
-
-    // 6. Midi solaire réel en minutes locales depuis minuit
+    // 5. Midi solaire réel en minutes locales depuis minuit
     const solarNoonMinutes = 720.0 - 4.0 * longitude - eqTime + tzOffsetMinutes;
 
     /**
@@ -185,12 +200,18 @@ function calculateSolarSchedule(date, lat, lon) {
 
     const norm = (m) => ((Math.round(m) % 1440) + 1440) % 1440;
 
-    return {
+    const result = {
         morning: norm(sunriseMin),
         noon: norm(solarNoonMinutes),
         evening: norm(sunsetMin),
         night: norm(duskMin)
     };
+
+    if (Object.keys(_solarScheduleCache).length >= 16) {
+        _solarScheduleCache = {};
+    }
+    _solarScheduleCache[cacheKey] = result;
+    return result;
 }
 
 /**
@@ -292,31 +313,44 @@ function toSafeFileUrl(rawPath) {
 }
 
 /**
+ * Chemins relatifs des images embarquées par défaut pour chaque période.
+ */
+const DEFAULT_PERIOD_IMAGES = {
+    morning: "../images/matin.png",
+    noon: "../images/midi.png",
+    evening: "../images/soir.png",
+    night: "../images/nuit.png"
+};
+
+/**
+ * Retourne l'URL résolue de l'image embarquée par défaut pour une période donnée.
+ */
+function getDefaultImageForPeriod(period, resolveLocalUrl) {
+    const safeResolve = (typeof resolveLocalUrl === "function") ? resolveLocalUrl : ((p) => p);
+    const defaultFile = DEFAULT_PERIOD_IMAGES[period] || DEFAULT_PERIOD_IMAGES.night;
+    return safeResolve(defaultFile);
+}
+
+/**
  * Résout l'URL de l'image correspondant à la période demandée.
  */
 function getImageForPeriod(period, cfg, resolveLocalUrl) {
     const c = cfg || {};
-    const safeResolve = (typeof resolveLocalUrl === "function") ? resolveLocalUrl : ((p) => p);
     let customImage;
-    let defaultFile;
 
     switch (period) {
         case "morning":
             customImage = c.MorningImage;
-            defaultFile = "../images/matin.png";
             break;
         case "noon":
             customImage = c.NoonImage;
-            defaultFile = "../images/midi.png";
             break;
         case "evening":
             customImage = c.EveningImage;
-            defaultFile = "../images/soir.png";
             break;
         case "night":
         default:
             customImage = c.NightImage;
-            defaultFile = "../images/nuit.png";
             break;
     }
 
@@ -324,7 +358,26 @@ function getImageForPeriod(period, cfg, resolveLocalUrl) {
         return toSafeFileUrl(String(customImage));
     }
 
-    return safeResolve(defaultFile);
+    return getDefaultImageForPeriod(period, resolveLocalUrl);
+}
+
+/**
+ * Retourne le nom localisé d'une période à l'aide de la fonction de traduction i18nd fournie.
+ */
+function getPeriodDisplayName(period, translateFn) {
+    const i18nd = (typeof translateFn === "function") ? translateFn : ((_domain, text) => text);
+    switch (period) {
+        case "morning":
+            return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning");
+        case "noon":
+            return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon");
+        case "evening":
+            return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening");
+        case "night":
+            return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night");
+        default:
+            return "";
+    }
 }
 
 /**

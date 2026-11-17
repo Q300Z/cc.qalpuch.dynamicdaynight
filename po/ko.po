@@ -1,0 +1,221 @@
+# Korean translations for cc.qalpuch.dynamicdaynight package.
+# Copyright (C) 2026 Q300Z
+# This file is distributed under the same license as the cc.qalpuch.dynamicdaynight package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cc.qalpuch.dynamicdaynight 1.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-17 15:13+0100\n"
+"PO-Revision-Date: 2026-11-17 15:18+0100\n"
+"Last-Translator: Plasma Developer <contact@kde.org>\n"
+"Language-Team: Korean <kde-i18n-ko@kde.org>\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contents/ui/config.qml:192 contents/ui/config.qml:230
+msgid "Click to enlarge"
+msgstr "클릭하여 확대"
+
+#: contents/ui/config.qml:240 contents/ui/config.qml:261
+msgid "Default"
+msgstr "기본값"
+
+#: contents/ui/config.qml:254
+msgid "Browse..."
+msgstr "찾아보기..."
+
+#: contents/ui/config.qml:274
+msgid "Image Files (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+msgstr "이미지 파일 (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+
+#: contents/ui/config.qml:275
+msgid "All Files (*)"
+msgstr "모든 파일 (*)"
+
+#: contents/ui/config.qml:294
+msgid "Schedule Mode"
+msgstr "일정 모드"
+
+#: contents/ui/config.qml:306
+msgid "Current period: %1 (%2)"
+msgstr "현재 시간대: %1 (%2)"
+
+#: contents/ui/config.qml:314
+msgid "Solar detection:"
+msgstr "태양 감지:"
+
+#: contents/ui/config.qml:315
+msgid ""
+"Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)"
+msgstr "전환 시간 자동 계산 (일출, 태양 정오, 일몰, 황혼)"
+
+#: contents/ui/config.qml:327
+msgid ""
+"Today's calculated times:\n"
+"• Morning (Sunrise): %1\n"
+"• Noon (Solar Noon): %2\n"
+"• Evening (Sunset): %3\n"
+"• Night (Dusk): %4"
+msgstr ""
+"오늘 계산된 시간:\n"
+"• 아침 (일출): %1\n"
+"• 낮 (태양 정오): %2\n"
+"• 저녁 (일몰): %3\n"
+"• 밤 (황혼): %4"
+
+#: contents/ui/config.qml:337
+msgid "System Settings:"
+msgstr "시스템 설정:"
+
+#: contents/ui/config.qml:342
+msgid "Open System Date, Time & Location Settings..."
+msgstr "시스템 날짜, 시간 및 위치 설정 열기..."
+
+#: contents/ui/config.qml:351
+msgid "Night Light Settings..."
+msgstr "야간 조명 설정..."
+
+#: contents/ui/config.qml:365
+msgid "Manual Time Periods"
+msgstr "수동 시간대"
+
+#: contents/ui/config.qml:371
+msgid "Morning starts at:"
+msgstr "아침 시작 시간:"
+
+#: contents/ui/config.qml:405
+msgid "Noon starts at:"
+msgstr "낮 시작 시간:"
+
+#: contents/ui/config.qml:439
+msgid "Evening starts at:"
+msgstr "저녁 시작 시간:"
+
+#: contents/ui/config.qml:473
+msgid "Night starts at:"
+msgstr "밤 시작 시간:"
+
+#: contents/ui/config.qml:509
+msgid "Images"
+msgstr "이미지"
+
+#: contents/ui/config.qml:515
+msgid "Morning wallpaper:"
+msgstr "아침 배경화면:"
+
+#: contents/ui/config.qml:517
+msgid "Select Morning Wallpaper"
+msgstr "아침 배경화면 선택"
+
+#: contents/ui/config.qml:523
+msgid "Noon wallpaper:"
+msgstr "낮 배경화면:"
+
+#: contents/ui/config.qml:525
+msgid "Select Noon Wallpaper"
+msgstr "낮 배경화면 선택"
+
+#: contents/ui/config.qml:531
+msgid "Evening wallpaper:"
+msgstr "저녁 배경화면:"
+
+#: contents/ui/config.qml:533
+msgid "Select Evening Wallpaper"
+msgstr "저녁 배경화면 선택"
+
+#: contents/ui/config.qml:539
+msgid "Night wallpaper:"
+msgstr "밤 배경화면:"
+
+#: contents/ui/config.qml:541
+msgid "Select Night Wallpaper"
+msgstr "밤 배경화면 선택"
+
+#: contents/ui/config.qml:549
+msgid "Appearance"
+msgstr "모양"
+
+#: contents/ui/config.qml:554
+msgid "Fill Mode:"
+msgstr "채우기 모드:"
+
+#: contents/ui/config.qml:556
+msgid "Scaled (Stretch)"
+msgstr "늘이기"
+
+#: contents/ui/config.qml:557
+msgid "Zoom / Crop (Preserve Aspect Ratio)"
+msgstr "확대 / 자르기 (비율 유지)"
+
+#: contents/ui/config.qml:558
+msgid "Fit (Preserve Aspect Ratio)"
+msgstr "맞춤 (비율 유지)"
+
+#: contents/ui/config.qml:566
+msgid "Background color:"
+msgstr "배경색:"
+
+#: contents/ui/config.qml:572 contents/ui/config.qml:595
+msgid "Select Background Color"
+msgstr "배경색 선택"
+
+#: contents/ui/config.qml:605
+msgid "Transition duration:"
+msgstr "전환 시간:"
+
+#: contents/ui/config.qml:619
+msgid "ms"
+msgstr "ms"
+
+#: contents/ui/config.qml:628
+msgid "Reset"
+msgstr "초기화"
+
+#: contents/ui/config.qml:632
+msgid "Defaults:"
+msgstr "기본값:"
+
+#: contents/ui/config.qml:636
+msgid "Restore Default Configuration"
+msgstr "기본 설정 복원"
+
+#: contents/ui/main.qml:96
+msgid "Previewing: %1 (Forced)"
+msgstr "미리보기: %1 (강제)"
+
+#: contents/ui/main.qml:103
+msgid "Current cycle: %1 (%2 - %3)"
+msgstr "현재 주기: %1 (%2 - %3)"
+
+#: contents/ui/main.qml:116 contents/ui/main.qml:128 contents/ui/main.qml:140
+#: contents/ui/main.qml:152
+msgid "Preview: %1"
+msgstr "미리보기: %1"
+
+#: contents/ui/main.qml:164
+msgid "Resume automatic cycle"
+msgstr "자동 주기 재개"
+
+#: contents/ui/main.qml:173
+msgid "Update Dynamic Wallpaper"
+msgstr "동적 배경화면 업데이트"
+
+#: contents/ui/TimeUtils.js:371
+msgid "Morning"
+msgstr "아침"
+
+#: contents/ui/TimeUtils.js:373
+msgid "Noon"
+msgstr "낮"
+
+#: contents/ui/TimeUtils.js:375
+msgid "Evening"
+msgstr "저녁"
+
+#: contents/ui/TimeUtils.js:377
+msgid "Night"
+msgstr "밤"

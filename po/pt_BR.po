@@ -1,0 +1,223 @@
+# Brazilian Portuguese translations for cc.qalpuch.dynamicdaynight package.
+# Copyright (C) 2026 Q300Z
+# This file is distributed under the same license as the cc.qalpuch.dynamicdaynight package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cc.qalpuch.dynamicdaynight 1.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-17 15:13+0100\n"
+"PO-Revision-Date: 2026-11-17 15:15+0100\n"
+"Last-Translator: Plasma Developer <contact@kde.org>\n"
+"Language-Team: Brazilian Portuguese <kde-i18n-pt_BR@kde.org>\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: contents/ui/config.qml:192 contents/ui/config.qml:230
+msgid "Click to enlarge"
+msgstr "Clique para ampliar"
+
+#: contents/ui/config.qml:240 contents/ui/config.qml:261
+msgid "Default"
+msgstr "Padrão"
+
+#: contents/ui/config.qml:254
+msgid "Browse..."
+msgstr "Procurar..."
+
+#: contents/ui/config.qml:274
+msgid "Image Files (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+msgstr "Arquivos de imagem (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+
+#: contents/ui/config.qml:275
+msgid "All Files (*)"
+msgstr "Todos os arquivos (*)"
+
+#: contents/ui/config.qml:294
+msgid "Schedule Mode"
+msgstr "Modo de agendamento"
+
+#: contents/ui/config.qml:306
+msgid "Current period: %1 (%2)"
+msgstr "Período atual: %1 (%2)"
+
+#: contents/ui/config.qml:314
+msgid "Solar detection:"
+msgstr "Detecção solar:"
+
+#: contents/ui/config.qml:315
+msgid ""
+"Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)"
+msgstr ""
+"Calcular horários de troca automaticamente (Nascer do sol, Meio-dia solar, "
+"Pôr do sol, Crepúsculo)"
+
+#: contents/ui/config.qml:327
+msgid ""
+"Today's calculated times:\n"
+"• Morning (Sunrise): %1\n"
+"• Noon (Solar Noon): %2\n"
+"• Evening (Sunset): %3\n"
+"• Night (Dusk): %4"
+msgstr ""
+"Horários calculados de hoje:\n"
+"• Manhã (Nascer do sol): %1\n"
+"• Meio-dia (Meio-dia solar): %2\n"
+"• Tarde (Pôr do sol): %3\n"
+"• Noite (Crepúsculo): %4"
+
+#: contents/ui/config.qml:337
+msgid "System Settings:"
+msgstr "Configurações do sistema:"
+
+#: contents/ui/config.qml:342
+msgid "Open System Date, Time & Location Settings..."
+msgstr "Abrir configurações de Data, Hora e Localização..."
+
+#: contents/ui/config.qml:351
+msgid "Night Light Settings..."
+msgstr "Configurações da Luz Noturna..."
+
+#: contents/ui/config.qml:365
+msgid "Manual Time Periods"
+msgstr "Períodos manuais"
+
+#: contents/ui/config.qml:371
+msgid "Morning starts at:"
+msgstr "A manhã começa às:"
+
+#: contents/ui/config.qml:405
+msgid "Noon starts at:"
+msgstr "O meio-dia começa às:"
+
+#: contents/ui/config.qml:439
+msgid "Evening starts at:"
+msgstr "A tarde começa às:"
+
+#: contents/ui/config.qml:473
+msgid "Night starts at:"
+msgstr "A noite começa às:"
+
+#: contents/ui/config.qml:509
+msgid "Images"
+msgstr "Imagens"
+
+#: contents/ui/config.qml:515
+msgid "Morning wallpaper:"
+msgstr "Papel de parede da manhã:"
+
+#: contents/ui/config.qml:517
+msgid "Select Morning Wallpaper"
+msgstr "Selecionar papel de parede da manhã"
+
+#: contents/ui/config.qml:523
+msgid "Noon wallpaper:"
+msgstr "Papel de parede do meio-dia:"
+
+#: contents/ui/config.qml:525
+msgid "Select Noon Wallpaper"
+msgstr "Selecionar papel de parede do meio-dia"
+
+#: contents/ui/config.qml:531
+msgid "Evening wallpaper:"
+msgstr "Papel de parede da tarde:"
+
+#: contents/ui/config.qml:533
+msgid "Select Evening Wallpaper"
+msgstr "Selecionar papel de parede da tarde"
+
+#: contents/ui/config.qml:539
+msgid "Night wallpaper:"
+msgstr "Papel de parede da noite:"
+
+#: contents/ui/config.qml:541
+msgid "Select Night Wallpaper"
+msgstr "Selecionar papel de parede da noite"
+
+#: contents/ui/config.qml:549
+msgid "Appearance"
+msgstr "Aparência"
+
+#: contents/ui/config.qml:554
+msgid "Fill Mode:"
+msgstr "Modo de preenchimento:"
+
+#: contents/ui/config.qml:556
+msgid "Scaled (Stretch)"
+msgstr "Escalonado (Esticar)"
+
+#: contents/ui/config.qml:557
+msgid "Zoom / Crop (Preserve Aspect Ratio)"
+msgstr "Zoom / Cortar (Preservar proporção)"
+
+#: contents/ui/config.qml:558
+msgid "Fit (Preserve Aspect Ratio)"
+msgstr "Ajustar (Preservar proporção)"
+
+#: contents/ui/config.qml:566
+msgid "Background color:"
+msgstr "Cor de fundo:"
+
+#: contents/ui/config.qml:572 contents/ui/config.qml:595
+msgid "Select Background Color"
+msgstr "Selecionar cor de fundo"
+
+#: contents/ui/config.qml:605
+msgid "Transition duration:"
+msgstr "Duração da transição:"
+
+#: contents/ui/config.qml:619
+msgid "ms"
+msgstr "ms"
+
+#: contents/ui/config.qml:628
+msgid "Reset"
+msgstr "Redefinir"
+
+#: contents/ui/config.qml:632
+msgid "Defaults:"
+msgstr "Padrões:"
+
+#: contents/ui/config.qml:636
+msgid "Restore Default Configuration"
+msgstr "Restaurar configuração padrão"
+
+#: contents/ui/main.qml:96
+msgid "Previewing: %1 (Forced)"
+msgstr "Visualizando: %1 (Forçado)"
+
+#: contents/ui/main.qml:103
+msgid "Current cycle: %1 (%2 - %3)"
+msgstr "Ciclo atual: %1 (%2 - %3)"
+
+#: contents/ui/main.qml:116 contents/ui/main.qml:128 contents/ui/main.qml:140
+#: contents/ui/main.qml:152
+msgid "Preview: %1"
+msgstr "Visualizar: %1"
+
+#: contents/ui/main.qml:164
+msgid "Resume automatic cycle"
+msgstr "Retomar ciclo automático"
+
+#: contents/ui/main.qml:173
+msgid "Update Dynamic Wallpaper"
+msgstr "Atualizar papel de parede dinâmico"
+
+#: contents/ui/TimeUtils.js:371
+msgid "Morning"
+msgstr "Manhã"
+
+#: contents/ui/TimeUtils.js:373
+msgid "Noon"
+msgstr "Meio-dia"
+
+#: contents/ui/TimeUtils.js:375
+msgid "Evening"
+msgstr "Tarde"
+
+#: contents/ui/TimeUtils.js:377
+msgid "Night"
+msgstr "Noite"

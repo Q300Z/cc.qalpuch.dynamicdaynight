@@ -3,11 +3,13 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
+pragma ComponentBehavior: Bound
+
 import QtQuick
+import QtQuick.Controls as QtControls2
 import QtQuick.Layouts as Layouts
 import QtQuick.Dialogs as QtDialogs
 import org.kde.kirigami as Kirigami
-import org.kde.plasma.components as PlasmaComponents
 import org.kde.kcmutils as KCM
 import org.kde.config as KConfig
 import "TimeUtils.js" as TimeUtils
@@ -24,28 +26,45 @@ Kirigami.FormLayout {
 
     signal configurationChanged()
 
-    // Liaisons déclaratives KConfigXT
+    // Liaisons déclaratives KConfigXT (et valeurs par défaut pour le bouton natif KCM)
     property alias cfg_AutoSchedule: autoScheduleCheckBox.checked
+    property bool cfg_AutoScheduleDefault: true
 
     property alias cfg_MorningHour: morningHourSpin.value
+    property int cfg_MorningHourDefault: 6
     property alias cfg_MorningMinute: morningMinuteSpin.value
+    property int cfg_MorningMinuteDefault: 0
 
     property alias cfg_NoonHour: noonHourSpin.value
+    property int cfg_NoonHourDefault: 12
     property alias cfg_NoonMinute: noonMinuteSpin.value
+    property int cfg_NoonMinuteDefault: 0
 
     property alias cfg_EveningHour: eveningHourSpin.value
+    property int cfg_EveningHourDefault: 18
     property alias cfg_EveningMinute: eveningMinuteSpin.value
+    property int cfg_EveningMinuteDefault: 0
 
     property alias cfg_NightHour: nightHourSpin.value
+    property int cfg_NightHourDefault: 22
     property alias cfg_NightMinute: nightMinuteSpin.value
+    property int cfg_NightMinuteDefault: 0
 
     property alias cfg_MorningImage: morningRow.pathText
+    property string cfg_MorningImageDefault: ""
     property alias cfg_NoonImage: noonRow.pathText
+    property string cfg_NoonImageDefault: ""
     property alias cfg_EveningImage: eveningRow.pathText
+    property string cfg_EveningImageDefault: ""
     property alias cfg_NightImage: nightRow.pathText
+    property string cfg_NightImageDefault: ""
 
     property alias cfg_FillMode: fillModeCombo.currentIndex
+    property int cfg_FillModeDefault: 1
+    property color cfg_BackgroundColor: "#000000"
+    property color cfg_BackgroundColorDefault: "#000000"
     property alias cfg_TransitionDuration: transitionSpin.value
+    property int cfg_TransitionDurationDefault: 1500
 
     // Horloge système et calcul en temps réel de la période active
     property var currentTime: new Date()
@@ -75,18 +94,7 @@ Kirigami.FormLayout {
     }
 
     function getPeriodDisplayName(period) {
-        switch (period) {
-            case "morning":
-                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning");
-            case "noon":
-                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon");
-            case "evening":
-                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening");
-            case "night":
-                return i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night");
-            default:
-                return "";
-        }
+        return TimeUtils.getPeriodDisplayName(period, i18nd);
     }
 
     // Calcul des éphémérides solaires du jour selon la localisation système
@@ -107,27 +115,28 @@ Kirigami.FormLayout {
     }
 
     /**
-     * Restaure l'ensemble des paramètres aux valeurs d'origine.
+     * Restaure l'ensemble des paramètres aux valeurs par défaut KConfigXT.
      */
     function resetToDefaults() {
-        autoScheduleCheckBox.checked = true;
+        autoScheduleCheckBox.checked = root.cfg_AutoScheduleDefault;
 
-        morningHourSpin.value = 6;
-        morningMinuteSpin.value = 0;
-        noonHourSpin.value = 12;
-        noonMinuteSpin.value = 0;
-        eveningHourSpin.value = 18;
-        eveningMinuteSpin.value = 0;
-        nightHourSpin.value = 22;
-        nightMinuteSpin.value = 0;
+        morningHourSpin.value = root.cfg_MorningHourDefault;
+        morningMinuteSpin.value = root.cfg_MorningMinuteDefault;
+        noonHourSpin.value = root.cfg_NoonHourDefault;
+        noonMinuteSpin.value = root.cfg_NoonMinuteDefault;
+        eveningHourSpin.value = root.cfg_EveningHourDefault;
+        eveningMinuteSpin.value = root.cfg_EveningMinuteDefault;
+        nightHourSpin.value = root.cfg_NightHourDefault;
+        nightMinuteSpin.value = root.cfg_NightMinuteDefault;
 
-        morningRow.pathText = "";
-        noonRow.pathText = "";
-        eveningRow.pathText = "";
-        nightRow.pathText = "";
+        morningRow.pathText = root.cfg_MorningImageDefault;
+        noonRow.pathText = root.cfg_NoonImageDefault;
+        eveningRow.pathText = root.cfg_EveningImageDefault;
+        nightRow.pathText = root.cfg_NightImageDefault;
 
-        fillModeCombo.currentIndex = 1;
-        transitionSpin.value = 1500;
+        fillModeCombo.currentIndex = root.cfg_FillModeDefault;
+        root.cfg_BackgroundColor = root.cfg_BackgroundColorDefault;
+        transitionSpin.value = root.cfg_TransitionDurationDefault;
 
         root.configurationChanged();
     }
@@ -218,13 +227,13 @@ Kirigami.FormLayout {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: root.openLargePreview(fileRow.dialogTitle, fileRow.resolvedImageSource)
 
-                PlasmaComponents.ToolTip.text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Click to enlarge")
-                PlasmaComponents.ToolTip.visible: containsMouse
+                QtControls2.ToolTip.text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Click to enlarge")
+                QtControls2.ToolTip.visible: containsMouse
             }
         }
 
         // Champ de saisie du chemin de fichier
-        PlasmaComponents.TextField {
+        QtControls2.TextField {
             id: pathField
             Layouts.Layout.fillWidth: true
             text: fileRow.pathText
@@ -239,7 +248,7 @@ Kirigami.FormLayout {
         }
 
         // Bouton Parcourir
-        PlasmaComponents.Button {
+        QtControls2.Button {
             id: browseBtn
             icon.name: "document-open"
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Browse...")
@@ -247,7 +256,7 @@ Kirigami.FormLayout {
         }
 
         // Bouton Restaurer par défaut
-        PlasmaComponents.Button {
+        QtControls2.Button {
             icon.name: "edit-undo"
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Default")
             enabled: fileRow.isCustom
@@ -300,7 +309,7 @@ Kirigami.FormLayout {
         )
     }
 
-    PlasmaComponents.CheckBox {
+    QtControls2.CheckBox {
         id: autoScheduleCheckBox
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Solar detection:")
         text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)")
@@ -328,7 +337,7 @@ Kirigami.FormLayout {
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "System Settings:")
         spacing: Kirigami.Units.smallSpacing
 
-        PlasmaComponents.Button {
+        QtControls2.Button {
             icon.name: "preferences-system-time"
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Open System Date, Time & Location Settings...")
             enabled: KConfig.KAuthorized.authorizeControlModule("kcm_clock")
@@ -337,7 +346,7 @@ Kirigami.FormLayout {
             }
         }
 
-        PlasmaComponents.Button {
+        QtControls2.Button {
             icon.name: "redshift-status-on"
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night Light Settings...")
             enabled: KConfig.KAuthorized.authorizeControlModule("kcm_nightlight")
@@ -362,7 +371,7 @@ Kirigami.FormLayout {
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Morning starts at:")
         spacing: Kirigami.Units.smallSpacing
 
-        PlasmaComponents.SpinBox {
+        QtControls2.SpinBox {
             id: morningHourSpin
             from: 0
             to: 23
@@ -370,11 +379,11 @@ Kirigami.FormLayout {
             value: 6
             onValueModified: root.configurationChanged()
         }
-        PlasmaComponents.Label {
+        QtControls2.Label {
             text: ":"
             font.bold: true
         }
-        PlasmaComponents.SpinBox {
+        QtControls2.SpinBox {
             id: morningMinuteSpin
             from: 0
             to: 59
@@ -396,7 +405,7 @@ Kirigami.FormLayout {
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Noon starts at:")
         spacing: Kirigami.Units.smallSpacing
 
-        PlasmaComponents.SpinBox {
+        QtControls2.SpinBox {
             id: noonHourSpin
             from: 0
             to: 23
@@ -404,11 +413,11 @@ Kirigami.FormLayout {
             value: 12
             onValueModified: root.configurationChanged()
         }
-        PlasmaComponents.Label {
+        QtControls2.Label {
             text: ":"
             font.bold: true
         }
-        PlasmaComponents.SpinBox {
+        QtControls2.SpinBox {
             id: noonMinuteSpin
             from: 0
             to: 59
@@ -430,7 +439,7 @@ Kirigami.FormLayout {
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Evening starts at:")
         spacing: Kirigami.Units.smallSpacing
 
-        PlasmaComponents.SpinBox {
+        QtControls2.SpinBox {
             id: eveningHourSpin
             from: 0
             to: 23
@@ -438,11 +447,11 @@ Kirigami.FormLayout {
             value: 18
             onValueModified: root.configurationChanged()
         }
-        PlasmaComponents.Label {
+        QtControls2.Label {
             text: ":"
             font.bold: true
         }
-        PlasmaComponents.SpinBox {
+        QtControls2.SpinBox {
             id: eveningMinuteSpin
             from: 0
             to: 59
@@ -464,7 +473,7 @@ Kirigami.FormLayout {
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Night starts at:")
         spacing: Kirigami.Units.smallSpacing
 
-        PlasmaComponents.SpinBox {
+        QtControls2.SpinBox {
             id: nightHourSpin
             from: 0
             to: 23
@@ -472,11 +481,11 @@ Kirigami.FormLayout {
             value: 22
             onValueModified: root.configurationChanged()
         }
-        PlasmaComponents.Label {
+        QtControls2.Label {
             text: ":"
             font.bold: true
         }
-        PlasmaComponents.SpinBox {
+        QtControls2.SpinBox {
             id: nightMinuteSpin
             from: 0
             to: 59
@@ -540,7 +549,7 @@ Kirigami.FormLayout {
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Appearance")
     }
 
-    PlasmaComponents.ComboBox {
+    QtControls2.ComboBox {
         id: fillModeCombo
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Fill Mode:")
         model: [
@@ -553,10 +562,50 @@ Kirigami.FormLayout {
     }
 
     Layouts.RowLayout {
+        visible: fillModeCombo.currentIndex === 2
+        Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Background color:")
+        spacing: Kirigami.Units.smallSpacing
+
+        QtControls2.Button {
+            id: bgColorBtn
+            text: root.cfg_BackgroundColor.toString().toUpperCase()
+            Accessible.name: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Background Color")
+            onClicked: bgColorDialog.open()
+
+            contentItem: Layouts.RowLayout {
+                spacing: Kirigami.Units.smallSpacing
+
+                Rectangle {
+                    implicitWidth: Kirigami.Units.gridUnit
+                    implicitHeight: Kirigami.Units.gridUnit
+                    radius: Kirigami.Units.smallSpacing / 2
+                    color: root.cfg_BackgroundColor
+                    border.color: Kirigami.Theme.disabledTextColor
+                    border.width: 1
+                }
+
+                QtControls2.Label {
+                    text: bgColorBtn.text
+                }
+            }
+        }
+
+        QtDialogs.ColorDialog {
+            id: bgColorDialog
+            title: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Select Background Color")
+            selectedColor: root.cfg_BackgroundColor
+            onAccepted: {
+                root.cfg_BackgroundColor = selectedColor;
+                root.configurationChanged();
+            }
+        }
+    }
+
+    Layouts.RowLayout {
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Transition duration:")
         spacing: Kirigami.Units.smallSpacing
 
-        PlasmaComponents.SpinBox {
+        QtControls2.SpinBox {
             id: transitionSpin
             from: 0
             to: 10000
@@ -566,7 +615,7 @@ Kirigami.FormLayout {
             onValueModified: root.configurationChanged()
         }
 
-        PlasmaComponents.Label {
+        QtControls2.Label {
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "ms")
         }
     }
@@ -582,7 +631,7 @@ Kirigami.FormLayout {
     Layouts.RowLayout {
         Kirigami.FormData.label: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Defaults:")
 
-        PlasmaComponents.Button {
+        QtControls2.Button {
             icon.name: "document-revert"
             text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Restore Default Configuration")
             onClicked: root.resetToDefaults()
@@ -590,56 +639,33 @@ Kirigami.FormLayout {
     }
 
     // Fenêtre modale d'aperçu d'image en grand format
-    PlasmaComponents.Popup {
+    Kirigami.Dialog {
         id: imagePreviewPopup
-        anchors.centerIn: parent
+        title: root.previewDialogTitle
         modal: true
-        focus: true
-        closePolicy: PlasmaComponents.Popup.CloseOnEscape | PlasmaComponents.Popup.CloseOnPressOutside
-        width: Math.min(root.width * 0.9, Kirigami.Units.gridUnit * 42)
-        height: Math.min(root.height * 0.9, Kirigami.Units.gridUnit * 26)
+        standardButtons: Kirigami.Dialog.Close
+        preferredWidth: Kirigami.Units.gridUnit * 38
+        preferredHeight: Kirigami.Units.gridUnit * 24
         padding: Kirigami.Units.largeSpacing
 
-        contentItem: Layouts.ColumnLayout
-        {
-            spacing: Kirigami.Units.smallSpacing
+        Rectangle {
+            implicitWidth: Kirigami.Units.gridUnit * 36
+            implicitHeight: Kirigami.Units.gridUnit * 21
+            radius: Kirigami.Units.smallSpacing
+            color: Kirigami.Theme.backgroundColor
+            border.color: Kirigami.Theme.disabledTextColor
+            border.width: 1
+            clip: true
 
-            Layouts.RowLayout {
-                Layouts.Layout.fillWidth: true
-
-                PlasmaComponents.Label {
-                    text: root.previewDialogTitle
-                    font.weight: Font.Bold
-                    Layouts.Layout.fillWidth: true
-                    elide: Text.ElideRight
-                }
-
-                PlasmaComponents.Button {
-                    icon.name: "window-close"
-                    text: i18nd("plasma_wallpaper_cc.qalpuch.dynamicdaynight", "Close")
-                    onClicked: imagePreviewPopup.close()
-                }
-            }
-
-            Rectangle {
-                Layouts.Layout.fillWidth: true
-                Layouts.Layout.fillHeight: true
-                radius: Kirigami.Units.smallSpacing
-                color: Kirigami.Theme.backgroundColor
-                border.color: Kirigami.Theme.disabledTextColor
-                border.width: 1
-                clip: true
-
-                Image {
-                    anchors.fill: parent
-                    anchors.margins: Kirigami.Units.smallSpacing
-                    source: root.previewDialogSource
-                    fillMode: Image.PreserveAspectFit
-                    asynchronous: true
-                    cache: true
-                    smooth: true
-                    mipmap: true
-                }
+            Image {
+                anchors.fill: parent
+                anchors.margins: Kirigami.Units.smallSpacing
+                source: root.previewDialogSource
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+                cache: true
+                smooth: true
+                mipmap: true
             }
         }
     }

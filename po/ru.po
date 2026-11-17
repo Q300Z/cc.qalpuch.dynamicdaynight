@@ -1,0 +1,223 @@
+# Russian translations for cc.qalpuch.dynamicdaynight package.
+# Copyright (C) 2026 Q300Z
+# This file is distributed under the same license as the cc.qalpuch.dynamicdaynight package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cc.qalpuch.dynamicdaynight 1.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-17 15:13+0100\n"
+"PO-Revision-Date: 2026-11-17 15:18+0100\n"
+"Last-Translator: Plasma Developer <contact@kde.org>\n"
+"Language-Team: Russian <kde-i18n-ru@kde.org>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: contents/ui/config.qml:192 contents/ui/config.qml:230
+msgid "Click to enlarge"
+msgstr "Нажмите, чтобы увеличить"
+
+#: contents/ui/config.qml:240 contents/ui/config.qml:261
+msgid "Default"
+msgstr "По умолчанию"
+
+#: contents/ui/config.qml:254
+msgid "Browse..."
+msgstr "Обзор..."
+
+#: contents/ui/config.qml:274
+msgid "Image Files (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+msgstr "Файлы изображений (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+
+#: contents/ui/config.qml:275
+msgid "All Files (*)"
+msgstr "Все файлы (*)"
+
+#: contents/ui/config.qml:294
+msgid "Schedule Mode"
+msgstr "Режим расписания"
+
+#: contents/ui/config.qml:306
+msgid "Current period: %1 (%2)"
+msgstr "Текущий период: %1 (%2)"
+
+#: contents/ui/config.qml:314
+msgid "Solar detection:"
+msgstr "Солнечный расчёт:"
+
+#: contents/ui/config.qml:315
+msgid ""
+"Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)"
+msgstr ""
+"Автоматически вычислять время переключения (Восход, Солнечный полдень, "
+"Закат, Сумерки)"
+
+#: contents/ui/config.qml:327
+msgid ""
+"Today's calculated times:\n"
+"• Morning (Sunrise): %1\n"
+"• Noon (Solar Noon): %2\n"
+"• Evening (Sunset): %3\n"
+"• Night (Dusk): %4"
+msgstr ""
+"Рассчитанное время на сегодня:\n"
+"• Утро (Восход): %1\n"
+"• Полдень (Солнечный полдень): %2\n"
+"• Вечер (Закат): %3\n"
+"• Ночь (Сумерки): %4"
+
+#: contents/ui/config.qml:337
+msgid "System Settings:"
+msgstr "Параметры системы:"
+
+#: contents/ui/config.qml:342
+msgid "Open System Date, Time & Location Settings..."
+msgstr "Открыть параметры даты, времени и местоположения..."
+
+#: contents/ui/config.qml:351
+msgid "Night Light Settings..."
+msgstr "Параметры ночного режима..."
+
+#: contents/ui/config.qml:365
+msgid "Manual Time Periods"
+msgstr "Временные интервалы вручную"
+
+#: contents/ui/config.qml:371
+msgid "Morning starts at:"
+msgstr "Утро начинается в:"
+
+#: contents/ui/config.qml:405
+msgid "Noon starts at:"
+msgstr "Полдень начинается в:"
+
+#: contents/ui/config.qml:439
+msgid "Evening starts at:"
+msgstr "Вечер начинается в:"
+
+#: contents/ui/config.qml:473
+msgid "Night starts at:"
+msgstr "Ночь начинается в:"
+
+#: contents/ui/config.qml:509
+msgid "Images"
+msgstr "Изображения"
+
+#: contents/ui/config.qml:515
+msgid "Morning wallpaper:"
+msgstr "Утренние обои:"
+
+#: contents/ui/config.qml:517
+msgid "Select Morning Wallpaper"
+msgstr "Выбрать утренние обои"
+
+#: contents/ui/config.qml:523
+msgid "Noon wallpaper:"
+msgstr "Дневные обои:"
+
+#: contents/ui/config.qml:525
+msgid "Select Noon Wallpaper"
+msgstr "Выбрать дневные обои"
+
+#: contents/ui/config.qml:531
+msgid "Evening wallpaper:"
+msgstr "Вечерние обои:"
+
+#: contents/ui/config.qml:533
+msgid "Select Evening Wallpaper"
+msgstr "Выбрать вечерние обои"
+
+#: contents/ui/config.qml:539
+msgid "Night wallpaper:"
+msgstr "Ночные обои:"
+
+#: contents/ui/config.qml:541
+msgid "Select Night Wallpaper"
+msgstr "Выбрать ночные обои"
+
+#: contents/ui/config.qml:549
+msgid "Appearance"
+msgstr "Оформление"
+
+#: contents/ui/config.qml:554
+msgid "Fill Mode:"
+msgstr "Режим заполнения:"
+
+#: contents/ui/config.qml:556
+msgid "Scaled (Stretch)"
+msgstr "Растянуть"
+
+#: contents/ui/config.qml:557
+msgid "Zoom / Crop (Preserve Aspect Ratio)"
+msgstr "Масштабировать и обрезать (Сохранять пропорции)"
+
+#: contents/ui/config.qml:558
+msgid "Fit (Preserve Aspect Ratio)"
+msgstr "Вписать (Сохранять пропорции)"
+
+#: contents/ui/config.qml:566
+msgid "Background color:"
+msgstr "Цвет фона:"
+
+#: contents/ui/config.qml:572 contents/ui/config.qml:595
+msgid "Select Background Color"
+msgstr "Выбрать цвет фона"
+
+#: contents/ui/config.qml:605
+msgid "Transition duration:"
+msgstr "Длительность перехода:"
+
+#: contents/ui/config.qml:619
+msgid "ms"
+msgstr "мс"
+
+#: contents/ui/config.qml:628
+msgid "Reset"
+msgstr "Сброс"
+
+#: contents/ui/config.qml:632
+msgid "Defaults:"
+msgstr "По умолчанию:"
+
+#: contents/ui/config.qml:636
+msgid "Restore Default Configuration"
+msgstr "Восстановить настройки по умолчанию"
+
+#: contents/ui/main.qml:96
+msgid "Previewing: %1 (Forced)"
+msgstr "Предпросмотр: %1 (Вручную)"
+
+#: contents/ui/main.qml:103
+msgid "Current cycle: %1 (%2 - %3)"
+msgstr "Текущий цикл: %1 (%2 - %3)"
+
+#: contents/ui/main.qml:116 contents/ui/main.qml:128 contents/ui/main.qml:140
+#: contents/ui/main.qml:152
+msgid "Preview: %1"
+msgstr "Предпросмотр: %1"
+
+#: contents/ui/main.qml:164
+msgid "Resume automatic cycle"
+msgstr "Возобновить автоматический цикл"
+
+#: contents/ui/main.qml:173
+msgid "Update Dynamic Wallpaper"
+msgstr "Обновить динамические обои"
+
+#: contents/ui/TimeUtils.js:371
+msgid "Morning"
+msgstr "Утро"
+
+#: contents/ui/TimeUtils.js:373
+msgid "Noon"
+msgstr "Полдень"
+
+#: contents/ui/TimeUtils.js:375
+msgid "Evening"
+msgstr "Вечер"
+
+#: contents/ui/TimeUtils.js:377
+msgid "Night"
+msgstr "Ночь"

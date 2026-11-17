@@ -1,0 +1,223 @@
+# Ukrainian translations for cc.qalpuch.dynamicdaynight package.
+# Copyright (C) 2026 Q300Z
+# This file is distributed under the same license as the cc.qalpuch.dynamicdaynight package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cc.qalpuch.dynamicdaynight 1.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-17 15:13+0100\n"
+"PO-Revision-Date: 2026-11-17 15:18+0100\n"
+"Last-Translator: Plasma Developer <contact@kde.org>\n"
+"Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: contents/ui/config.qml:192 contents/ui/config.qml:230
+msgid "Click to enlarge"
+msgstr "Натисніть, щоб збільшити"
+
+#: contents/ui/config.qml:240 contents/ui/config.qml:261
+msgid "Default"
+msgstr "Типово"
+
+#: contents/ui/config.qml:254
+msgid "Browse..."
+msgstr "Огляд..."
+
+#: contents/ui/config.qml:274
+msgid "Image Files (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+msgstr "Файли зображень (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+
+#: contents/ui/config.qml:275
+msgid "All Files (*)"
+msgstr "Усі файли (*)"
+
+#: contents/ui/config.qml:294
+msgid "Schedule Mode"
+msgstr "Режим розкладу"
+
+#: contents/ui/config.qml:306
+msgid "Current period: %1 (%2)"
+msgstr "Поточний період: %1 (%2)"
+
+#: contents/ui/config.qml:314
+msgid "Solar detection:"
+msgstr "Сонячний розрахунок:"
+
+#: contents/ui/config.qml:315
+msgid ""
+"Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)"
+msgstr ""
+"Автоматично обчислювати час перемикання (Схід сонця, Сонячний полудень, "
+"Захід сонця, Сутінки)"
+
+#: contents/ui/config.qml:327
+msgid ""
+"Today's calculated times:\n"
+"• Morning (Sunrise): %1\n"
+"• Noon (Solar Noon): %2\n"
+"• Evening (Sunset): %3\n"
+"• Night (Dusk): %4"
+msgstr ""
+"Обчислений час на сьогодні:\n"
+"• Ранок (Схід сонця): %1\n"
+"• Полудень (Сонячний полудень): %2\n"
+"• Вечір (Захід сонця): %3\n"
+"• Ніч (Сутінки): %4"
+
+#: contents/ui/config.qml:337
+msgid "System Settings:"
+msgstr "Системні параметри:"
+
+#: contents/ui/config.qml:342
+msgid "Open System Date, Time & Location Settings..."
+msgstr "Відкрити параметри дати, часу та розташування..."
+
+#: contents/ui/config.qml:351
+msgid "Night Light Settings..."
+msgstr "Параметри нічного режиму..."
+
+#: contents/ui/config.qml:365
+msgid "Manual Time Periods"
+msgstr "Ручні часові інтервали"
+
+#: contents/ui/config.qml:371
+msgid "Morning starts at:"
+msgstr "Ранок починається о:"
+
+#: contents/ui/config.qml:405
+msgid "Noon starts at:"
+msgstr "Полудень починається о:"
+
+#: contents/ui/config.qml:439
+msgid "Evening starts at:"
+msgstr "Вечір починається о:"
+
+#: contents/ui/config.qml:473
+msgid "Night starts at:"
+msgstr "Ніч починається о:"
+
+#: contents/ui/config.qml:509
+msgid "Images"
+msgstr "Зображення"
+
+#: contents/ui/config.qml:515
+msgid "Morning wallpaper:"
+msgstr "Ранкові шпалери:"
+
+#: contents/ui/config.qml:517
+msgid "Select Morning Wallpaper"
+msgstr "Вибрати ранкові шпалери"
+
+#: contents/ui/config.qml:523
+msgid "Noon wallpaper:"
+msgstr "Денні шпалери:"
+
+#: contents/ui/config.qml:525
+msgid "Select Noon Wallpaper"
+msgstr "Вибрати денні шпалери"
+
+#: contents/ui/config.qml:531
+msgid "Evening wallpaper:"
+msgstr "Вечірні шпалери:"
+
+#: contents/ui/config.qml:533
+msgid "Select Evening Wallpaper"
+msgstr "Вибрати вечірні шпалери"
+
+#: contents/ui/config.qml:539
+msgid "Night wallpaper:"
+msgstr "Нічні шпалери:"
+
+#: contents/ui/config.qml:541
+msgid "Select Night Wallpaper"
+msgstr "Вибрати нічні шпалери"
+
+#: contents/ui/config.qml:549
+msgid "Appearance"
+msgstr "Вигляд"
+
+#: contents/ui/config.qml:554
+msgid "Fill Mode:"
+msgstr "Режим заповнення:"
+
+#: contents/ui/config.qml:556
+msgid "Scaled (Stretch)"
+msgstr "Масштабовано (Розтягнути)"
+
+#: contents/ui/config.qml:557
+msgid "Zoom / Crop (Preserve Aspect Ratio)"
+msgstr "Збільшення / Обрізання (Зберегти пропорції)"
+
+#: contents/ui/config.qml:558
+msgid "Fit (Preserve Aspect Ratio)"
+msgstr "Вписати (Зберегти пропорції)"
+
+#: contents/ui/config.qml:566
+msgid "Background color:"
+msgstr "Колір тла:"
+
+#: contents/ui/config.qml:572 contents/ui/config.qml:595
+msgid "Select Background Color"
+msgstr "Вибрати колір тла"
+
+#: contents/ui/config.qml:605
+msgid "Transition duration:"
+msgstr "Тривалість переходу:"
+
+#: contents/ui/config.qml:619
+msgid "ms"
+msgstr "мс"
+
+#: contents/ui/config.qml:628
+msgid "Reset"
+msgstr "Скидання"
+
+#: contents/ui/config.qml:632
+msgid "Defaults:"
+msgstr "Типові:"
+
+#: contents/ui/config.qml:636
+msgid "Restore Default Configuration"
+msgstr "Відновити типові налаштування"
+
+#: contents/ui/main.qml:96
+msgid "Previewing: %1 (Forced)"
+msgstr "Перегляд: %1 (Примусово)"
+
+#: contents/ui/main.qml:103
+msgid "Current cycle: %1 (%2 - %3)"
+msgstr "Поточний цикл: %1 (%2 - %3)"
+
+#: contents/ui/main.qml:116 contents/ui/main.qml:128 contents/ui/main.qml:140
+#: contents/ui/main.qml:152
+msgid "Preview: %1"
+msgstr "Перегляд: %1"
+
+#: contents/ui/main.qml:164
+msgid "Resume automatic cycle"
+msgstr "Відновити автоматичний цикл"
+
+#: contents/ui/main.qml:173
+msgid "Update Dynamic Wallpaper"
+msgstr "Оновити динамічні шпалери"
+
+#: contents/ui/TimeUtils.js:371
+msgid "Morning"
+msgstr "Ранок"
+
+#: contents/ui/TimeUtils.js:373
+msgid "Noon"
+msgstr "Полудень"
+
+#: contents/ui/TimeUtils.js:375
+msgid "Evening"
+msgstr "Вечір"
+
+#: contents/ui/TimeUtils.js:377
+msgid "Night"
+msgstr "Ніч"

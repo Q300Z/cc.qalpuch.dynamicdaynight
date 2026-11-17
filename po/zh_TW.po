@@ -1,0 +1,221 @@
+# Traditional Chinese translations for cc.qalpuch.dynamicdaynight package.
+# Copyright (C) 2026 Q300Z
+# This file is distributed under the same license as the cc.qalpuch.dynamicdaynight package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cc.qalpuch.dynamicdaynight 1.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-17 15:13+0100\n"
+"PO-Revision-Date: 2026-11-17 15:18+0100\n"
+"Last-Translator: Plasma Developer <contact@kde.org>\n"
+"Language-Team: Chinese (Traditional) <kde-i18n-zh_TW@kde.org>\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: contents/ui/config.qml:192 contents/ui/config.qml:230
+msgid "Click to enlarge"
+msgstr "點擊放大"
+
+#: contents/ui/config.qml:240 contents/ui/config.qml:261
+msgid "Default"
+msgstr "預設"
+
+#: contents/ui/config.qml:254
+msgid "Browse..."
+msgstr "瀏覽..."
+
+#: contents/ui/config.qml:274
+msgid "Image Files (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+msgstr "影像檔案 (*.png *.jpg *.jpeg *.webp *.avif *.svg)"
+
+#: contents/ui/config.qml:275
+msgid "All Files (*)"
+msgstr "所有檔案 (*)"
+
+#: contents/ui/config.qml:294
+msgid "Schedule Mode"
+msgstr "排程模式"
+
+#: contents/ui/config.qml:306
+msgid "Current period: %1 (%2)"
+msgstr "目前時段：%1 (%2)"
+
+#: contents/ui/config.qml:314
+msgid "Solar detection:"
+msgstr "太陽位置偵測："
+
+#: contents/ui/config.qml:315
+msgid ""
+"Calculate switch times automatically (Sunrise, Solar Noon, Sunset, Dusk)"
+msgstr "自動計算切換時間（日出、正午、日落、黃昏）"
+
+#: contents/ui/config.qml:327
+msgid ""
+"Today's calculated times:\n"
+"• Morning (Sunrise): %1\n"
+"• Noon (Solar Noon): %2\n"
+"• Evening (Sunset): %3\n"
+"• Night (Dusk): %4"
+msgstr ""
+"今日計算時間：\n"
+"• 早晨（日出）：%1\n"
+"• 中午（正午）：%2\n"
+"• 傍晚（日落）：%3\n"
+"• 夜晚（黃昏）：%4"
+
+#: contents/ui/config.qml:337
+msgid "System Settings:"
+msgstr "系統設定："
+
+#: contents/ui/config.qml:342
+msgid "Open System Date, Time & Location Settings..."
+msgstr "開啟系統日期、時間與位置設定..."
+
+#: contents/ui/config.qml:351
+msgid "Night Light Settings..."
+msgstr "夜覽模式設定..."
+
+#: contents/ui/config.qml:365
+msgid "Manual Time Periods"
+msgstr "手動時間段"
+
+#: contents/ui/config.qml:371
+msgid "Morning starts at:"
+msgstr "早晨開始時間："
+
+#: contents/ui/config.qml:405
+msgid "Noon starts at:"
+msgstr "中午開始時間："
+
+#: contents/ui/config.qml:439
+msgid "Evening starts at:"
+msgstr "傍晚開始時間："
+
+#: contents/ui/config.qml:473
+msgid "Night starts at:"
+msgstr "夜晚開始時間："
+
+#: contents/ui/config.qml:509
+msgid "Images"
+msgstr "影像"
+
+#: contents/ui/config.qml:515
+msgid "Morning wallpaper:"
+msgstr "早晨桌布："
+
+#: contents/ui/config.qml:517
+msgid "Select Morning Wallpaper"
+msgstr "選擇早晨桌布"
+
+#: contents/ui/config.qml:523
+msgid "Noon wallpaper:"
+msgstr "中午桌布："
+
+#: contents/ui/config.qml:525
+msgid "Select Noon Wallpaper"
+msgstr "選擇中午桌布"
+
+#: contents/ui/config.qml:531
+msgid "Evening wallpaper:"
+msgstr "傍晚桌布："
+
+#: contents/ui/config.qml:533
+msgid "Select Evening Wallpaper"
+msgstr "選擇傍晚桌布"
+
+#: contents/ui/config.qml:539
+msgid "Night wallpaper:"
+msgstr "夜晚桌布："
+
+#: contents/ui/config.qml:541
+msgid "Select Night Wallpaper"
+msgstr "選擇夜晚桌布"
+
+#: contents/ui/config.qml:549
+msgid "Appearance"
+msgstr "外觀"
+
+#: contents/ui/config.qml:554
+msgid "Fill Mode:"
+msgstr "填滿模式："
+
+#: contents/ui/config.qml:556
+msgid "Scaled (Stretch)"
+msgstr "縮放（延展）"
+
+#: contents/ui/config.qml:557
+msgid "Zoom / Crop (Preserve Aspect Ratio)"
+msgstr "縮放 / 裁剪（保留長寬比）"
+
+#: contents/ui/config.qml:558
+msgid "Fit (Preserve Aspect Ratio)"
+msgstr "符合（保留長寬比）"
+
+#: contents/ui/config.qml:566
+msgid "Background color:"
+msgstr "背景顏色："
+
+#: contents/ui/config.qml:572 contents/ui/config.qml:595
+msgid "Select Background Color"
+msgstr "選擇背景顏色"
+
+#: contents/ui/config.qml:605
+msgid "Transition duration:"
+msgstr "轉場時間："
+
+#: contents/ui/config.qml:619
+msgid "ms"
+msgstr "毫秒"
+
+#: contents/ui/config.qml:628
+msgid "Reset"
+msgstr "重設"
+
+#: contents/ui/config.qml:632
+msgid "Defaults:"
+msgstr "預設值："
+
+#: contents/ui/config.qml:636
+msgid "Restore Default Configuration"
+msgstr "還原預設設定"
+
+#: contents/ui/main.qml:96
+msgid "Previewing: %1 (Forced)"
+msgstr "預覽：%1（強制）"
+
+#: contents/ui/main.qml:103
+msgid "Current cycle: %1 (%2 - %3)"
+msgstr "目前週期：%1 (%2 - %3)"
+
+#: contents/ui/main.qml:116 contents/ui/main.qml:128 contents/ui/main.qml:140
+#: contents/ui/main.qml:152
+msgid "Preview: %1"
+msgstr "預覽：%1"
+
+#: contents/ui/main.qml:164
+msgid "Resume automatic cycle"
+msgstr "恢復自動週期"
+
+#: contents/ui/main.qml:173
+msgid "Update Dynamic Wallpaper"
+msgstr "更新動態桌布"
+
+#: contents/ui/TimeUtils.js:371
+msgid "Morning"
+msgstr "早晨"
+
+#: contents/ui/TimeUtils.js:373
+msgid "Noon"
+msgstr "中午"
+
+#: contents/ui/TimeUtils.js:375
+msgid "Evening"
+msgstr "傍晚"
+
+#: contents/ui/TimeUtils.js:377
+msgid "Night"
+msgstr "夜晚"
